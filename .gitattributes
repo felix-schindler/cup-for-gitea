@@ -1,0 +1,10 @@
+# Default values
+* text=auto
+* eol=lf
+*.bat text eol=crlf
+
+# For binary files, you may add:
+# *.jpg binary
+
+# For large files, you may add:
+*.png filter=lfs diff=lfs merge=lfs -text
