@@ -8,25 +8,33 @@
 import SwiftUI
 
 struct SettingsView: View {
+	@AppStorage("counter") var counter = 1
 	@Binding var appearance: String
 
 	var body: some View {
 		Form {
-			Picker("Appearance", selection: $appearance) {
-				Text("System").tag("")
-				Text("Light").tag("light")
-				Text("Dark").tag("dark")
+			Section {
+				Picker("Appearance", selection: $appearance) {
+					Text("System").tag("")
+					Text("Light").tag("light")
+					Text("Dark").tag("dark")
+				}
 			}
-			if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
-				let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-			{
-				Text("Version \(version) (\(buildNumber))")
+
+			Section {
+
+				if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+					Button("Version \(version) (\(counter))") {
+						counter += 1
+					}.foregroundStyle(.foreground)
+				}
+
+				HStack {
+					PlatformHeartView()
+					Text("Powered by [Skip](https://skip.dev)")
+				}
 			}
-			HStack {
-				PlatformHeartView()
-				Text("Powered by [Skip](https://skip.dev)")
-			}
-		}
+		}.navigationTitle("Settings")
 	}
 }
 
