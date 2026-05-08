@@ -5,6 +5,7 @@
 //  Created by Felix Schindler on 08.05.26.
 //
 
+import SkipKit
 import SwiftUI
 
 struct SettingsView: View {
@@ -22,6 +23,9 @@ struct SettingsView: View {
 			}
 
 			Section {
+				NavigationLink("Bill of Materials") {
+					SBOMView(bundle: .module)
+				}
 
 				if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
 					Button("Version \(version) (\(counter))") {

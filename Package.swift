@@ -13,6 +13,7 @@ let package = Package(
 	dependencies: [
 		.package(url: "https://source.skip.tools/skip.git", from: "1.8.13"),
 		.package(url: "https://source.skip.tools/skip-fuse-ui.git", from: "1.15.0"),
+		.package(url: "https://source.skip.dev/skip-kit.git", from: "1.0.3"),
 		.package(url: "https://github.com/apple/swift-openapi-generator", from: "1.12.0"),
 		.package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
 		.package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
@@ -30,7 +31,11 @@ let package = Package(
 			name: "Cup",
 			dependencies: [
 				.product(name: "SkipFuseUI", package: "skip-fuse-ui"),
+				.product(name: "SkipKit", package: "skip-kit"),
 				.target(name: "GiteaAPI"),
-			], resources: [.process("Resources")], plugins: [.plugin(name: "skipstone", package: "skip")]),
+			],
+			resources: [.process("Resources")],
+			plugins: [.plugin(name: "skipstone", package: "skip")]
+		),
 	]
 )

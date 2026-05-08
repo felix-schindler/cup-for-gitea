@@ -1,0 +1,1016 @@
+{
+  "creationInfo" : {
+    "created" : "2026-05-08T22:51:14Z",
+    "creators" : [
+      "Tool: skip-sbom"
+    ],
+    "licenseListVersion" : "3.22"
+  },
+  "dataLicense" : "CC0-1.0",
+  "documentNamespace" : "https://skip.dev/spdx/cup-gitea/ios",
+  "name" : "cup-gitea-ios",
+  "packages" : [
+    {
+      "downloadLocation" : "NOASSERTION",
+      "filesAnalyzed" : false,
+      "name" : "cup-gitea",
+      "primaryPackagePurpose" : "APPLICATION",
+      "SPDXID" : "SPDXRef-Package-cup-gitea",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "source"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/swift-server/async-http-client.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/swift-server/async-http-client.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "async-http-client",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-async-http-client",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.33.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/mattpolzin/OpenAPIKit",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/mattpolzin/OpenAPIKit",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MIT",
+      "licenseDeclared" : "MIT",
+      "name" : "openapikit",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-openapikit",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "3.9.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.8.13"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-android-bridge.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-android-bridge.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "licenseDeclared" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "name" : "skip-android-bridge",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-android-bridge",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "0.6.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-bridge.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-bridge.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "licenseDeclared" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "name" : "skip-bridge",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-bridge",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "0.16.7"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-foundation.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-foundation.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-foundation",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-foundation",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.4.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-fuse.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-fuse.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "licenseDeclared" : "LGPL-3.0-only WITH LGPL-3.0-linking-exception",
+      "name" : "skip-fuse",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-fuse",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.0.2"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-fuse-ui.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-fuse-ui.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-fuse-ui",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-fuse-ui",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.15.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-lib.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-lib.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-lib",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-lib",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.4.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-model.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-model.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-model",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-model",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.7.3"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-ui.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-ui.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-ui",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-ui",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.53.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/skip-unit.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/skip-unit.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-unit",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-unit",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.6.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-algorithms",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-algorithms",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-algorithms",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-algorithms",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.2.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/swift-android-native.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/swift-android-native.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-android-native",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-android-native",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.5.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-argument-parser",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-argument-parser",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-argument-parser",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-argument-parser",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.7.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-asn1.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-asn1.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-asn1",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-asn1",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.7.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-async-algorithms.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-async-algorithms.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-async-algorithms",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-async-algorithms",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.1.3"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-atomics.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-atomics.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-atomics",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-atomics",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.3.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-certificates.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-certificates.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-certificates",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-certificates",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.19.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-collections",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-collections",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-collections",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-collections",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.5.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-configuration.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-configuration.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-configuration",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-configuration",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.2.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-crypto.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-crypto.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-crypto",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-crypto",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "4.5.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-distributed-tracing.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-distributed-tracing.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-distributed-tracing",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-distributed-tracing",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.4.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-http-structured-headers.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-http-structured-headers.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-http-structured-headers",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-http-structured-headers",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.7.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-http-types",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-http-types",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-http-types",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-http-types",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.5.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.tools/swift-jni.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.tools/swift-jni.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-jni",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-jni",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "0.5.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-log.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-log.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-log",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-log",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.12.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-nio.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-nio.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-nio",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-nio",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "2.99.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-nio-extras.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-nio-extras.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-nio-extras",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-nio-extras",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.34.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-nio-http2.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-nio-http2.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-nio-http2",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-nio-http2",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.43.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-nio-ssl.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-nio-ssl.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-nio-ssl",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-nio-ssl",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "2.37.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-nio-transport-services.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-nio-transport-services.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-nio-transport-services",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-nio-transport-services",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.28.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-numerics.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-numerics.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-numerics",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-numerics",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.1.1"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/swift-server/swift-openapi-async-http-client",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/swift-server/swift-openapi-async-http-client",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-openapi-async-http-client",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-openapi-async-http-client",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.5.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-openapi-generator",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-openapi-generator",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-openapi-generator",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-openapi-generator",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.12.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-openapi-runtime",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-openapi-runtime",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-openapi-runtime",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-openapi-runtime",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.11.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-openapi-urlsession",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-openapi-urlsession",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-openapi-urlsession",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-openapi-urlsession",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.3.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-service-context.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-service-context.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-service-context",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-service-context",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.3.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/swift-server/swift-service-lifecycle",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/swift-server/swift-service-lifecycle",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-service-lifecycle",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-service-lifecycle",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "2.11.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/apple/swift-system",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/apple/swift-system",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "Apache-2.0",
+      "licenseDeclared" : "Apache-2.0",
+      "name" : "swift-system",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-swift-system",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.6.4"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://github.com/jpsim/Yams",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://github.com/jpsim/Yams",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MIT",
+      "licenseDeclared" : "MIT",
+      "name" : "yams",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-yams",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "6.2.1"
+    }
+  ],
+  "relationships" : [
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-cup-gitea",
+      "relationshipType" : "DESCRIBES",
+      "spdxElementId" : "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-async-http-client",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-openapikit",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-android-bridge",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-bridge",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-foundation",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-fuse",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-fuse-ui",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-lib",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-model",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-ui",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-unit",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-algorithms",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-android-native",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-argument-parser",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-asn1",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-async-algorithms",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-atomics",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-certificates",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-collections",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-configuration",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-crypto",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-distributed-tracing",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-http-structured-headers",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-http-types",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-jni",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-log",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-nio",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-nio-extras",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-nio-http2",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-nio-ssl",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-nio-transport-services",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-numerics",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-openapi-async-http-client",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-openapi-generator",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-openapi-runtime",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-openapi-urlsession",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-service-context",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-service-lifecycle",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-swift-system",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-yams",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    }
+  ],
+  "SPDXID" : "SPDXRef-DOCUMENT",
+  "spdxVersion" : "SPDX-2.3"
+}
