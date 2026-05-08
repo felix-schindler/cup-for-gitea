@@ -3,9 +3,9 @@
 import PackageDescription
 
 let package = Package(
-    platforms: [.iOS(.v17), .macOS(.v14)],
 	name: "cup-gitea",
 	defaultLocalization: "en",
+	platforms: [.iOS(.v16), .macOS(.v13)],
 	products: [
 		.library(name: "Cup", type: .dynamic, targets: ["Cup"]),
 		.library(name: "GiteaAPI", type: .dynamic, targets: ["GiteaAPI"]),
