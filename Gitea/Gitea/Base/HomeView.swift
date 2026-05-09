@@ -5,8 +5,6 @@
 //  Created by Felix Schindler on 08.05.26.
 //
 
-import GiteaAPI
-import SkipKit
 import SwiftUI
 
 struct HomeView: View {
@@ -61,8 +59,7 @@ struct HomeView: View {
 		}.toolbar {
 			Button("Notifications", systemImage: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue) {
 				showNotifications = true
-				HapticFeedback.play(.pick)
-			}
+			}.sensoryFeedback(.selection, trigger: showNotifications)
 		}.sheet(isPresented: $showNotifications, onDismiss: { showNotifications = false }) {
 			NavigationStack {
 				NotificationLoader()

@@ -5,7 +5,6 @@
 //  Created by Felix Schindler on 09.05.26.
 //
 
-import GiteaAPI
 import SwiftUI
 
 struct HeaderRepoView: View {
