@@ -5,31 +5,72 @@
 //  Created by Felix Schindler on 08.05.26.
 //
 
+import GiteaAPI
+import SkipKit
 import SwiftUI
 
 struct HomeView: View {
 	@State var showNotifications = false
+	@State var showNotificationsBadge = false
+	@State var starredRepos: Result<[Components.Schemas.Repository], Error>?
+
+	private func load() async {
+		if let count = try? await Network.shared.client.notifyNewAvailable().ok.body.json.new, count > 0 {
+			showNotificationsBadge = true
+		}
+
+		do {
+			let repos = try await Network.shared.client.userCurrentListStarred().ok.body.json
+			starredRepos = .success(repos)
+		} catch {
+			starredRepos = .failure(error)
+		}
+	}
 
 	var body: some View {
 		List {
 			Section("Your work") {
-				Text("Issues")
-				Text("Pull Requests")
-				Text("Milestones")
-				NavigationLink("Repositories") {
-					UserReposLoader()
+				Label("Issues", systemImage: Icons.issues.rawValue)
+				Label("Pull Requests", systemImage: Icons.pull_requests.rawValue)
+				Label("Milestones", systemImage: Icons.milestones.rawValue)
+				NavigationLink(destination: UserReposLoader()) {
+					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
-				Text("Organizations")
-				Text("Starred")
-				Text("Subscriptions")
-				Text("Gitea settings")
+				Label("Organizations", systemImage: Icons.organizations.rawValue)
+				Label("Subscriptions", systemImage: Icons.subscriptions.rawValue)
+			}
+
+			Section("Starred repositories") {
+				if let starredRepos {
+					switch starredRepos {
+					case .success(let success):
+						if success.isEmpty {
+							NoContentView("You don't have starred repositories", systemImage: Icons.starred.rawValue)
+						} else {
+							ForEach(success, id: \.id!) { repo in
+								SmallRepoView(repo)
+							}
+						}
+					case .failure(let failure):
+						FailedView(failure)
+					}
+				} else {
+					LoadingView("Loading starred repositories", systemImage: Icons.starred.rawValue)
+				}
 			}
 		}.toolbar {
-			Button("Notifications", systemImage: "bell") {
+			Button("Notifications", systemImage: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue) {
 				showNotifications = true
+				HapticFeedback.play(.pick)
 			}
 		}.sheet(isPresented: $showNotifications, onDismiss: { showNotifications = false }) {
-			Text("Notifications")
+			NavigationStack {
+				NotificationLoader()
+			}
+		}.task {
+			await load()
+		}.refreshable {
+			await load()
 		}.navigationTitle("Home")
 	}
 }
