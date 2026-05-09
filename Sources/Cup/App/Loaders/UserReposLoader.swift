@@ -9,6 +9,7 @@ import GiteaAPI
 import SwiftUI
 
 struct UserReposLoader: View {
+	private let icon = Icons.repositories.rawValue
 	@State var repos: Result<[Components.Schemas.Repository], Error>?
 
 	private func loadRepos() async {
@@ -26,14 +27,18 @@ struct UserReposLoader: View {
 			if let repos {
 				switch repos {
 				case .success(let success):
-					ForEach(success, id: \.id!) { repo in
-						SmallRepoView(repo)
+					if success.isEmpty {
+						NoContentView("There are no Repositories", systemImage: icon)
+					} else {
+						ForEach(success, id: \.id!) { repo in
+							SmallRepoView(repo)
+						}
 					}
 				case .failure(let failure):
 					FailedView(failure)
 				}
 			} else {
-				LoadingView("Loading Repositories", systemImage: "app.gift.fill")
+				LoadingView("Loading Repositories", systemImage: icon)
 			}
 		}.onAppear {
 			Task {
