@@ -1,6 +1,6 @@
 {
   "creationInfo" : {
-    "created" : "2026-05-08T22:51:14Z",
+    "created" : "2026-05-09T17:27:22Z",
     "creators" : [
       "Tool: skip-sbom"
     ],
@@ -170,6 +170,25 @@
       "SPDXID" : "SPDXRef-Package-skip-fuse-ui",
       "supplier" : "NOASSERTION",
       "versionInfo" : "1.15.0"
+    },
+    {
+      "copyrightText" : "NOASSERTION",
+      "downloadLocation" : "https://source.skip.dev/skip-kit.git",
+      "externalRefs" : [
+        {
+          "referenceCategory" : "PACKAGE-MANAGER",
+          "referenceLocator" : "https://source.skip.dev/skip-kit.git",
+          "referenceType" : "swiftpm"
+        }
+      ],
+      "filesAnalyzed" : false,
+      "licenseConcluded" : "MPL-2.0",
+      "licenseDeclared" : "MPL-2.0",
+      "name" : "skip-kit",
+      "primaryPackagePurpose" : "LIBRARY",
+      "SPDXID" : "SPDXRef-Package-skip-kit",
+      "supplier" : "NOASSERTION",
+      "versionInfo" : "1.0.3"
     },
     {
       "copyrightText" : "NOASSERTION",
@@ -842,6 +861,11 @@
     },
     {
       "relatedSpdxElement" : "SPDXRef-Package-skip-fuse-ui",
+      "relationshipType" : "DEPENDS_ON",
+      "spdxElementId" : "SPDXRef-Package-cup-gitea"
+    },
+    {
+      "relatedSpdxElement" : "SPDXRef-Package-skip-kit",
       "relationshipType" : "DEPENDS_ON",
       "spdxElementId" : "SPDXRef-Package-cup-gitea"
     },
