@@ -19,7 +19,6 @@ public final class GiteaClient: Sendable {
 		self.token = token
 
 		let transport: any ClientTransport
-		var middlewares: [any ClientMiddleware] = []
 
 		if let token {
 			let urlSessionConfig = URLSessionConfiguration.default
