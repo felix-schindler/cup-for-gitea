@@ -1,1 +1,1 @@
-swift format -irp --configuration ./format.json ./Sources ./Package.swift
+swift format -irp --configuration ./format.json ./Gitea/Gitea

@@ -7,14 +7,6 @@
 # macOS
 .DS_Store
 
-# gradle properties
-local.properties
-.gradle/
-.android/
-.kotlin/
-Android/app/keystore.jks
-Android/app/keystore.properties
-
 xcodebuild*.log
 
 default.profraw
@@ -64,13 +56,3 @@ Packages/
 Package.pins
 Package.resolved
 #*.xcodeproj
-
-Carthage/Build/
-
-# fastlane
-
-**/fastlane/apikey.json
-**/fastlane/report.xml
-**/fastlane/README.md
-**/fastlane/Preview.html
-**/fastlane/test_output
