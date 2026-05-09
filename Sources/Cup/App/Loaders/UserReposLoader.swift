@@ -12,7 +12,7 @@ struct UserReposLoader: View {
 	private let icon = Icons.repositories.rawValue
 	@State var repos: Result<[Components.Schemas.Repository], Error>?
 
-	private func loadRepos() async {
+	private func load() async {
 		do {
 			let repos = try await Network.shared.client.userCurrentListRepos().ok.body.json
 			self.repos = .success(repos)
@@ -40,10 +40,10 @@ struct UserReposLoader: View {
 			} else {
 				LoadingView("Loading Repositories", systemImage: icon)
 			}
-		}.onAppear {
-			Task {
-				await loadRepos()
-			}
+		}.task {
+			await load()
+		}.refreshable {
+			await load()
 		}.navigationTitle("Repositories")
 	}
 }

@@ -16,10 +16,16 @@ struct SmallRepoView: View {
 	}
 
 	var body: some View {
-		VStack(alignment: .leading) {
-			if let name = repo.name {
-				Text(name)
-			}
-		}
+		NavigationLink(
+			destination: {
+				FullRepoView(repo)
+			},
+			label: {
+				VStack(alignment: .leading) {
+					if let name = repo.name {
+						Text(name)
+					}
+				}
+			})
 	}
 }
