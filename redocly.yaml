@@ -1,0 +1,11 @@
+apis:
+  main:
+    root: ./openapi.yaml
+    decorators:
+      local/required-all: on
+
+plugins:
+  - plugins/required-all.js
+
+decorators:
+  local/required-all: on

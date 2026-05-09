@@ -26,10 +26,8 @@ struct FullRepoView: View {
 					title: {
 						HStack {
 							Text("Issues")
-							if let openIssuesCount = repo.openIssuesCount {
-								Spacer()
-								Text("\(openIssuesCount)")
-							}
+							Spacer()
+							Text("\(repo.openIssuesCount)")
 						}
 					},
 					icon: {
@@ -40,10 +38,8 @@ struct FullRepoView: View {
 					title: {
 						HStack {
 							Text("Pull Requests")
-							if let openPrCounter = repo.openPrCounter {
-								Spacer()
-								Text("\(openPrCounter)")
-							}
+							Spacer()
+							Text("\(repo.openPrCounter)")
 						}
 					},
 					icon: {

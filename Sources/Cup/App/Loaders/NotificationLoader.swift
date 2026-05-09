@@ -29,11 +29,9 @@ struct NotificationLoader: View {
 					if success.isEmpty {
 						NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
 					} else {
-						ForEach(success, id: \.id!) { notification in
+						ForEach(success, id: \.id) { notif in
 							VStack {
-								if let url = notification.url {
-									Text(url)
-								}
+								Text(notif.url)
 							}
 						}
 					}

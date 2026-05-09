@@ -22,8 +22,8 @@ struct SmallRepoView: View {
 			},
 			label: {
 				VStack(alignment: .leading) {
-					if let name = repo.name {
-						Text(name)
+					if repo.name.isNotEmpty {
+						Text(repo.name)
 					}
 				}
 			})

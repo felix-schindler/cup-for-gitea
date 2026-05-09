@@ -47,7 +47,7 @@ struct HomeView: View {
 						if success.isEmpty {
 							NoContentView("You don't have starred repositories", systemImage: Icons.starred.rawValue)
 						} else {
-							ForEach(success, id: \.id!) { repo in
+							ForEach(success, id: \.id) { repo in
 								SmallRepoView(repo)
 							}
 						}

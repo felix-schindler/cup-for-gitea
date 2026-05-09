@@ -30,7 +30,7 @@ struct UserReposLoader: View {
 					if success.isEmpty {
 						NoContentView("There are no Repositories", systemImage: icon)
 					} else {
-						ForEach(success, id: \.id!) { repo in
+						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)
 						}
 					}

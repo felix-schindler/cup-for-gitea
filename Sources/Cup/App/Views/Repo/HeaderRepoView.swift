@@ -17,25 +17,19 @@ struct HeaderRepoView: View {
 
 	var body: some View {
 		VStack {
-			if let name = repo.name {
-				Text(name)
+			if repo.name.isNotEmpty {
+				Text(repo.name)
 			}
 
 			HStack {
-				if let owner = repo.owner,
-					let name = owner.fullName ?? owner.login ?? owner.loginName,
-					!name.isEmpty
-				{
-					Text(name)
+				if repo.owner.fullName.isNotEmpty {
+					Text(repo.owner.fullName)
+				} else {
+					Text(repo.owner.login)
 				}
 
-				if let starsCount = repo.starsCount {
-					Text("\(starsCount)")
-				}
-
-				if let forksCount = repo.forksCount {
-					Text("\(forksCount)")
-				}
+				Text("\(repo.starsCount)")
+				Text("\(repo.forksCount)")
 			}
 		}
 	}
