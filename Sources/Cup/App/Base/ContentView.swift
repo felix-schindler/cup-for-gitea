@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum ContentTab: String, Hashable {
-	case home, profile, settings, search
+	case home, explore, profile, search
 }
 
 struct ContentView: View {
@@ -19,21 +19,21 @@ struct ContentView: View {
 		Group {
 			if #available(iOS 26.0, *) {
 				TabView(selection: $tab) {
-					Tab("Home", systemImage: "house.fill", value: ContentTab.home) {
+					Tab("Home", systemImage: Icons.home.rawValue, value: ContentTab.home) {
 						NavigationStack {
 							HomeView()
 						}
 					}
 
-					Tab("Profile", systemImage: "person.fill", value: ContentTab.profile) {
+					Tab("Explore", systemImage: Icons.explore.rawValue, value: ContentTab.explore) {
 						NavigationStack {
-							Text("Profile")
+							ExploreView()
 						}
 					}
 
-					Tab("Settings", systemImage: "gearshape.fill", value: ContentTab.settings) {
+					Tab("Profile", systemImage: Icons.users.rawValue, value: ContentTab.profile) {
 						NavigationStack {
-							SettingsView(appearance: $appearance)
+							CurrentUserLoader(appearance: $appearance)
 						}
 					}
 
@@ -48,26 +48,26 @@ struct ContentView: View {
 					NavigationStack {
 						HomeView()
 					}
-					.tabItem { Label("Home", systemImage: "house.fill") }
+					.tabItem { Label("Home", systemImage: Icons.home.rawValue) }
 					.tag(ContentTab.home)
+
+					NavigationStack {
+						ExploreView()
+					}
+					.tabItem { Label("Explore", systemImage: Icons.explore.rawValue) }
+					.tag(ContentTab.explore)
 
 					NavigationStack {
 						SearchView()
 					}
-					.tabItem { Label("Search", systemImage: "magnifyingglass") }
+					.tabItem { Label("Search", systemImage: Icons.search.rawValue) }
 					.tag(ContentTab.search)
 
 					NavigationStack {
-						Text("Profile")
+						CurrentUserLoader(appearance: $appearance)
 					}
-					.tabItem { Label("Profile", systemImage: "person.fill") }
+					.tabItem { Label("Profile", systemImage: Icons.users.rawValue) }
 					.tag(ContentTab.profile)
-
-					NavigationStack {
-						SettingsView(appearance: $appearance)
-					}
-					.tabItem { Label("Settings", systemImage: "gearshape.fill") }
-					.tag(ContentTab.settings)
 				}
 			}
 		}.preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)
