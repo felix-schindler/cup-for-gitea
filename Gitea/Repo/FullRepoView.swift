@@ -5,8 +5,8 @@
 //  Created by Felix Schindler on 09.05.26.
 //
 
-import SwiftUI
 import OpenAPIRuntime
+import SwiftUI
 import Textual
 
 struct FullRepoView: View {
@@ -20,12 +20,14 @@ struct FullRepoView: View {
 
 	private func load() async {
 		do {
-			let contents = try await Network.shared.client.repoGetRawFile(.init(path: .init(
-				owner: repo.owner.login,
-				repo: repo.name,
-				filepath: "README.md"))
+			let contents = try await Network.shared.client.repoGetRawFile(
+				.init(
+					path: .init(
+						owner: repo.owner.login,
+						repo: repo.name,
+						filepath: "README.md"))
 			).ok.body.plainText
-			
+
 			// Collect the entire HTTP body into a single String, limiting to 2 MB
 			let stringContents = try await String(collecting: contents, upTo: 2 * 1024 * 1024)
 			readmeContents = stringContents
@@ -105,7 +107,7 @@ struct FullRepoView: View {
 							Image(systemName: Icons.pull_requests.rawValue)
 						})
 				}
-				
+
 				DisclosureGroup(
 					content: {
 						Text("Members")
@@ -132,14 +134,16 @@ struct FullRepoView: View {
 				)
 
 				if repo.hasCode {
-					DisclosureGroup(content: {
-						Text("Code")
-						Text("Commits")
-						Text("Branches")
-						Text("Tags")
-					}, label: {
-						Label("Repository", systemImage: Icons.code.rawValue)
-					})
+					DisclosureGroup(
+						content: {
+							Text("Code")
+							Text("Commits")
+							Text("Branches")
+							Text("Tags")
+						},
+						label: {
+							Label("Repository", systemImage: Icons.code.rawValue)
+						})
 				}
 
 				if repo.hasReleases || repo.hasActions || repo.hasPackages {
@@ -161,7 +165,7 @@ struct FullRepoView: View {
 					)
 				}
 			}
-			
+
 			if let readmeContents, readmeContents.isNotEmpty {
 				Section {
 					// TODO: Fix base url — should be host/{owner}/{repo}

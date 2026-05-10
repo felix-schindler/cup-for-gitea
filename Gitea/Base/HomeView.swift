@@ -59,24 +59,32 @@ struct HomeView: View {
 		}.toolbar {
 			HStack {
 				Menu("More", systemImage: "ellipsis") {
-					NavigationLink(destination: NewRepoView(), label: {
-						Label("New Repository", systemImage: "plus")
-					})
-					NavigationLink(destination: NewRepoMigrationView(), label: {
-						Label("New Migration", systemImage: "square.grid.3x1.folder.badge.plus")
-					})
-					NavigationLink(destination: NewOrgaView(), label: {
-						Label("New Organization", systemImage: Icons.organizations.rawValue)
-					})
+					NavigationLink(
+						destination: NewRepoView(),
+						label: {
+							Label("New Repository", systemImage: "plus")
+						})
+					NavigationLink(
+						destination: NewRepoMigrationView(),
+						label: {
+							Label("New Migration", systemImage: "square.grid.3x1.folder.badge.plus")
+						})
+					NavigationLink(
+						destination: NewOrgaView(),
+						label: {
+							Label("New Organization", systemImage: Icons.organizations.rawValue)
+						})
 				}
 
-				Button(action: {
-					showNotifications = true
-					HapticFeedback.play(.light)
-				}, label: {
-					Image(systemName: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue)
-						.symbolRenderingMode(.multicolor)
-				})
+				Button(
+					action: {
+						showNotifications = true
+						HapticFeedback.play(.light)
+					},
+					label: {
+						Image(systemName: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue)
+							.symbolRenderingMode(.multicolor)
+					})
 			}
 		}.sheet(isPresented: $showNotifications, onDismiss: { showNotifications = false }) {
 			NavigationStack {

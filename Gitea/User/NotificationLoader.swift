@@ -12,7 +12,7 @@ enum StatusChange: String {
 	case read = "read"
 	case unread = "unread"
 	case pinned = "pinned"
-	
+
 }
 
 struct NotificationLoader: View {
@@ -68,7 +68,7 @@ struct NotificationLoader: View {
 											}
 										}
 									}
-									
+
 									InlineText(markdown: notif.subject.title.emojized(), baseURL: Network.shared.serverURL)
 										.textual.structuredTextStyle(.gitHub)
 										.textual.textSelection(.enabled)

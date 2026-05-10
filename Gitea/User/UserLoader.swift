@@ -9,11 +9,11 @@ import SwiftUI
 
 struct UserLoader: View {
 	private let username: String?
-	
+
 	init(username: String? = nil) {
 		self.username = username
 	}
-	
+
 	var body: some View {
 		List {
 			NoContentView("Profile", systemImage: Icons.users.rawValue)

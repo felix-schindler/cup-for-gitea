@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NewRepoView: View {
 	@Environment(\.dismiss) private var dismiss
-	
+
 	@State private var name = ""
 	@State private var makePrivate = true
 	@State private var desc = ""
@@ -22,20 +22,24 @@ struct NewRepoView: View {
 
 	private func create() async {
 		do {
-			_ = try await Network.shared.client.createCurrentUserRepo(.init(body: .json(.init(
-				autoInit: initRepo,
-				defaultBranch: defaultBranch,
-				description: desc,
-				//gitignores: <#T##String#>,
-				//issueLabels: <#T##String#>,
-				//license: <#T##String#>,
-				name: name,
-				objectFormatName: objectFormat,
-				_private: makePrivate,
-				//readme: <#T##String#>,
-				//template: <#T##Bool#>,
-				//trustModel: <#T##Components.Schemas.CreateRepoOption.TrustModelPayload#>
-			)))).created
+			_ = try await Network.shared.client.createCurrentUserRepo(
+				.init(
+					body: .json(
+						.init(
+							autoInit: initRepo,
+							defaultBranch: defaultBranch,
+							description: desc,
+							//gitignores: <#T##String#>,
+							//issueLabels: <#T##String#>,
+							//license: <#T##String#>,
+							name: name,
+							objectFormatName: objectFormat,
+							_private: makePrivate,
+							//readme: <#T##String#>,
+							//template: <#T##Bool#>,
+							//trustModel: <#T##Components.Schemas.CreateRepoOption.TrustModelPayload#>
+						)))
+			).created
 
 			HapticFeedback.notify(.success)
 			dismiss()
@@ -43,7 +47,7 @@ struct NewRepoView: View {
 			self.error = error
 		}
 	}
-	
+
 	var body: some View {
 		Form {
 			if let error {
@@ -55,9 +59,11 @@ struct NewRepoView: View {
 			Section {
 				VStack(alignment: .leading) {
 					TextField("Repository Name", text: $name)
-					Text("Good repository names use short, memorable and unique keywords. A repository named \".profile\" or \".profile-private\" could be used to add a README.md for the user/organization profile.")
-						.font(.footnote)
-						.foregroundStyle(.secondary)
+					Text(
+						"Good repository names use short, memorable and unique keywords. A repository named \".profile\" or \".profile-private\" could be used to add a README.md for the user/organization profile."
+					)
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 				}
 
 				VStack(alignment: .leading) {
@@ -85,7 +91,7 @@ struct NewRepoView: View {
 				if (initRepo) {
 				}
 			} */
-			
+
 			Section {
 				VStack(alignment: .leading) {
 					TextField("Default Branch", text: $defaultBranch)
@@ -106,7 +112,7 @@ struct NewRepoView: View {
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
-				
+
 				Toggle("Make repository a template", isOn: $makeTemplate)
 			}
 		}.toolbar {
