@@ -1,17 +1,17 @@
 //
-//  ProjectsLoader.swift
-//  cup-gitea
+//  StarredReposLoader.swift
+//  Gitea
 //
-//  Created by Felix Schindler on 08.05.26.
+//  Created by Felix Schindler on 10.05.26.
 //
 
 import SwiftUI
 
-struct UserReposLoader: View {
+struct StarredReposLoader: View {
 	let username: String?
-	private let icon = Icons.repositories.rawValue
+	private let icon = Icons.starred.rawValue
 	@State private var repos: Result<[Components.Schemas.Repository], Error>?
-
+	
 	init(_ username: String? = nil) {
 		self.username = username
 	}
@@ -20,9 +20,9 @@ struct UserReposLoader: View {
 		do {
 			var repos: [Components.Schemas.Repository]
 			if let username {
-				repos = try await Network.shared.client.userListRepos(path: .init(username: username)).ok.body.json
+				repos = try await Network.shared.client.userListStarred(path: .init(username: username)).ok.body.json
 			} else {
-				repos = try await Network.shared.client.userCurrentListRepos().ok.body.json
+				repos = try await Network.shared.client.userCurrentListStarred().ok.body.json
 			}
 			self.repos = .success(repos)
 		} catch {
@@ -37,7 +37,7 @@ struct UserReposLoader: View {
 				switch repos {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There are no Repositories", systemImage: icon)
+						NoContentView("There are no starred repositories", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)
@@ -47,12 +47,12 @@ struct UserReposLoader: View {
 					FailedView(failure)
 				}
 			} else {
-				LoadingView("Loading Repositories", systemImage: icon)
+				LoadingView("Loading starred Repositories", systemImage: icon)
 			}
 		}.task {
 			await load()
 		}.refreshable {
 			await load()
-		}.navigationTitle("Repositories")
+		}.navigationTitle("Starred Repositories")
 	}
 }

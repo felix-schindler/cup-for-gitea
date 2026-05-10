@@ -9,9 +9,11 @@ import SwiftUI
 
 struct SmallRepoView: View {
 	private let repo: Components.Schemas.Repository
+	private let showFullName: Bool
 
-	init(_ repo: Components.Schemas.Repository) {
+	init(_ repo: Components.Schemas.Repository, showFullName: Bool = false) {
 		self.repo = repo
+		self.showFullName = showFullName
 	}
 
 	var body: some View {
@@ -20,8 +22,14 @@ struct SmallRepoView: View {
 				FullRepoView(repo)
 			},
 			label: {
-				VStack(alignment: .leading) {
-					if repo.name.isNotEmpty {
+				HStack {
+					if let url = URL(string: repo.avatarUrl) {
+						AvatarImage(url, size: .small)
+					}
+
+					if showFullName {
+						Text(repo.fullName)
+					} else {
 						Text(repo.name)
 					}
 				}

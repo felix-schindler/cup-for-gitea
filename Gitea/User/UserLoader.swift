@@ -117,8 +117,12 @@ struct UserLoader: View {
 
 							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
-									Image(systemName: Icons.users.rawValue)
-									Text("\(u.followersCount) Followers · \(u.followingCount) Following")
+									NavigationLink(destination: FollowLoader(u.login, type: .followers)) {
+										PillView("\(u.followersCount) Followers")
+									}
+									NavigationLink(destination: FollowLoader(u.login, type: .following)) {
+										PillView("\(u.followingCount) Following")
+									}
 								}.font(.footnote)
 							}
 
@@ -133,22 +137,26 @@ struct UserLoader: View {
 					}
 
 					Section {
-						Label("Repositories", systemImage: Icons.repositories.rawValue)
+						NavigationLink(destination: UserReposLoader(username), label: {
+							Label("Repositories", systemImage: Icons.repositories.rawValue)
+						})
 						Label("Projects", systemImage: Icons.projects.rawValue)
 						Label("Packages", systemImage: Icons.packages.rawValue)
 						Label("Public Activity", systemImage: Icons.activity.rawValue)
 
-						Label(
-							title: {
-								HStack {
-									Text("Starred Repositories")
-									Spacer()
-									Text(String(u.starredReposCount))
-								}
-							},
-							icon: {
-								Image(systemName: Icons.starred.rawValue)
-							})
+						NavigationLink(destination: StarredReposLoader(username), label: {
+							Label(
+								title: {
+									HStack {
+										Text("Starred Repositories")
+										Spacer()
+										Text(String(u.starredReposCount))
+									}
+								},
+								icon: {
+									Image(systemName: Icons.starred.rawValue)
+								})
+						})
 					}
 				case .failure(let failure):
 					FailedView(failure)
