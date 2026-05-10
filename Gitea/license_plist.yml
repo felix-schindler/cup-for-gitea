@@ -1,0 +1,7 @@
+options:
+  xcworkspacePath: "Gitea.xcworkspace"
+  singlePage: true
+  outputPath: "./Settings.bundle"
+
+spm:
+  - path: "Gitea.xcworkspace/xcshareddata/swiftpm/Package.resolved"

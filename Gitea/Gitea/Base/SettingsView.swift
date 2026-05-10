@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
 	@AppStorage("counter") var counter = 1
-	@Binding var appearance: String
+	@AppStorage("appearance") var appearance: String = ""
 
 	var body: some View {
 		Form {

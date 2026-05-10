@@ -57,9 +57,12 @@ struct HomeView: View {
 				}
 			}
 		}.toolbar {
-			Button("Notifications", systemImage: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue) {
+			Button(action: {
 				showNotifications = true
-			}.sensoryFeedback(.selection, trigger: showNotifications)
+			}, label: {
+				Image(systemName: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue)
+					.symbolRenderingMode(.multicolor)
+			}).sensoryFeedback(.selection, trigger: showNotifications)
 		}.sheet(isPresented: $showNotifications, onDismiss: { showNotifications = false }) {
 			NavigationStack {
 				NotificationLoader()

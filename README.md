@@ -14,3 +14,10 @@ npx swagger2openapi swagger.json --targetVersion 3.0.3 --yaml --resolve --patch 
 npx @redocly/cli@latest bundle openapi.yaml -o openapi.required.yaml
 mv openapi.required.yaml ./Gitea/Gitea/openapi.yaml
 ```
+
+# Licenses
+
+```
+cd Gitea
+license-plist --config-path license_plist.yml
+```

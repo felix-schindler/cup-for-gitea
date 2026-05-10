@@ -17,57 +17,29 @@ struct ContentView: View {
 
 	var body: some View {
 		Group {
-			if #available(iOS 26.0, *) {
-				TabView(selection: $tab) {
-					Tab("Home", systemImage: Icons.home.rawValue, value: ContentTab.home) {
-						NavigationStack {
-							HomeView()
-						}
-					}
-
-					Tab("Explore", systemImage: Icons.explore.rawValue, value: ContentTab.explore) {
-						NavigationStack {
-							ExploreView()
-						}
-					}
-
-					Tab("Profile", systemImage: Icons.users.rawValue, value: ContentTab.profile) {
-						NavigationStack {
-							CurrentUserLoader(appearance: $appearance)
-						}
-					}
-
-					Tab(value: ContentTab.search, role: .search) {
-						NavigationStack {
-							SearchView()
-						}
-					}
-				}
-			} else {
-				TabView(selection: $tab) {
+			TabView(selection: $tab) {
+				Tab("Home", systemImage: Icons.home.rawValue, value: ContentTab.home) {
 					NavigationStack {
 						HomeView()
 					}
-					.tabItem { Label("Home", systemImage: Icons.home.rawValue) }
-					.tag(ContentTab.home)
+				}
 
+				Tab("Explore", systemImage: Icons.explore.rawValue, value: ContentTab.explore) {
 					NavigationStack {
 						ExploreView()
 					}
-					.tabItem { Label("Explore", systemImage: Icons.explore.rawValue) }
-					.tag(ContentTab.explore)
+				}
 
+				Tab("Profile", systemImage: Icons.users.rawValue, value: ContentTab.profile) {
+					NavigationStack {
+						UserLoader()
+					}
+				}
+
+				Tab(value: ContentTab.search, role: .search) {
 					NavigationStack {
 						SearchView()
 					}
-					.tabItem { Label("Search", systemImage: Icons.search.rawValue) }
-					.tag(ContentTab.search)
-
-					NavigationStack {
-						CurrentUserLoader(appearance: $appearance)
-					}
-					.tabItem { Label("Profile", systemImage: Icons.users.rawValue) }
-					.tag(ContentTab.profile)
 				}
 			}
 		}.preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)

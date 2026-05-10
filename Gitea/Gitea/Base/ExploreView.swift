@@ -11,6 +11,6 @@ struct ExploreView: View {
 	var body: some View {
 		List {
 			NoContentView("Explore", systemImage: Icons.explore.rawValue)
-		}.navigationTitle("Explore")
+		}
 	}
 }

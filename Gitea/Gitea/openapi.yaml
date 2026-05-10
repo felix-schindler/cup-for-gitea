@@ -10617,10 +10617,9 @@ paths:
         '200':
           description: Returns raw file content.
           content:
-            application/octet-stream:
+            text/plain:
               schema:
                 type: string
-                format: binary
         '404':
           $ref: '#/components/responses/notFound'
   /repos/{owner}/{repo}/releases:
@@ -22811,11 +22810,8 @@ components:
         - default_branch
         - default_delete_branch_after_merge
         - default_merge_style
-        - default_target_branch
         - description
         - empty
-        - external_tracker
-        - external_wiki
         - fork
         - forks_count
         - full_name
@@ -22831,7 +22827,6 @@ components:
         - id
         - ignore_whitespace_conflicts
         - internal
-        - internal_tracker
         - language
         - languages_url
         - licenses
@@ -22845,12 +22840,9 @@ components:
         - open_pr_counter
         - original_url
         - owner
-        - parent
-        - permissions
         - private
         - projects_mode
         - release_counter
-        - repo_transfer
         - size
         - ssh_url
         - stars_count

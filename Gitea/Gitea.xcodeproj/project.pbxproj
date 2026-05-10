@@ -10,10 +10,15 @@
 		DC3950342FAFE7D900D5984A /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = DC3950332FAFE7D900D5984A /* Textual */; };
 		DC39503C2FAFE94400D5984A /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = DC39503B2FAFE94400D5984A /* OpenAPIRuntime */; };
 		DC39503F2FAFE95500D5984A /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = DC39503E2FAFE95500D5984A /* OpenAPIURLSession */; };
+		DC5C68BD2FAFF7250012D957 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */; };
+		DC5C68C12FAFF7410012D957 /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C68C02FAFF7410012D957 /* Highlightr */; };
+		DC5C6A622FB04B200012D957 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DC5C6A072FB047350012D957 /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DC394FFC2FAFE4BC00D5984A /* Gitea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gitea.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC5C69A42FB042CD0012D957 /* license_plist.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = license_plist.yml; sourceTree = "<group>"; };
+		DC5C6A072FB047350012D957 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -29,7 +34,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC5C68C12FAFF7410012D957 /* Highlightr in Frameworks */,
 				DC39503C2FAFE94400D5984A /* OpenAPIRuntime in Frameworks */,
+				DC5C68BD2FAFF7250012D957 /* CachedAsyncImage in Frameworks */,
 				DC39503F2FAFE95500D5984A /* OpenAPIURLSession in Frameworks */,
 				DC3950342FAFE7D900D5984A /* Textual in Frameworks */,
 			);
@@ -41,8 +48,10 @@
 		DC394FF32FAFE4BC00D5984A = {
 			isa = PBXGroup;
 			children = (
+				DC5C6A072FB047350012D957 /* Settings.bundle */,
 				DC394FFE2FAFE4BC00D5984A /* Gitea */,
 				DC394FFD2FAFE4BC00D5984A /* Products */,
+				DC5C69A42FB042CD0012D957 /* license_plist.yml */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +73,7 @@
 				DC394FF82FAFE4BC00D5984A /* Sources */,
 				DC394FF92FAFE4BC00D5984A /* Frameworks */,
 				DC394FFA2FAFE4BC00D5984A /* Resources */,
+				DC393E242FB0461900D5984A /* Copy Acknowledgements */,
 			);
 			buildRules = (
 			);
@@ -78,6 +88,8 @@
 				DC3950332FAFE7D900D5984A /* Textual */,
 				DC39503B2FAFE94400D5984A /* OpenAPIRuntime */,
 				DC39503E2FAFE95500D5984A /* OpenAPIURLSession */,
+				DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */,
+				DC5C68C02FAFF7410012D957 /* Highlightr */,
 			);
 			productName = Gitea;
 			productReference = DC394FFC2FAFE4BC00D5984A /* Gitea.app */;
@@ -113,6 +125,8 @@
 				DC39503A2FAFE94400D5984A /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
 				DC39503D2FAFE95500D5984A /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 				DC5C68572FAFEDD70012D957 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
+				DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
+				DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DC394FFD2FAFE4BC00D5984A /* Products */;
@@ -129,10 +143,28 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC5C6A622FB04B200012D957 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DC393E242FB0461900D5984A /* Copy Acknowledgements */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Acknowledgements";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Will copy acknowledgements\"\n\nACKNOWLEDGEMENTS_DIR=${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/com.mono0926.LicensePlist.Output\nDESTINATION_PATH=${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Settings.bundle/\n\ncp -r \"${ACKNOWLEDGEMENTS_DIR}\"/* \"${DESTINATION_PATH}\"\nrm -rf \"${ACKNOWLEDGEMENTS_DIR}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DC394FF82FAFE4BC00D5984A /* Sources */ = {
@@ -285,6 +317,8 @@
 				DEVELOPMENT_TEAM = S2D94HHFAY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Cup;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,6 +352,8 @@
 				DEVELOPMENT_TEAM = S2D94HHFAY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Cup;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -397,6 +433,22 @@
 				minimumVersion = 1.12.0;
 			};
 		};
+		DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
+			requirement = {
+				kind = exactVersion;
+				version = 2.1.1;
+			};
+		};
+		DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/raspu/Highlightr";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -419,6 +471,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DC5C68572FAFEDD70012D957 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */;
 			productName = "plugin:OpenAPIGenerator";
+		};
+		DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
+		};
+		DC5C68C02FAFF7410012D957 /* Highlightr */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */;
+			productName = Highlightr;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

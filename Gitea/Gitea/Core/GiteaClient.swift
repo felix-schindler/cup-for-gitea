@@ -33,6 +33,6 @@ public final class GiteaClient: Sendable {
 			transport = URLSessionTransport()
 		}
 
-		self.client = Client(serverURL: serverURL, transport: transport, middlewares: middlewares)
+		self.client = Client(serverURL: serverURL, transport: transport)
 	}
 }
