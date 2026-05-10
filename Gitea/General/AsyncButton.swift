@@ -50,7 +50,7 @@ extension AsyncButton {
 
 extension AsyncButton where Label == Text {
 	init(
-		_ label: String,
+		_ label: LocalizedStringResource,
 		role: ButtonRole? = nil,
 		actionOptions: Set<ActionOption> = Set(ActionOption.allCases),
 		action: @escaping () async -> Void
@@ -76,7 +76,7 @@ extension AsyncButton where Label == Image {
 
 extension AsyncButton where Label == SwiftUI.Label<Text, Image> {
 	init(
-		_ title: String,
+		_ title: LocalizedStringResource,
 		systemImage: String,
 		role: ButtonRole? = nil,
 		actionOptions: Set<ActionOption> = Set(ActionOption.allCases),

@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct FailedView: View {
-	private let msg: String
+	private let msg: LocalizedStringResource
 	private let icon: String
 
 	init(_ error: Error) {
 		self.icon = "exclamationmark.triangle"
-		self.msg = error.localizedDescription
+		self.msg = LocalizedStringResource(stringLiteral: error.localizedDescription)
 	}
 
 	init(
-		_ message: String = "Failed to load. Please make sure you're connected to the internet.",
+		_ message: LocalizedStringResource = "Failed to load. Please make sure you're connected to the internet.",
 		icon: String = "exclamationmark.triangle"
 	) {
 		self.msg = message

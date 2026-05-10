@@ -9,11 +9,11 @@ import SwiftUI
 
 /// Could be replaced by  `ContentUnavailableView` when iOS 16 support is dropped
 struct NoContentView: View {
-	private let msg: String
+	private let msg: LocalizedStringResource
 	private let systemImage: String
-	private let description: String?
+	private let description: LocalizedStringResource?
 
-	init(_ message: String, systemImage: String, description: String? = nil) {
+	init(_ message: LocalizedStringResource, systemImage: String, description: LocalizedStringResource? = nil) {
 		self.msg = message
 		self.systemImage = systemImage
 		self.description = description

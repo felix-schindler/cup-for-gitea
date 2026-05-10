@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct LoadingView: View {
-	private let msg: String
+	private let msg: LocalizedStringResource
 	private let systemImage: String
 	private let color: Color
 
-	init(_ message: String, systemImage: String, color: Color = .secondary) {
+	init(_ message: LocalizedStringResource, systemImage: String, color: Color = .secondary) {
 		self.msg = message
 		self.systemImage = systemImage
 		self.color = color
