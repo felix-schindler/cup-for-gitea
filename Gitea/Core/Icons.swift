@@ -28,6 +28,9 @@ enum Icons: String {
 	case subscriptions = "bell"
 	case topics = "tag"
 	case share = "square.and.arrow.up"
+	// MARK: - Repositories
+	case forks = "tuningfork"
+	case watchers = "eye"
 	case code = "chevron.left.forwardslash.chevron.right"
 	case commits = "clock.arrow.trianglehead.counterclockwise.rotate.90"
 }

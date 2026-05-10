@@ -9,6 +9,17 @@ import OpenAPIRuntime
 import SwiftUI
 import Textual
 
+struct TrailingIconLabelStyle: LabelStyle {
+	func makeBody(configuration: LabelStyleConfiguration) -> some View {
+		HStack {
+			configuration.title
+				.multilineTextAlignment(.leading)
+			Spacer()
+			configuration.icon
+		}
+	}
+}
+
 struct FullRepoView: View {
 	@State private var readmeContents: String?
 	@State private var copied = false
@@ -38,35 +49,33 @@ struct FullRepoView: View {
 
 	var body: some View {
 		List {
+			Section {
+				HeaderRepoView(repo)
+			}
+
 			if repo.fork || repo.template || repo.mirror || repo.archived || repo.originalUrl.isNotEmpty {
 				Section {
 					VStack(alignment: .leading) {
 						if repo.fork {
-							Text("This repository is a fork of another repository.")
+							Label("This repository is a fork of another repository.", systemImage: Icons.forks.rawValue)
 						}
 						if repo.template {
 							Text("This repository is a template.")
 						}
 						if repo.mirror {
-							Text("This repository is a mirror.")
+							Label("This repository is a mirror.", systemImage: "square.stack.3d.forward.dottedline")
 							Text("Last updated at \(repo.mirrorUpdated.toString()); Inverval: \(repo.mirrorInterval)")
 								.font(.footnote)
 						}
 						if repo.archived {
-							Text("This repository has been archived on \(repo.archivedAt.toString()).")
+							Label("This repository has been archived on \(repo.archivedAt.toString()).", systemImage: "archivebox")
 						}
-						if repo.originalUrl.isNotEmpty {
-							Link(repo.originalUrl, destination: URL(string: repo.originalUrl)!)
+						if let url = URL(string: repo.originalUrl) {
+							Link(repo.originalUrl, destination: url)
 								.font(.caption)
 						}
-					}
-				}
-				.listRowBackground(Color.yellow)
-				.foregroundStyle(Color.black)
-			}
-
-			Section {
-				HeaderRepoView(repo)
+					}.labelStyle(TrailingIconLabelStyle())
+				}.foregroundStyle(.foreground)
 			}
 
 			Section {

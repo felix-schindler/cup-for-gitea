@@ -110,9 +110,9 @@ struct HeaderRepoView: View {
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack {
 					SmallUserView(repo.owner, showAvatar: repo.avatarUrl.isNotEmpty)  // TODO: Handle groups
-					PillView("\(repo.starsCount)", systemImage: "star")
-					PillView("\(repo.forksCount)", systemImage: "tuningfork")
-					PillView("\(repo.watchersCount)", systemImage: "eye")
+					PillView("\(repo.starsCount)", systemImage: Icons.starred.rawValue)
+					PillView("\(repo.forksCount)", systemImage: Icons.forks.rawValue)
+					PillView("\(repo.watchersCount)", systemImage: Icons.watchers.rawValue)
 				}
 			}
 
