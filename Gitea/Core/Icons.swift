@@ -33,4 +33,7 @@ enum Icons: String {
 	case watchers = "eye"
 	case code = "chevron.left.forwardslash.chevron.right"
 	case commits = "clock.arrow.trianglehead.counterclockwise.rotate.90"
+	case projects = "uiwindow.split.2x1"
+	case packages = "cube"
+	case activity = "radiowaves.right"
 }

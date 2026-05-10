@@ -41,7 +41,7 @@ struct SearchView: View {
 
 			List {
 				if search.isEmpty {
-					NoContentView("Start by entering a search term", systemImage: "magnifyingglass", description: "Hier könnte eine Beschreibung stehen.")
+					NoContentView("Start by entering a search term", systemImage: "magnifyingglass")
 				} else {
 					// TODO: List results
 					Text(search)

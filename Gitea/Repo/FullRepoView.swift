@@ -10,11 +10,15 @@ import SwiftUI
 import Textual
 
 struct TrailingIconLabelStyle: LabelStyle {
+	var useSpacer: Bool = true
+
 	func makeBody(configuration: LabelStyleConfiguration) -> some View {
 		HStack {
 			configuration.title
 				.multilineTextAlignment(.leading)
-			Spacer()
+			if useSpacer {
+				Spacer()
+			}
 			configuration.icon
 		}
 	}
