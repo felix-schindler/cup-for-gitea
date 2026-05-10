@@ -106,6 +106,31 @@ struct FullRepoView: View {
 						})
 				}
 				
+				DisclosureGroup(
+					content: {
+						Text("Members")
+						Text("Labels")
+					},
+					label: {
+						Label("Manage", systemImage: "person.2")
+					}
+				)
+
+				DisclosureGroup(
+					content: {
+						Text("Milestones")
+						if repo.hasProjects {
+							Text("Projects")
+						}
+						if repo.hasWiki {
+							Text("Wiki")
+						}
+					},
+					label: {
+						Label("Plan", systemImage: "calendar.badge.checkmark")
+					}
+				)
+
 				if repo.hasCode {
 					DisclosureGroup(content: {
 						Text("Code")
@@ -113,30 +138,22 @@ struct FullRepoView: View {
 						Text("Branches")
 						Text("Tags")
 					}, label: {
-						Label("Code", systemImage: Icons.code.rawValue)
+						Label("Repository", systemImage: Icons.code.rawValue)
 					})
 				}
 
-				if repo.hasWiki {
-					Text("Wiki")
-				}
-
-				if repo.hasPackages {
-					Text("Packages")
-				}
-
-				if repo.hasProjects {
-					Text("Projects")
-				}
-				
-				if let permissions = repo.permissions {
-				}
-
-				if repo.hasReleases || repo.hasActions {
+				if repo.hasReleases || repo.hasActions || repo.hasPackages {
 					DisclosureGroup(
 						content: {
-							Text("Actions")
-							Text("Releases")
+							if repo.hasActions {
+								Text("Actions")
+							}
+							if repo.hasReleases {
+								Text("Releases")
+							}
+							if repo.hasPackages {
+								Text("Packages")
+							}
 						},
 						label: {
 							Label("Build", systemImage: "flag")
