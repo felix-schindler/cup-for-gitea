@@ -4,4 +4,4 @@ options:
   outputPath: "./Settings.bundle"
 
 spm:
-  - path: "Gitea.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+  - path: "Gitea.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"

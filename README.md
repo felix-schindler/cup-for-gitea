@@ -18,6 +18,5 @@ mv openapi.required.yaml ./Gitea/Gitea/openapi.yaml
 # Licenses
 
 ```
-cd Gitea
 license-plist --config-path license_plist.yml
 ```

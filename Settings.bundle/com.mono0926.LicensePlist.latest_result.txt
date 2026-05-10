@@ -1,3 +1,47 @@
+name: APIKit, nameSpecified: APIKit, owner: ishkawa, version: 5.4.0, source: https://github.com/ishkawa/APIKit
+
+name: HeliumLogger, nameSpecified: HeliumLogger, owner: Kitura, version: 2.0.0, source: https://github.com/Kitura/HeliumLogger
+
+name: Highlightr, nameSpecified: Highlightr, owner: raspu, version: 2.3.0, source: https://github.com/raspu/Highlightr
+
+name: LicensePlist, nameSpecified: LicensePlist, owner: mono0926, version: 3.27.7, source: https://github.com/mono0926/LicensePlist
+
+name: LoggerAPI, nameSpecified: LoggerAPI, owner: Kitura, version: 2.0.0, source: https://github.com/Kitura/LoggerAPI
+
+name: OpenAPIKit, nameSpecified: OpenAPIKit, owner: mattpolzin, version: 3.9.0, source: https://github.com/mattpolzin/OpenAPIKit
+
+name: swift-algorithms, nameSpecified: swift-algorithms, owner: apple, version: 1.2.1, source: https://github.com/apple/swift-algorithms
+
+name: swift-argument-parser, nameSpecified: swift-argument-parser, owner: apple, version: 1.7.1, source: https://github.com/apple/swift-argument-parser
+
+name: swift-collections, nameSpecified: swift-collections, owner: apple, version: 1.5.0, source: https://github.com/apple/swift-collections
+
+name: swift-concurrency-extras, nameSpecified: swift-concurrency-extras, owner: pointfreeco, version: 1.3.2, source: https://github.com/pointfreeco/swift-concurrency-extras
+
+name: swift-html-entities, nameSpecified: HTMLEntities, owner: Kitura, version: 4.0.1, source: https://github.com/Kitura/swift-html-entities
+
+name: swift-http-types, nameSpecified: swift-http-types, owner: apple, version: 1.5.1, source: https://github.com/apple/swift-http-types
+
+name: swift-log, nameSpecified: swift-log, owner: apple, version: 1.12.0, source: https://github.com/apple/swift-log
+
+name: swift-numerics, nameSpecified: swift-numerics, owner: apple, version: 1.1.1, source: https://github.com/apple/swift-numerics
+
+name: swift-openapi-generator, nameSpecified: swift-openapi-generator, owner: apple, version: 1.12.0, source: https://github.com/apple/swift-openapi-generator
+
+name: swift-openapi-runtime, nameSpecified: swift-openapi-runtime, owner: apple, version: 1.11.0, source: https://github.com/apple/swift-openapi-runtime
+
+name: swift-openapi-urlsession, nameSpecified: swift-openapi-urlsession, owner: apple, version: 1.3.0, source: https://github.com/apple/swift-openapi-urlsession
+
+name: swiftui-cached-async-image, nameSpecified: swiftui-cached-async-image, owner: lorenzofiamingo, version: 2.1.1, source: https://github.com/lorenzofiamingo/swiftui-cached-async-image
+
+name: swiftui-math, nameSpecified: swiftui-math, owner: gonzalezreal, version: 0.1.0, source: https://github.com/gonzalezreal/swiftui-math
+
+name: textual, nameSpecified: textual, owner: gonzalezreal, version: 0.3.1, source: https://github.com/gonzalezreal/textual
+
+name: XcodeEdit, nameSpecified: XcodeEdit, owner: tomlokhorst, version: 2.13.0, source: https://github.com/tomlokhorst/XcodeEdit
+
+name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.1, source: https://github.com/jpsim/Yams
+
 add-version-numbers: false
 
 LicensePlist Version: 3.27.7
