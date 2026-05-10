@@ -45,22 +45,6 @@
         }
       }
     },
-    "%lld Followers · %lld Following" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Followers · %2$lld Folge ich"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld Followers · %2$lld Following"
-          }
-        }
-      }
-    },
     "Actions" : {
       "localizations" : {
         "de" : {
@@ -319,6 +303,16 @@
         }
       }
     },
+    "Loading starred Repositories" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten werden geladen"
+          }
+        }
+      }
+    },
     "Loading user" : {
       "localizations" : {
         "de" : {
@@ -335,6 +329,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Benachrichtigung wird geladen"
+          }
+        }
+      }
+    },
+    "Loading users" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzer werden geladen"
           }
         }
       }
@@ -827,6 +831,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es sind keine Repositories vorhanden"
+          }
+        }
+      }
+    },
+    "There are no starred repositories" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Favoriten vorhanden"
+          }
+        }
+      }
+    },
+    "There are no users" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Nutzer vorhanden"
           }
         }
       }
