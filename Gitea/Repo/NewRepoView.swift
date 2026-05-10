@@ -59,6 +59,7 @@ struct NewRepoView: View {
 			Section {
 				VStack(alignment: .leading) {
 					TextField("Repository Name", text: $name)
+						.textInputAutocapitalization(.never)
 					Text(
 						"Good repository names use short, memorable and unique keywords. A repository named \".profile\" or \".profile-private\" could be used to add a README.md for the user/organization profile."
 					)
@@ -67,19 +68,17 @@ struct NewRepoView: View {
 				}
 
 				VStack(alignment: .leading) {
-					Toggle("Visibility", isOn: $makePrivate)
+					Toggle("Make repository private", isOn: $makePrivate)
 					Text("Only the owner or the organization members if they have rights, will be able to see it.")
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
 
-				TextField("Description", text: $desc, axis: .vertical)
+				TextField("Description (optional)", text: $desc, axis: .vertical)
 					.lineLimit(5)
 			}
 
-			// TODO: Let the user choose template repo
-			// TODO: when not from template: Issue label set
-			// TODO: when not from template: Init with .gitignore, license, readme
+			// TODO: Issue label set
 
 			/* Section {
 				VStack(alignment: .leading) {
@@ -88,6 +87,7 @@ struct NewRepoView: View {
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
+				// TODO: Choose templates for .gitignore, license and readme
 				if (initRepo) {
 				}
 			} */
@@ -119,7 +119,9 @@ struct NewRepoView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.buttonStyle(.borderedProminent)
-		}.navigationTitle("New Repository")
+		}
+		.scrollDismissesKeyboard(.immediately)
+		.navigationTitle("New Repository")
 	}
 }
 
