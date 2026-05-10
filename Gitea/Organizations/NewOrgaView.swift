@@ -1,5 +1,5 @@
 //
-//  NewProject.swift
+//  NewOrgaView.swift
 //  Gitea
 //
 //  Created by Felix Schindler on 10.05.26.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct NewRepo: View {
+struct NewOrgaView: View {
 	var body: some View {
 		Form {
-		}.navigationTitle("New Repository")
+		}.navigationTitle("New Organization")
 	}
 }

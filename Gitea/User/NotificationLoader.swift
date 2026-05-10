@@ -29,7 +29,6 @@ struct NotificationLoader: View {
 		}
 	}
 
-	// TODO: FIXME: This doesn't work
 	private func mark(_ id: Int64, status: StatusChange) async throws {
 		_ = try await Network.shared.client.notifyReadThread(.init(path: .init(id: String(id)), query: .init(toStatus: status.rawValue))).resetContent.body.json
 	}
@@ -74,7 +73,6 @@ struct NotificationLoader: View {
 										.textual.structuredTextStyle(.gitHub)
 										.textual.textSelection(.enabled)
 								}.swipeActions {
-									// TODO: Haptic feedback; Update without re-fetching
 									if notif.unread || notif.pinned {
 										Button("Mark read", systemImage: "envelope.open") {
 											Task {

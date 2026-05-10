@@ -18286,17 +18286,10 @@ components:
       type: object
       required:
         - name
-        - auto_init
         - default_branch
         - description
-        - gitignores
-        - issue_labels
-        - license
         - object_format_name
         - private
-        - readme
-        - template
-        - trust_model
       properties:
         auto_init:
           description: Whether the repository should be auto-initialized?

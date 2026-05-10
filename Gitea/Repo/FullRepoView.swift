@@ -182,13 +182,14 @@ struct FullRepoView: View {
 						})
 				}
 
-				// TODO: Add haptic feedback
 				Section("Clone code") {
 					Button("Copy SSH URL") {
 						UIPasteboard.general.string = repo.sshUrl
+						HapticFeedback.notify(.success)
 					}
 					Button("Copy HTTPS URL") {
 						UIPasteboard.general.string = repo.sshUrl
+						HapticFeedback.notify(.success)
 					}
 				}
 			}
