@@ -38,7 +38,7 @@ struct OrgView: View {
 							.textual.structuredTextStyle(.gitHub)
 							.textual.textSelection(.enabled)
 					}
-					
+
 					if org.email.isNotEmpty {
 						ScrollView(.horizontal, showsIndicators: false) {
 							Link(org.email, destination: URL(string: "mailto:\(org.email)")!)
