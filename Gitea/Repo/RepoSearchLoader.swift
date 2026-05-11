@@ -28,7 +28,7 @@ struct RepoSearchLoader: View {
 				switch results {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There no repositories", systemImage: icon)
+						NoContentView("There are no repositories", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)

@@ -27,7 +27,7 @@ struct SubscriptionsLoader: View {
 				switch repos {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There no subscribed repositories", systemImage: icon)
+						NoContentView("There are no subscribed repositories", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)

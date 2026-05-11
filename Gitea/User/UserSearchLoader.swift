@@ -28,7 +28,7 @@ struct UserSearchLoader: View {
 				switch results {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There no users", systemImage: icon)
+						NoContentView("There are no users", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { user in
 							SmallUserView(user)
