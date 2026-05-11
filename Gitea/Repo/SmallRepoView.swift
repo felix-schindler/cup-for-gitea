@@ -26,12 +26,13 @@ struct SmallRepoView: View {
 					if let url = URL(string: repo.avatarUrl) {
 						AvatarImage(url, size: .small)
 					}
-
 					if showFullName {
 						Text(repo.fullName)
 					} else {
 						Text(repo.name)
 					}
+					Spacer()
+					VisibilityIcon(repo._private ? "private" : repo._internal ? "limited" : "")
 				}
 			})
 	}
