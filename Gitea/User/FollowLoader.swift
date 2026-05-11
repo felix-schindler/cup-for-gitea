@@ -15,7 +15,7 @@ struct FollowLoader: View {
 	private let username: String
 	private let filterUserType: UsersType
 	@State private var users: Result<[Components.Schemas.User], Error>? = nil
-	
+
 	init(_ username: String, type: UsersType) {
 		self.username = username
 		self.filterUserType = type

@@ -42,17 +42,10 @@ struct HeaderRepoView: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 5) {
 			HStack {
-				if repo.avatarUrl.isNotEmpty,
-					let avatarUrl = URL(string: repo.avatarUrl)
-				{
+				if let avatarUrl = URL(string: repo.avatarUrl) {
 					AvatarImage(avatarUrl, size: .medium)
-					Spacer()
-				} else if repo.owner.avatarUrl.isNotEmpty,
-					let avatarUrl = URL(string: repo.owner.avatarUrl)
-				{
-					AvatarImage(avatarUrl, size: .medium)
-					Spacer()
 				}
+
 				Text(repo.name)
 					.font(.title)
 					.fontWeight(.bold)
@@ -109,7 +102,7 @@ struct HeaderRepoView: View {
 
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack {
-					SmallUserView(repo.owner, showAvatar: repo.avatarUrl.isNotEmpty)  // TODO: Handle groups
+					SmallUserView(repo.owner)
 					PillView("\(repo.starsCount)", systemImage: Icons.starred.rawValue)
 					PillView("\(repo.forksCount)", systemImage: Icons.forks.rawValue)
 					PillView("\(repo.watchersCount)", systemImage: Icons.watchers.rawValue)

@@ -8,24 +8,28 @@
 import SwiftUI
 
 struct FailedView: View {
-	private let msg: String
+	private let message: LocalizedStringResource
+	private let description: LocalizedStringResource?
 	private let icon: String
 
 	init(_ error: Error) {
+		self.message = LocalizedStringResource(stringLiteral: error.localizedDescription)
+		self.description = nil
 		self.icon = "exclamationmark.triangle"
-		self.msg = error.localizedDescription
 	}
 
-	private init(
-		_ message: String,
-		icon: String = "exclamationmark.triangle"
+	init(
+		_ message: LocalizedStringResource,
+		icon: String = "exclamationmark.triangle",
+		description: LocalizedStringResource? = nil
 	) {
-		self.msg = message
+		self.message = message
+		self.description = description
 		self.icon = icon
 	}
 
 	public var body: some View {
-		NoContentView(LocalizedStringResource(stringLiteral: msg), systemImage: icon)
+		NoContentView(message, systemImage: icon, description: description)
 			.foregroundStyle(.red)
 	}
 }

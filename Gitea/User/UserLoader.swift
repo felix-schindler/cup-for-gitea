@@ -8,33 +8,15 @@
 import SwiftUI
 import Textual
 
-struct UserVisibilityIcon: View {
-	private let systemName: String
-
-	init(_ visibility: String) {
-		self.systemName =
-			switch visibility {
-			case "private":
-				"lock"
-			case "limited":
-				"network.badge.shield.half.filled"
-			default:
-				"network"
-			}
-	}
-
-	var body: some View {
-		Image(systemName: systemName)
-	}
-}
-
 struct UserLoader: View {
 	private let username: String?
+	private let isNamespace: Bool
 
 	@State private var user: Result<Components.Schemas.User, Error>?
 
-	init(username: String? = nil) {
+	init(username: String? = nil, isNamespace: Bool = false) {
 		self.username = username
+		self.isNamespace = isNamespace
 	}
 
 	private func load() async {
@@ -75,7 +57,7 @@ struct UserLoader: View {
 											Image(systemName: "checkmark.seal")
 										}
 
-										UserVisibilityIcon(u.visibility)
+										VisibilityIcon(u.visibility)
 									}
 
 									if u.fullName.isNotEmpty {
@@ -137,29 +119,45 @@ struct UserLoader: View {
 					}
 
 					Section {
-						NavigationLink(destination: UserReposLoader(username), label: {
-							Label("Repositories", systemImage: Icons.repositories.rawValue)
-						})
+						NavigationLink(
+							destination: UserReposLoader(username),
+							label: {
+								Label("Repositories", systemImage: Icons.repositories.rawValue)
+							})
+
+						NavigationLink(destination: UserOrgLoader()) {
+							Label("Organizations", systemImage: Icons.organizations.rawValue)
+						}
+
 						Label("Projects", systemImage: Icons.projects.rawValue)
 						Label("Packages", systemImage: Icons.packages.rawValue)
 						Label("Public Activity", systemImage: Icons.activity.rawValue)
 
-						NavigationLink(destination: StarredReposLoader(username), label: {
-							Label(
-								title: {
-									HStack {
-										Text("Starred Repositories")
-										Spacer()
-										Text(String(u.starredReposCount))
-									}
-								},
-								icon: {
-									Image(systemName: Icons.starred.rawValue)
-								})
-						})
+						NavigationLink(
+							destination: StarredReposLoader(username),
+							label: {
+								Label(
+									title: {
+										HStack {
+											Text("Starred Repositories")
+											Spacer()
+											Text(String(u.starredReposCount))
+										}
+									},
+									icon: {
+										Image(systemName: Icons.starred.rawValue)
+									})
+							})
 					}
 				case .failure(let failure):
-					FailedView(failure)
+					if isNamespace {
+						FailedView(
+							"Failed to load namespace",
+							description: LocalizedStringResource(stringLiteral: failure.localizedDescription)
+						)
+					} else {
+						FailedView(failure)
+					}
 				}
 			} else {
 				LoadingView("Loading user", systemImage: Icons.users.rawValue)

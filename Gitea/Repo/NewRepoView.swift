@@ -17,8 +17,29 @@ struct NewRepoView: View {
 	@State private var makeTemplate = false
 	@State private var defaultBranch = "main"
 	@State private var objectFormat = Components.Schemas.CreateRepoOption.ObjectFormatNamePayload.sha1
+	@State private var gitignore = ""
+	@State private var issueLabels = ""
+	@State private var license = ""
+
+	@State private var labelTemplates: [String] = []
+	@State private var gitignoreTemplates: [String] = []
+	@State private var licenseTemplates: [Components.Schemas.LicensesTemplateListEntry] = []
 
 	@State private var error: Error?
+
+	private func load() async {
+		if let templates = try? await Network.shared.client.listLabelTemplates().ok.body.json {
+			self.labelTemplates = templates
+		}
+
+		if let templates = try? await Network.shared.client.listGitignoresTemplates().ok.body.json {
+			self.gitignoreTemplates = templates
+		}
+
+		if let templates = try? await Network.shared.client.listLicenseTemplates().ok.body.json {
+			self.licenseTemplates = templates
+		}
+	}
 
 	private func create() async {
 		do {
@@ -29,14 +50,14 @@ struct NewRepoView: View {
 							autoInit: initRepo,
 							defaultBranch: defaultBranch,
 							description: desc,
-							//gitignores: <#T##String#>,
-							//issueLabels: <#T##String#>,
-							//license: <#T##String#>,
+							gitignores: gitignore,
+							issueLabels: issueLabels,
+							license: license,
 							name: name,
 							objectFormatName: objectFormat,
 							_private: makePrivate,
 							//readme: <#T##String#>,
-							//template: <#T##Bool#>,
+							template: makeTemplate,
 							//trustModel: <#T##Components.Schemas.CreateRepoOption.TrustModelPayload#>
 						)))
 			).created
@@ -76,21 +97,44 @@ struct NewRepoView: View {
 
 				TextField("Description (optional)", text: $desc, axis: .vertical)
 					.lineLimit(5)
+
+				if issueLabels.isNotEmpty {
+					Picker("Issue-Label-Set", selection: $issueLabels) {
+						Text("None").tag("")
+						ForEach(labelTemplates, id: \.self) { l in
+							Text(l).tag(l)
+						}
+					}
+				}
 			}
 
-			// TODO: Issue label set
-
-			/* Section {
+			Section {
 				VStack(alignment: .leading) {
 					Toggle("Initialize Repository", isOn: $initRepo)
 					Text("Adds .gitignore, License and README")
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
-				// TODO: Choose templates for .gitignore, license and readme
-				if (initRepo) {
+				// TODO: What to do with readme?
+				if initRepo {
+					if gitignoreTemplates.isNotEmpty {
+						Picker(".gitignore", selection: $gitignore) {
+							Text("None").tag("")
+							ForEach(gitignoreTemplates, id: \.self) { t in
+								Text(t).tag(t)
+							}
+						}
+					}
+					if licenseTemplates.isNotEmpty {
+						Picker(".gitignore", selection: $license) {
+							Text("None").tag("")
+							ForEach(licenseTemplates, id: \.self) { l in
+								Text(l.name).tag(l.name)
+							}
+						}
+					}
 				}
-			} */
+			}
 
 			Section {
 				VStack(alignment: .leading) {
@@ -119,6 +163,10 @@ struct NewRepoView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.buttonStyle(.borderedProminent)
+		}.task {
+			await load()
+		}.refreshable {
+			await load()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Repository")

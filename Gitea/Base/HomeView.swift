@@ -28,14 +28,20 @@ struct HomeView: View {
 	var body: some View {
 		List {
 			Section("Your work") {
-				Label("Issues", systemImage: Icons.issues.rawValue)
+				NavigationLink(destination: IssueSearchLoader(search: .constant(""))) {
+					Label("Issues", systemImage: Icons.issues.rawValue)
+				}
 				Label("Pull Requests", systemImage: Icons.pull_requests.rawValue)
 				Label("Milestones", systemImage: Icons.milestones.rawValue)
 				NavigationLink(destination: UserReposLoader()) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
-				Label("Organizations", systemImage: Icons.organizations.rawValue)
-				Label("Subscriptions", systemImage: Icons.subscriptions.rawValue)
+				NavigationLink(destination: UserOrgLoader()) {
+					Label("Organizations", systemImage: Icons.organizations.rawValue)
+				}
+				NavigationLink(destination: SubscriptionsLoader()) {
+					Label("Subscriptions", systemImage: Icons.subscriptions.rawValue)
+				}
 			}
 
 			Section("Starred repositories") {

@@ -18,16 +18,6 @@ enum SearchType: String, CaseIterable {
 struct SearchView: View {
 	@State var type: SearchType = .repo
 	@State var search: String = ""
-	@State var results: Result<Void, Error>?
-
-	// TODO: Search for the selected thing
-	private func loadSearch() async throws {
-		// try Network.shared.client.repoSearch()
-		// try Network.shared.client.teamSearch()
-		// try Network.shared.client.userSearch()
-		// try Network.shared.client.topicSearch()
-		// try Network.shared.client.issueSearchIssues()
-	}
 
 	var body: some View {
 		VStack {
@@ -39,13 +29,17 @@ struct SearchView: View {
 			.pickerStyle(.segmented)
 			.padding(.horizontal)
 
-			List {
-				if search.isEmpty {
-					NoContentView("Start by entering a search term", systemImage: "magnifyingglass")
-				} else {
-					// TODO: List results
-					Text(search)
-				}
+			switch type {
+			case .repo:
+				RepoSearchLoader(search: $search)
+			case .team:
+				RepoSearchLoader(search: $search)
+			case .user:
+				UserSearchLoader(search: $search)
+			case .topic:
+				TopicsSearchLoader(search: $search)
+			case .issue:
+				IssueSearchLoader(search: $search)
 			}
 		}
 		.searchable(text: $search, prompt: Text("Search for a \(type.rawValue)"))

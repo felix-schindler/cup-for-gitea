@@ -1,5 +1,5 @@
 //
-//  StarredReposLoader.swift
+//  SubscriptionsLoader.swift
 //  Gitea
 //
 //  Created by Felix Schindler on 10.05.26.
@@ -7,23 +7,13 @@
 
 import SwiftUI
 
-struct StarredReposLoader: View {
-	let username: String?
+struct SubscriptionsLoader: View {
 	private let icon = Icons.starred.rawValue
 	@State private var repos: Result<[Components.Schemas.Repository], Error>?
 
-	init(_ username: String? = nil) {
-		self.username = username
-	}
-
 	private func load() async {
 		do {
-			var repos: [Components.Schemas.Repository]
-			if let username {
-				repos = try await Network.shared.client.userListStarred(path: .init(username: username)).ok.body.json
-			} else {
-				repos = try await Network.shared.client.userCurrentListStarred().ok.body.json
-			}
+			let repos = try await Network.shared.client.userCurrentListSubscriptions().ok.body.json
 			self.repos = .success(repos)
 		} catch {
 			print(error, error.localizedDescription)
@@ -37,7 +27,7 @@ struct StarredReposLoader: View {
 				switch repos {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There are no starred repositories", systemImage: icon)
+						NoContentView("There no subscribed repositories", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)
@@ -47,12 +37,12 @@ struct StarredReposLoader: View {
 					FailedView(failure)
 				}
 			} else {
-				LoadingView("Loading starred Repositories", systemImage: icon)
+				LoadingView("Loading subscribed repositories", systemImage: icon)
 			}
 		}.task {
 			await load()
 		}.refreshable {
 			await load()
-		}.navigationTitle("Starred Repositories")
+		}.navigationTitle("Subscriptions")
 	}
 }

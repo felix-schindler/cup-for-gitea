@@ -20496,24 +20496,18 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - assets
-        - assignee
-        - assignees
         - body
-        - closed_at
         - comments
         - content_version
         - created_at
-        - due_date
         - html_url
         - id
         - is_locked
         - labels
-        - milestone
         - number
         - original_author
         - original_author_id
         - pin_order
-        - pull_request
         - ref
         - repository
         - state
@@ -21151,7 +21145,6 @@ components:
           x-go-name: Updated
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
-        - closed_at
         - closed_issues
         - created_at
         - description
@@ -22112,7 +22105,6 @@ components:
         - draft
         - html_url
         - merged
-        - merged_at
     PullReview:
       description: PullReview represents a pull request review
       type: object

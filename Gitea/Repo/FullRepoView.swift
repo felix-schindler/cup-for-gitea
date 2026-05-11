@@ -93,17 +93,19 @@ struct FullRepoView: View {
 								Label("Issues", systemImage: Icons.issues.rawValue)
 							})
 					} else {
-						Label(
-							title: {
-								HStack {
-									Text("Issues")
-									Spacer()
-									Text("\(repo.openIssuesCount)")
-								}
-							},
-							icon: {
-								Image(systemName: Icons.issues.rawValue)
-							})
+						NavigationLink(destination: RepoIssueLoader(owner: repo.owner.login, repo: repo.name)) {
+							Label(
+								title: {
+									HStack {
+										Text("Issues")
+										Spacer()
+										Text("\(repo.openIssuesCount)")
+									}
+								},
+								icon: {
+									Image(systemName: Icons.issues.rawValue)
+								})
+						}
 					}
 				}
 

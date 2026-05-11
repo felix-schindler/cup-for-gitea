@@ -9,18 +9,16 @@ import SwiftUI
 
 struct SmallUserView: View {
 	private let user: Components.Schemas.User
-	private let showAvatar: Bool
 	private let showUsername: Bool
 
-	init(_ user: Components.Schemas.User, showAvatar: Bool = true, showUsername: Bool = false) {
+	init(_ user: Components.Schemas.User, showUsername: Bool = false) {
 		self.user = user
-		self.showAvatar = showAvatar
 		self.showUsername = showUsername
 	}
 
 	public var body: some View {
 		NavigationLink(
-			destination: UserLoader(username: user.login),
+			destination: NamespaceLoader(user.login),
 			label: {
 				Label(
 					title: {
@@ -31,10 +29,8 @@ struct SmallUserView: View {
 						}
 					},
 					icon: {
-						if showAvatar, let url = URL(string: user.avatarUrl) {
+						if let url = URL(string: user.avatarUrl) {
 							AvatarImage(url, size: .tiny)
-						} else {
-							Image(systemName: "person")
 						}
 					}
 				)
@@ -53,9 +49,7 @@ struct SmallUserView: View {
 		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0, starredReposCount: 0, visibility: "", website: "")
 
 	VStack {
-		SmallUserView(user, showAvatar: true, showUsername: true)
-		SmallUserView(user, showAvatar: true, showUsername: false)
-		SmallUserView(user, showAvatar: false, showUsername: true)
-		SmallUserView(user, showAvatar: false, showUsername: false)
+		SmallUserView(user, showUsername: true)
+		SmallUserView(user, showUsername: false)
 	}
 }
