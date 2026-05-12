@@ -1,8 +1,8 @@
 # Privacy
 
-This app does not collect any data for itself. All the data collected is managed by the GitLab instance you configured yourself.
+This app does not collect any data for itself. All the data collected is managed by the Gitea instance you configured yourself.
 
-Diese App sammelt keine Daten für sich selbst. Alle gesammelten Daten werden von der GitLab-Instanz verwaltet, die Sie selbst konfiguriert haben.
+Diese App sammelt keine Daten für sich selbst. Alle gesammelten Daten werden von der Gitea-Instanz verwaltet, die Sie selbst konfiguriert haben.
 
 # Icon
 
@@ -33,3 +33,9 @@ license-plist --config-path license_plist.yml
 ```
 git remote add github git@github.com:felix-schindler/cup-for-gitea.git
 ```
+
+# Release a new version
+
+1. Change app version in Xcode → Targets → Gitea → Identity → Version
+2. Add changelog in `changelogs/v<verison>.md`
+3. Tag branch `git push origin v<version>`
