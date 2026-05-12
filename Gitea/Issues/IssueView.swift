@@ -71,7 +71,7 @@ struct IssueView: View {
 							}
 						}
 					}
-					
+
 					if issue.assets.isNotEmpty {
 						ScrollView(.horizontal, showsIndicators: false) {
 							ForEach(issue.assets, id: \.id) { a in
@@ -97,23 +97,27 @@ struct IssueView: View {
 			if issue.assignees != nil || issue.labels.isNotEmpty || issue.milestone != nil {
 				Section("Details") {
 					if let assignees = issue.assignees {
-						DisclosureGroup(content: {
-							ForEach(assignees, id: \.id) { u in
-								SmallUserView(u)
-							}
-						}, label: {
-							Label(title: {
-								HStack {
-									Text("Assignees")
-									Spacer()
-									Text("\(assignees.count)")
+						DisclosureGroup(
+							content: {
+								ForEach(assignees, id: \.id) { u in
+									SmallUserView(u)
 								}
-							}, icon: {
-								Image(systemName: Icons.users.rawValue)
+							},
+							label: {
+								Label(
+									title: {
+										HStack {
+											Text("Assignees")
+											Spacer()
+											Text("\(assignees.count)")
+										}
+									},
+									icon: {
+										Image(systemName: Icons.users.rawValue)
+									})
 							})
-						})
 					}
-					
+
 					if issue.labels.isNotEmpty {
 						Label(
 							title: {
@@ -137,7 +141,7 @@ struct IssueView: View {
 					}
 				}
 			}
-			
+
 			if issue.comments != 0 {
 				Section("Comments") {
 					IssueCommentsLoader(owner: issue.repository.owner, repo: issue.repository.name, iid: issue.number)

@@ -90,7 +90,7 @@ extension Color {
 		let a = components.count >= 4 ? Int(round(components[3] * 255)) : 255
 		return String(format: "#%02X%02X%02X%02X", r, g, b, a)
 	}
-	
+
 	func adaptiveText() -> Color {
 		guard let components = cgColor?.components else { return .black }
 		let red = components[0]

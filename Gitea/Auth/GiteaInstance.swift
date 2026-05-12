@@ -5,8 +5,8 @@
 //  Created by Felix Schindler on 12.05.26.
 //
 
-import Foundation
 import CryptoKit
+import Foundation
 
 struct GiteaInstance: Codable, Identifiable, Equatable {
 	let host: String

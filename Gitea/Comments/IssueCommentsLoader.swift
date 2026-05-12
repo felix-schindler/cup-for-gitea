@@ -12,9 +12,9 @@ struct IssueCommentsLoader: View {
 	let owner: String
 	let repo: String
 	let iid: Int64
-	
+
 	@State private var comments: Result<[Components.Schemas.Comment], Error>?
-	
+
 	private func load() async {
 		do {
 			let comments = try await Network.shared.client.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid))).ok.body.json
@@ -23,7 +23,7 @@ struct IssueCommentsLoader: View {
 			self.comments = .failure(error)
 		}
 	}
-	
+
 	var body: some View {
 		Group {
 			if let comments {
@@ -44,21 +44,23 @@ struct IssueCommentsLoader: View {
 								StructuredText(markdown: c.body.emojized())
 									.textual.structuredTextStyle(.gitHub)
 									.textual.textSelection(.enabled)
-								
 
 								if c.assets.isNotEmpty {
 									ScrollView(.horizontal) {
 										HStack {
 											ForEach(c.assets, id: \.id) { a in
 												if let url = URL(string: a.browserDownloadUrl) {
-													Link(destination: url, label: {
-														Label("\(a.name) (\(ByteFormatter.shared.format(a.size)))", systemImage: "square.and.arrow.down")
-															.modifier {
-																if #available(iOS 26.0, *) {
-																	$0.labelIconToTitleSpacing(5)
+													Link(
+														destination: url,
+														label: {
+															Label("\(a.name) (\(ByteFormatter.shared.format(a.size)))", systemImage: "square.and.arrow.down")
+																.modifier {
+																	if #available(iOS 26.0, *) {
+																		$0.labelIconToTitleSpacing(5)
+																	}
 																}
-															}
-													})
+														}
+													)
 													.controlSize(.mini)
 													.buttonBorderShape(.capsule)
 													.modifier {
