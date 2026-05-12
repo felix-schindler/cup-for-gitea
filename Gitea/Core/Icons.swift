@@ -36,4 +36,5 @@ enum Icons: String {
 	case projects = "uiwindow.split.2x1"
 	case packages = "cube"
 	case activity = "radiowaves.right"
+	case comments = "note.text"
 }

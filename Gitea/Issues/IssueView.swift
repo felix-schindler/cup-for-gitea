@@ -53,19 +53,33 @@ struct IssueView: View {
 								.buttonStyle(.bordered)
 							}
 							if let milestone = issue.milestone {
-								HStack(spacing: 5) {
-									Image(systemName: Icons.milestones.rawValue)
-									Text(milestone.title)
-								}
+								PillView(milestone.title.emojized(), systemImage: Icons.milestones.rawValue)
 							}
 						}
 					}
 
-					ScrollView(.horizontal, showsIndicators: false) {
-						HStack {
-							Label("\(issue.timeEstimate)", systemImage: "clock")
-							if let dueDate = issue.dueDate {
-								Label(dueDate.toString(), systemImage: "calendar.badge.checkmark")
+					if issue.timeEstimate != 0 || issue.dueDate != nil {
+						ScrollView(.horizontal, showsIndicators: false) {
+							HStack {
+								if issue.timeEstimate != 0 {
+									PillView("\(issue.timeEstimate)", systemImage: "clock")
+										.font(.footnote)
+								}
+								if let dueDate = issue.dueDate {
+									PillView(dueDate.toString(), systemImage: "calendar.badge.checkmark")
+								}
+							}
+						}
+					}
+					
+					if issue.assets.isNotEmpty {
+						ScrollView(.horizontal, showsIndicators: false) {
+							ForEach(issue.assets, id: \.id) { a in
+								if let url = URL(string: a.browserDownloadUrl) {
+									Link(a.name, destination: url)
+								} else {
+									Text(a.name)
+								}
 							}
 						}
 					}
@@ -80,7 +94,59 @@ struct IssueView: View {
 				}
 			}
 
-			// TODO: Display assets, labels, milestone, assignee(s)
+			if issue.assignees != nil || issue.labels.isNotEmpty || issue.milestone != nil {
+				Section("Details") {
+					if let assignees = issue.assignees {
+						DisclosureGroup(content: {
+							ForEach(assignees, id: \.id) { u in
+								SmallUserView(u)
+							}
+						}, label: {
+							Label(title: {
+								HStack {
+									Text("Assignees")
+									Spacer()
+									Text("\(assignees.count)")
+								}
+							}, icon: {
+								Image(systemName: Icons.users.rawValue)
+							})
+						})
+					}
+					
+					if issue.labels.isNotEmpty {
+						Label(
+							title: {
+								ScrollView(.horizontal) {
+									HStack {
+										ForEach(issue.labels, id: \.id) { l in
+											let bgColor = Color(hex: l.color)
+											PillView(
+												l.name.emojized(),
+												bgColor: bgColor,
+												fgColor: bgColor.adaptiveText()
+											)
+										}
+									}
+								}
+							},
+							icon: {
+								Image(systemName: Icons.topics.rawValue)
+							}
+						)
+					}
+				}
+			}
+			
+			if issue.comments != 0 {
+				Section("Comments") {
+					IssueCommentsLoader(owner: issue.repository.owner, repo: issue.repository.name, iid: issue.number)
+				}
+			}
+		}.toolbar {
+			if let url = URL(string: issue.htmlUrl) {
+				ShareLink(item: url)
+			}
 		}
 	}
 }

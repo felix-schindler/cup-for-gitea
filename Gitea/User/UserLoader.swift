@@ -175,11 +175,7 @@ struct UserLoader: View {
 		}.toolbar {
 			HStack {
 				if let user, case .success(let u) = user, let url = URL(string: u.htmlUrl) {
-					ShareLink(
-						item: url,
-						label: {
-							Label("Share", systemImage: Icons.share.rawValue)
-						})
+					ShareLink(item: url)
 				}
 				if username == nil {
 					NavigationLink(

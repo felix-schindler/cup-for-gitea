@@ -193,12 +193,10 @@ struct FullRepoView: View {
 			await load()
 		}.toolbar {
 			Menu("More", systemImage: "ellipsis") {
-				Section {
-					ShareLink(
-						item: URL(string: repo.htmlUrl)!,
-						label: {
-							Label("Share", systemImage: Icons.share.rawValue)
-						})
+				if let url = URL(string: repo.htmlUrl) {
+					Section {
+						ShareLink(item: url)
+					}
 				}
 
 				Section("Clone code") {

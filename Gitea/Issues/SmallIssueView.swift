@@ -38,7 +38,7 @@ struct SmallIssueView: View {
 						SmallUserView(issue.user)
 					}
 					Spacer()
-					Image(systemName: "note.text")
+					Image(systemName: Icons.comments.rawValue)
 						.font(.footnote)
 						.foregroundStyle(.foreground)
 					Text("\(issue.comments)")
