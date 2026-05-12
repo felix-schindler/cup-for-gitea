@@ -76,7 +76,7 @@ struct HomeView: View {
 							Label("New Migration", systemImage: "square.grid.3x1.folder.badge.plus")
 						})
 					NavigationLink(
-						destination: NewOrgaView(),
+						destination: NewOrgView(),
 						label: {
 							Label("New Organization", systemImage: Icons.organizations.rawValue)
 						})
