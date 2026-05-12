@@ -23,11 +23,18 @@ struct SubscriptionsLoader: View {
 
 	var body: some View {
 		List {
+			Section {
+				Label(
+					"Gitea Web provides two tabs, \"Subscriptions\" and \"Watching\", however the REST API only returns watched repositories, not the subscription items.",
+					systemImage: "exclamationmark.triangle"
+				)
+				.foregroundStyle(.foreground, .yellow)
+			}
 			if let repos {
 				switch repos {
 				case .success(let success):
 					if success.isEmpty {
-						NoContentView("There are no subscribed repositories", systemImage: icon)
+						NoContentView("There are no watched repositories", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { repo in
 							SmallRepoView(repo)
@@ -37,12 +44,18 @@ struct SubscriptionsLoader: View {
 					FailedView(failure)
 				}
 			} else {
-				LoadingView("Loading subscribed repositories", systemImage: icon)
+				LoadingView("Loading watched repositories", systemImage: icon)
 			}
 		}.task {
 			await load()
 		}.refreshable {
 			await load()
 		}.navigationTitle("Subscriptions")
+	}
+}
+
+#Preview {
+	NavigationStack {
+		SubscriptionsLoader()
 	}
 }

@@ -70,7 +70,18 @@ struct HeaderRepoView: View {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
 							ForEach(repo.topics, id: \.self) { topic in
-								PillView(topic)
+								NavigationLink(destination: RepoSearchLoader(search: .constant(topic))) {
+									Text(topic)
+								}
+								.controlSize(.mini)
+								.buttonBorderShape(.capsule)
+								.modifier {
+									if #available(iOS 26.0, *) {
+										$0.buttonStyle(.glass)
+									} else {
+										$0.buttonStyle(.bordered)
+									}
+								}
 							}
 						}
 					}

@@ -10,10 +10,12 @@ import SwiftUI
 struct SmallUserView: View {
 	private let user: Components.Schemas.User
 	private let showUsername: Bool
+	private let avatarSize: AvatarSize
 
-	init(_ user: Components.Schemas.User, showUsername: Bool = false) {
+	init(_ user: Components.Schemas.User, showUsername: Bool = false, avatarSize: AvatarSize = .tiny) {
 		self.user = user
 		self.showUsername = showUsername
+		self.avatarSize = avatarSize
 	}
 
 	public var body: some View {
@@ -30,15 +32,21 @@ struct SmallUserView: View {
 					},
 					icon: {
 						if let url = URL(string: user.avatarUrl) {
-							AvatarImage(url, size: .tiny)
+							AvatarImage(url, size: avatarSize)
 						}
 					}
 				)
 			}
 		)
 		.controlSize(.mini)
-		.buttonStyle(.borderedProminent)
 		.buttonBorderShape(.capsule)
+		.modifier {
+			if #available(iOS 26.0, *) {
+				$0.buttonStyle(.glassProminent)
+			} else {
+				$0.buttonStyle(.borderedProminent)
+			}
+		}
 	}
 }
 
@@ -48,8 +56,10 @@ struct SmallUserView: View {
 		followersCount: 0, followingCount: 0, fullName: "Felix", htmlUrl: "https://git.schindlerfelix.de/felix-schindler", id: 1, isAdmin: true, language: "", lastLogin: Date(), location: "",
 		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0, starredReposCount: 0, visibility: "", website: "")
 
-	VStack {
-		SmallUserView(user, showUsername: true)
-		SmallUserView(user, showUsername: false)
+	NavigationStack {
+		VStack {
+			SmallUserView(user, showUsername: true)
+			SmallUserView(user, showUsername: false)
+		}
 	}
 }

@@ -73,24 +73,26 @@ struct NotificationLoader: View {
 										.textual.structuredTextStyle(.gitHub)
 										.textual.textSelection(.enabled)
 								}.swipeActions {
-									if notif.unread || notif.pinned {
-										Button("Mark read", systemImage: "envelope.open") {
-											Task {
-												try? await mark(notif.id, status: .read)
-											}
-										}.tint(.accentColor)
-									} else {
-										Button("Mark pinned", systemImage: "pin") {
-											Task {
-												try? await mark(notif.id, status: .pinned)
-											}
-										}.tint(.orange)
-										Button("Mark unread", systemImage: "envelope.badge") {
-											Task {
-												try? await mark(notif.id, status: .unread)
-											}
-										}.tint(.accentColor)
-									}
+									HStack {
+										if notif.unread || notif.pinned {
+											Button("Mark read", systemImage: "envelope.open") {
+												Task {
+													try? await mark(notif.id, status: .read)
+												}
+											}.tint(.accentColor)
+										} else {
+											Button("Mark pinned", systemImage: "pin") {
+												Task {
+													try? await mark(notif.id, status: .pinned)
+												}
+											}.tint(.orange)
+											Button("Mark unread", systemImage: "envelope.badge") {
+												Task {
+													try? await mark(notif.id, status: .unread)
+												}
+											}.tint(.accentColor)
+										}
+									}.labelStyle(.iconOnly)
 								}
 							}
 						}

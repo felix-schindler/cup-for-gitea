@@ -33,7 +33,7 @@ struct OrgMembersLoader: View {
 						NoContentView("This organization has no members", systemImage: Icons.users.rawValue)
 					} else {
 						ForEach(success, id: \.id) { user in
-							SmallUserView(user)
+							SmallUserView(user, avatarSize: .medium)
 						}
 					}
 				case .failure(let failure):

@@ -15338,9 +15338,14 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/TopicResponse'
+            type: object
+            properties:
+              topics:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TopicResponse'
+            required:
+              - topics
     TopicNames:
       description: TopicNames
       content:
@@ -18024,13 +18029,8 @@ components:
       type: object
       required:
         - username
-        - description
-        - email
-        - full_name
-        - location
         - repo_admin_change_team_access
         - visibility
-        - website
       properties:
         description:
           description: The description of the organization

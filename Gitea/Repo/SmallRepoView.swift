@@ -32,6 +32,18 @@ struct SmallRepoView: View {
 						Text(repo.name)
 					}
 					Spacer()
+					if repo.fork {
+						Image(systemName: Icons.forks.rawValue)
+					}
+					if repo.template {
+						Image(systemName: "document.on.document")
+					}
+					if repo.mirror {
+						Image(systemName: "square.stack.3d.forward.dottedline")
+					}
+					if repo.archived {
+						Image(systemName: "archivebox")
+					}
 					VisibilityIcon(repo._private ? "private" : repo._internal ? "limited" : "")
 				}
 			})

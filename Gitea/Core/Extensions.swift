@@ -5,7 +5,7 @@
 //  Created by Felix Schindler on 09.05.26.
 //
 
-import Foundation
+import SwiftUI
 
 extension String {
 	var isNotEmpty: Bool {
@@ -40,4 +40,10 @@ extension URLCache {
 		memoryCapacity: 100 * 1024 * 1024,  // 100 MB in RAM
 		diskCapacity: 300 * 1024 * 1024  // 300 MB on disk
 	)
+}
+
+extension View {
+	func modifier(@ViewBuilder _ closure: (Self) -> some View) -> some View {
+		closure(self)
+	}
 }

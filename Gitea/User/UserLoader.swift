@@ -99,13 +99,19 @@ struct UserLoader: View {
 
 							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
-									NavigationLink(destination: FollowLoader(u.login, type: .followers)) {
-										PillView("\(u.followersCount) Followers")
+									NavigationLink("\(u.followersCount) Followers", destination: FollowLoader(u.login, type: .followers))
+									NavigationLink("\(u.followingCount) Following", destination: FollowLoader(u.login, type: .following))
+								}
+								.controlSize(.mini)
+								.buttonBorderShape(.capsule)
+								.modifier {
+									if #available(iOS 26.0, *) {
+										$0.buttonStyle(.glass)
+									} else {
+										$0.buttonStyle(.bordered)
 									}
-									NavigationLink(destination: FollowLoader(u.login, type: .following)) {
-										PillView("\(u.followingCount) Following")
-									}
-								}.font(.footnote)
+								}
+								.font(.footnote)
 							}
 
 							if u.description.isNotEmpty {

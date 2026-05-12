@@ -66,6 +66,7 @@ struct NewRepoView: View {
 			dismiss()
 		} catch {
 			self.error = error
+			HapticFeedback.notify(.error)
 		}
 	}
 

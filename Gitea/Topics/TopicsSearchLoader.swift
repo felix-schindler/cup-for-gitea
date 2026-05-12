@@ -15,7 +15,7 @@ struct TopicsSearchLoader: View {
 	private func load() async {
 		do {
 			let results = try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json
-			self.results = .success(results)
+			self.results = .success(results.topics)
 		} catch {
 			self.results = .failure(error)
 		}

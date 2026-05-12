@@ -31,7 +31,7 @@ struct UserSearchLoader: View {
 						NoContentView("There are no users", systemImage: icon)
 					} else {
 						ForEach(success, id: \.id) { user in
-							SmallUserView(user)
+							SmallUserView(user, avatarSize: .medium)
 						}
 					}
 				case .failure(let failure):

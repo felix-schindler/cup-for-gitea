@@ -64,7 +64,7 @@ struct FullRepoView: View {
 							Label("This repository is a fork of another repository.", systemImage: Icons.forks.rawValue)
 						}
 						if repo.template {
-							Text("This repository is a template.")
+							Label("This repository is a template.", systemImage: "document.on.document")
 						}
 						if repo.mirror {
 							Label("This repository is a mirror.", systemImage: "square.stack.3d.forward.dottedline")
