@@ -1,12 +1,19 @@
+# Privacy
+
+This app does not collect any data for itself. All the data collected is managed by the GitLab instance you configured yourself.
+
+Diese App sammelt keine Daten für sich selbst. Alle gesammelten Daten werden von der GitLab-Instanz verwaltet, die Sie selbst konfiguriert haben.
+
 # Icon
 
-![](./symbol.svg)
-
+* File: [symbol.svg](./symbol.svg)
 * Author: Jack Liu
 * License: Public Domain
 * Source: https://www.svgrepo.com/svg/477069/tea
 
-# Swagger -> OpenAPI (mit Fehlerkorrektur)
+# Useful commands
+
+## Swagger → OpenAPI
 
 ```
 curl https://git.schindlerfelix.de/swagger.v1.json > swagger.json
@@ -15,8 +22,14 @@ npx @redocly/cli@latest bundle openapi.yaml -o openapi.required.yaml
 mv openapi.required.yaml ./Gitea/Gitea/openapi.yaml
 ```
 
-# Licenses
+## Bundle Licenses
 
 ```
 license-plist --config-path license_plist.yml
+```
+
+## Add GitHub remote
+
+```
+git remote add github git@github.com:felix-schindler/cup-for-gitea.git
 ```
