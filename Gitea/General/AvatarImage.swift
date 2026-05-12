@@ -22,12 +22,6 @@ struct AvatarImage: View {
 	private let width: CGFloat
 	private let height: CGFloat
 
-	private var request: URLRequest {
-		var req = URLRequest(url: self.url)
-		req.setValue("token \(Network.shared.token ?? "")", forHTTPHeaderField: "Authorization")
-		return req
-	}
-
 	public init(
 		_ url: URL, radius: CGFloat = 10, width: CGFloat = 50,
 		height: CGFloat = 50
@@ -62,7 +56,7 @@ struct AvatarImage: View {
 	}
 
 	public var body: some View {
-		CachedAsyncImage(urlRequest: self.request, urlCache: .avatarCache) { phase in
+		CachedAsyncImage(url: url, urlCache: .avatarCache) { phase in
 			switch phase {
 			case .empty:
 				ProgressView()

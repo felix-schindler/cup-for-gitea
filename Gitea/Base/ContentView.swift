@@ -14,6 +14,7 @@ enum ContentTab: String, Hashable {
 struct ContentView: View {
 	@AppStorage("tab") var tab = ContentTab.home
 	@AppStorage("appearance") var appearance = ""
+	@StateObject private var sessionStore = SessionStore.shared
 
 	var body: some View {
 		Group {
@@ -36,6 +37,8 @@ struct ContentView: View {
 					}
 				}
 			}
+		}.task {
+			sessionStore.refresh()
 		}.preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)
 	}
 }

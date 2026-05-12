@@ -34,8 +34,12 @@ struct UserOrgLoader: View {
 			if let results {
 				switch results {
 				case .success(let success):
-					ForEach(success, id: \.id) { org in
-						SmallOrgView(org)
+					if success.isEmpty {
+						NoContentView("There are no organizations", systemImage: Icons.organizations.rawValue)
+					} else {
+						ForEach(success, id: \.id) { org in
+							SmallOrgView(org)
+						}
 					}
 				case .failure(let failure):
 					FailedView(failure)

@@ -14,6 +14,12 @@ struct SettingsView: View {
 	var body: some View {
 		Form {
 			Section {
+				NavigationLink(destination: InstancesView()) {
+					Label("Instances", systemImage: "server.rack")
+				}
+			}
+
+			Section {
 				Picker("Appearance", selection: $appearance) {
 					Text("System").tag("")
 					Text("Light").tag("light")

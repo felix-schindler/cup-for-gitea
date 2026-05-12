@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct GiteaApp: App {
+	@StateObject private var sessionStore = SessionStore.shared
+
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+			if sessionStore.needsSetup {
+				SetupView()
+			} else {
+				ContentView()
+			}
 		}
 	}
 }
