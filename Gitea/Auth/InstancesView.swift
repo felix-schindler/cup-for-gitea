@@ -38,7 +38,7 @@ struct InstancesView: View {
 			}
 			switchingId = nil
 		} else {
-			await Auth.logout()
+			Auth.logout()
 		}
 	}
 
