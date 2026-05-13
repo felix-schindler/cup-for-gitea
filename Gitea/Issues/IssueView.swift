@@ -52,9 +52,15 @@ struct IssueView: View {
 								.controlSize(.mini)
 								.buttonStyle(.bordered)
 							}
-							if let milestone = issue.milestone {
-								PillView(milestone.title.emojized(), systemImage: Icons.milestones.rawValue)
+						if let milestone = issue.milestone {
+							NavigationLink {
+								MilestonesLoader(owner: issue.repository.owner, repo: issue.repository.name)
+							} label: {
+								Label(milestone.title.emojized(), systemImage: Icons.milestones.rawValue)
 							}
+							.controlSize(.mini)
+							.buttonStyle(.bordered)
+						}
 						}
 					}
 

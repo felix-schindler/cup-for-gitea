@@ -113,7 +113,9 @@ struct FullRepoView: View {
 						NavigationLink("Labels") {
 							LabelsLoader(owner: repo.owner.login, repo: repo.name)
 						}
-						Text("Milestones")
+						NavigationLink("Milestones") {
+							MilestonesLoader(owner: repo.owner.login, repo: repo.name)
+						}
 						if repo.hasProjects {
 							Text("Projects")
 						}
