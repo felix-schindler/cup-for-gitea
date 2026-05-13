@@ -1,3 +1,5 @@
+name: HighlightedTextEditor, nameSpecified: HighlightedTextEditor, owner: kyle-n, version: 2.1.2, source: https://github.com/kyle-n/HighlightedTextEditor
+
 name: Highlightr, nameSpecified: Highlightr, owner: raspu, version: 2.3.0, source: https://github.com/raspu/Highlightr
 
 name: OpenAPIKit, nameSpecified: OpenAPIKit, owner: mattpolzin, version: 3.9.0, source: https://github.com/mattpolzin/OpenAPIKit
