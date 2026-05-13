@@ -6,10 +6,8 @@ Diese App sammelt keine Daten für sich selbst. Alle gesammelten Daten werden v
 
 # Icon
 
-* File: [symbol.svg](./symbol.svg)
-* Author: Jack Liu
-* License: Public Domain
-* Source: https://www.svgrepo.com/svg/477069/tea
+* License: CC0 - Creative Commons License
+* Source: https://3dicons.co/icons/845bf0-tea-cup
 
 # Useful commands
 
