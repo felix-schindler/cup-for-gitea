@@ -33,6 +33,23 @@ struct NotificationLoader: View {
 		_ = try await Network.shared.client.notifyReadThread(.init(path: .init(id: String(id)), query: .init(toStatus: status.rawValue))).resetContent.body.json
 	}
 
+	private func applyStatusChange(id: Int64, status: StatusChange) {
+		guard case .success(let current) = notifications else { return }
+		let shouldRemove: Bool
+		switch status {
+		case .read:
+			shouldRemove = showAll == false
+		case .unread:
+			shouldRemove = showAll == true
+		case .pinned:
+			shouldRemove = false
+		}
+
+		guard shouldRemove else { return }
+		let updated = current.filter { $0.id != id }
+		notifications = .success(updated)
+	}
+
 	var body: some View {
 		List {
 			Section {
@@ -47,9 +64,9 @@ struct NotificationLoader: View {
 			}
 
 			Section {
-				if let notifications {
-					switch notifications {
-					case .success(let success):
+								if let notifications {
+									switch notifications {
+									case .success(let success):
 						if success.isEmpty {
 							NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
 						} else {
@@ -74,27 +91,45 @@ struct NotificationLoader: View {
 										.textual.textSelection(.enabled)
 								}.swipeActions {
 									HStack {
-										if notif.unread || notif.pinned {
-											Button("Mark read", systemImage: "envelope.open") {
-												Task {
-													try? await mark(notif.id, status: .read)
-												}
-											}.tint(.accentColor)
-										} else {
-											Button("Mark pinned", systemImage: "pin") {
-												Task {
-													try? await mark(notif.id, status: .pinned)
-												}
-											}.tint(.orange)
-											Button("Mark unread", systemImage: "envelope.badge") {
-												Task {
-													try? await mark(notif.id, status: .unread)
-												}
-											}.tint(.accentColor)
+													if notif.unread || notif.pinned {
+														Button("Mark read", systemImage: "envelope.open") {
+															Task {
+																do {
+																	try await mark(notif.id, status: .read)
+																	applyStatusChange(id: notif.id, status: .read)
+																	HapticFeedback.notify(.success)
+																} catch {
+																	HapticFeedback.notify(.error)
+																}
+															}
+														}.tint(.accentColor)
+													} else {
+														Button("Mark pinned", systemImage: "pin") {
+															Task {
+																do {
+																	try await mark(notif.id, status: .pinned)
+																	applyStatusChange(id: notif.id, status: .pinned)
+																	HapticFeedback.notify(.success)
+																} catch {
+																	HapticFeedback.notify(.error)
+																}
+															}
+														}.tint(.orange)
+														Button("Mark unread", systemImage: "envelope.badge") {
+															Task {
+																do {
+																	try await mark(notif.id, status: .unread)
+																	applyStatusChange(id: notif.id, status: .unread)
+																	HapticFeedback.notify(.success)
+																} catch {
+																	HapticFeedback.notify(.error)
+																}
+															}
+														}.tint(.accentColor)
+													}
+												}.labelStyle(.iconOnly)
+											}
 										}
-									}.labelStyle(.iconOnly)
-								}
-							}
 						}
 					case .failure(let failure):
 						FailedView(failure)
