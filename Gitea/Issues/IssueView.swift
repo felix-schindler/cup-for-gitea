@@ -31,7 +31,7 @@ struct IssueView: View {
 					}.font(.footnote)
 
 					InlineText(markdown: issue.title.emojized())
-						.textual.structuredTextStyle(.gitHub)
+						.textual.inlineStyle(.gitHub)
 						.textual.textSelection(.enabled)
 
 					ScrollView(.horizontal, showsIndicators: false) {

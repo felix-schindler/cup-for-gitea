@@ -35,7 +35,7 @@ struct OrgView: View {
 
 					if org.description.isNotEmpty {
 						InlineText(markdown: org.description)
-							.textual.structuredTextStyle(.gitHub)
+							.textual.inlineStyle(.gitHub)
 							.textual.textSelection(.enabled)
 					}
 

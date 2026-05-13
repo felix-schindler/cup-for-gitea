@@ -87,7 +87,7 @@ struct NotificationLoader: View {
 									}
 
 									InlineText(markdown: notif.subject.title.emojized(), baseURL: Network.shared.serverURL)
-										.textual.structuredTextStyle(.gitHub)
+										.textual.inlineStyle(.gitHub)
 										.textual.textSelection(.enabled)
 								}.swipeActions {
 									HStack {
