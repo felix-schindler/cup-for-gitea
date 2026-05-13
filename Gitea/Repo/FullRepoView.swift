@@ -9,21 +9,6 @@ import OpenAPIRuntime
 import SwiftUI
 import Textual
 
-struct TrailingIconLabelStyle: LabelStyle {
-	var useSpacer: Bool = true
-
-	func makeBody(configuration: LabelStyleConfiguration) -> some View {
-		HStack {
-			configuration.title
-				.multilineTextAlignment(.leading)
-			if useSpacer {
-				Spacer()
-			}
-			configuration.icon
-		}
-	}
-}
-
 struct FullRepoView: View {
 	@State private var readmeContents: String?
 	@State private var copied = false
