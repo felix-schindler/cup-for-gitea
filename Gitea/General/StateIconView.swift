@@ -57,6 +57,21 @@ struct StateIconView: View {
 			}
 	}
 
+	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.PullRequest.StatePayload) {
+		if type != .issue {
+			fatalError("Wrong initializer")
+		}
+
+		self.icon = Icons.issues.rawValue
+		self.color =
+			switch state {
+			case .open:
+				.green
+			case .closed:
+				.red
+			}
+	}
+
 	var body: some View {
 		Image(systemName: self.icon)
 			.foregroundStyle(self.color)

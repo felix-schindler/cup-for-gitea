@@ -38,14 +38,22 @@ struct IssueView: View {
 						HStack {
 							SmallUserView(issue.user)
 
-							if let pr = issue.pullRequest {
-								NavigationLink(destination: PR_Loader()) {
+							if let pr = issue.pullRequest,
+								let url = URL(string: pr.htmlUrl)
+							{
+								NavigationLink(
+									destination: PullRequestLoader(
+										owner: issue.repository.owner,
+										repo: issue.repository.name,
+										index: issue.number
+									)
+								) {
 									Label(
 										title: {
-											Text("#\(URL(string: pr.htmlUrl)!.lastPathComponent)")
+											Text("#\(url.lastPathComponent)")
 										},
 										icon: {
-											Image(systemName: pr.merged ? Icons.pull_request_merged.rawValue : pr.draft ? "" : Icons.pull_requests.rawValue)
+											Image(systemName: pr.merged ? Icons.pull_request_merged.rawValue : Icons.pull_requests.rawValue)
 												.foregroundStyle(pr.merged ? .purple : pr.draft ? .secondary : .green)
 										})
 								}
@@ -150,7 +158,7 @@ struct IssueView: View {
 
 			if issue.comments != 0 {
 				Section("Comments") {
-					IssueCommentsLoader(owner: issue.repository.owner, repo: issue.repository.name, iid: issue.number)
+					CommentsLoader(owner: issue.repository.owner, repo: issue.repository.name, iid: issue.number)
 				}
 			}
 		}.toolbar {

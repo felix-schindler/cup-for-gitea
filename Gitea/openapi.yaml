@@ -22037,38 +22037,25 @@ components:
           $ref: '#/components/schemas/User'
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
-        - additions
         - allow_maintainer_edit
-        - assignee
-        - assignees
         - base
         - body
-        - changed_files
-        - closed_at
         - comments
         - content_version
         - created_at
-        - deletions
         - diff_url
         - draft
-        - due_date
         - head
         - html_url
         - id
         - is_locked
         - labels
         - merge_base
-        - merge_commit_sha
         - mergeable
         - merged
-        - merged_at
-        - merged_by
-        - milestone
         - number
         - patch_url
         - pin_order
-        - requested_reviewers
-        - requested_reviewers_teams
         - review_comments
         - state
         - title

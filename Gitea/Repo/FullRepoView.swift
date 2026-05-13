@@ -95,17 +95,19 @@ struct FullRepoView: View {
 				}
 
 				if repo.hasPullRequests {
-					Label(
-						title: {
-							HStack {
-								Text("Pull Requests")
-								Spacer()
-								Text("\(repo.openPrCounter)")
-							}
-						},
-						icon: {
-							Image(systemName: Icons.pull_requests.rawValue)
-						})
+					NavigationLink(destination: RepoPullRequestsLoader(owner: repo.owner.login, repo: repo.name)) {
+						Label(
+							title: {
+								HStack {
+									Text("Pull Requests")
+									Spacer()
+									Text("\(repo.openPrCounter)")
+								}
+							},
+							icon: {
+								Image(systemName: Icons.pull_requests.rawValue)
+							})
+					}
 				}
 
 				DisclosureGroup(

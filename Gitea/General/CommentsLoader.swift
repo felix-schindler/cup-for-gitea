@@ -1,14 +1,14 @@
 //
-//  IssueCommentsLoader.swift
+//  CommentsLoader.swift
 //  Gitea
 //
-//  Created by Felix Schindler on 12.05.26.
+//  Created by Felix Schindler on 13.05.26.
 //
 
 import SwiftUI
 import Textual
 
-struct IssueCommentsLoader: View {
+struct CommentsLoader: View {
 	let owner: String
 	let repo: String
 	let iid: Int64
@@ -17,7 +17,9 @@ struct IssueCommentsLoader: View {
 
 	private func load() async {
 		do {
-			let comments = try await Network.shared.client.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid))).ok.body.json
+			let comments = try await Network.shared.client
+				.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid)))
+				.ok.body.json
 			self.comments = .success(comments)
 		} catch {
 			self.comments = .failure(error)
@@ -97,7 +99,7 @@ struct IssueCommentsLoader: View {
 #Preview {
 	NavigationStack {
 		List {
-			IssueCommentsLoader(owner: "tanuki", repo: "gitea-ios", iid: 6)
+			CommentsLoader(owner: "tanuki", repo: "gitea-ios", iid: 6)
 		}
 	}
 }
