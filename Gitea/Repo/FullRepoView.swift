@@ -144,7 +144,9 @@ struct FullRepoView: View {
 								Text("Actions")
 							}
 							if repo.hasReleases {
-								Text("Releases")
+								NavigationLink("Releases") {
+									ReleaseLoader(owner: repo.owner.login, repo: repo.name)
+								}
 							}
 							if repo.hasPackages {
 								Text("Packages")
