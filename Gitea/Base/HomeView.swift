@@ -31,8 +31,6 @@ struct HomeView: View {
 				NavigationLink(destination: IssueSearchLoader(search: .constant(""))) {
 					Label("Issues", systemImage: Icons.issues.rawValue)
 				}
-				Label("Pull Requests", systemImage: Icons.pull_requests.rawValue)
-				Label("Milestones", systemImage: Icons.milestones.rawValue)
 				NavigationLink(destination: UserReposLoader()) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
