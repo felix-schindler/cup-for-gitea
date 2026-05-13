@@ -46,7 +46,7 @@ struct RepoIssueLoader: View {
 		}.refreshable {
 			await load()
 		}.toolbar {
-			NavigationLink(destination: NewIssueView()) {
+			NavigationLink(destination: NewIssueView(owner: owner, repo: repo)) {
 				Label("New Issue", systemImage: "plus")
 			}
 		}.navigationTitle("Issues")

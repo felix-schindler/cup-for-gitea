@@ -64,9 +64,9 @@ struct NotificationLoader: View {
 			}
 
 			Section {
-								if let notifications {
-									switch notifications {
-									case .success(let success):
+				if let notifications {
+					switch notifications {
+					case .success(let success):
 						if success.isEmpty {
 							NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
 						} else {
@@ -91,45 +91,45 @@ struct NotificationLoader: View {
 										.textual.textSelection(.enabled)
 								}.swipeActions {
 									HStack {
-													if notif.unread || notif.pinned {
-														Button("Mark read", systemImage: "envelope.open") {
-															Task {
-																do {
-																	try await mark(notif.id, status: .read)
-																	applyStatusChange(id: notif.id, status: .read)
-																	HapticFeedback.notify(.success)
-																} catch {
-																	HapticFeedback.notify(.error)
-																}
-															}
-														}.tint(.accentColor)
-													} else {
-														Button("Mark pinned", systemImage: "pin") {
-															Task {
-																do {
-																	try await mark(notif.id, status: .pinned)
-																	applyStatusChange(id: notif.id, status: .pinned)
-																	HapticFeedback.notify(.success)
-																} catch {
-																	HapticFeedback.notify(.error)
-																}
-															}
-														}.tint(.orange)
-														Button("Mark unread", systemImage: "envelope.badge") {
-															Task {
-																do {
-																	try await mark(notif.id, status: .unread)
-																	applyStatusChange(id: notif.id, status: .unread)
-																	HapticFeedback.notify(.success)
-																} catch {
-																	HapticFeedback.notify(.error)
-																}
-															}
-														}.tint(.accentColor)
+										if notif.unread || notif.pinned {
+											Button("Mark read", systemImage: "envelope.open") {
+												Task {
+													do {
+														try await mark(notif.id, status: .read)
+														applyStatusChange(id: notif.id, status: .read)
+														HapticFeedback.notify(.success)
+													} catch {
+														HapticFeedback.notify(.error)
 													}
-												}.labelStyle(.iconOnly)
-											}
+												}
+											}.tint(.accentColor)
+										} else {
+											Button("Mark pinned", systemImage: "pin") {
+												Task {
+													do {
+														try await mark(notif.id, status: .pinned)
+														applyStatusChange(id: notif.id, status: .pinned)
+														HapticFeedback.notify(.success)
+													} catch {
+														HapticFeedback.notify(.error)
+													}
+												}
+											}.tint(.orange)
+											Button("Mark unread", systemImage: "envelope.badge") {
+												Task {
+													do {
+														try await mark(notif.id, status: .unread)
+														applyStatusChange(id: notif.id, status: .unread)
+														HapticFeedback.notify(.success)
+													} catch {
+														HapticFeedback.notify(.error)
+													}
+												}
+											}.tint(.accentColor)
 										}
+									}.labelStyle(.iconOnly)
+								}
+							}
 						}
 					case .failure(let failure):
 						FailedView(failure)

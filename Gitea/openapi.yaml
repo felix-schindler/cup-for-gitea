@@ -17852,14 +17852,6 @@ components:
       type: object
       required:
         - title
-        - assignee
-        - assignees
-        - body
-        - closed
-        - due_date
-        - labels
-        - milestone
-        - ref
       properties:
         assignee:
           description: deprecated

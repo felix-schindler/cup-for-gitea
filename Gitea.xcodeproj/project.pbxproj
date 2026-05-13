@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC3382D92FB4CD4900EBB6D4 /* HighlightedTextEditor in Frameworks */ = {isa = PBXBuildFile; productRef = DC3382D82FB4CD4900EBB6D4 /* HighlightedTextEditor */; };
 		DC3950342FAFE7D900D5984A /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = DC3950332FAFE7D900D5984A /* Textual */; };
 		DC39503C2FAFE94400D5984A /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = DC39503B2FAFE94400D5984A /* OpenAPIRuntime */; };
 		DC39503F2FAFE95500D5984A /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = DC39503E2FAFE95500D5984A /* OpenAPIURLSession */; };
@@ -38,6 +39,7 @@
 				DC39503C2FAFE94400D5984A /* OpenAPIRuntime in Frameworks */,
 				DC5C68BD2FAFF7250012D957 /* CachedAsyncImage in Frameworks */,
 				DC39503F2FAFE95500D5984A /* OpenAPIURLSession in Frameworks */,
+				DC3382D92FB4CD4900EBB6D4 /* HighlightedTextEditor in Frameworks */,
 				DC3950342FAFE7D900D5984A /* Textual in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,6 +91,7 @@
 				DC39503E2FAFE95500D5984A /* OpenAPIURLSession */,
 				DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */,
 				DC5C68C02FAFF7410012D957 /* Highlightr */,
+				DC3382D82FB4CD4900EBB6D4 /* HighlightedTextEditor */,
 			);
 			productName = Gitea;
 			productReference = DC394FFC2FAFE4BC00D5984A /* Gitea.app */;
@@ -126,6 +129,7 @@
 				DC5C68572FAFEDD70012D957 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
 				DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 				DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */,
+				DC3382D72FB4CD4900EBB6D4 /* XCRemoteSwiftPackageReference "HighlightedTextEditor" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DC394FFD2FAFE4BC00D5984A /* Products */;
@@ -395,6 +399,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DC3382D72FB4CD4900EBB6D4 /* XCRemoteSwiftPackageReference "HighlightedTextEditor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kyle-n/HighlightedTextEditor";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
+			};
+		};
 		DC3950322FAFE7D900D5984A /* XCRemoteSwiftPackageReference "textual" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/gonzalezreal/textual";
@@ -446,6 +458,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DC3382D82FB4CD4900EBB6D4 /* HighlightedTextEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC3382D72FB4CD4900EBB6D4 /* XCRemoteSwiftPackageReference "HighlightedTextEditor" */;
+			productName = HighlightedTextEditor;
+		};
 		DC3950332FAFE7D900D5984A /* Textual */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DC3950322FAFE7D900D5984A /* XCRemoteSwiftPackageReference "textual" */;
