@@ -125,16 +125,7 @@ struct FullRepoView: View {
 
 				DisclosureGroup(
 					content: {
-						Text("Members")
 						Text("Labels")
-					},
-					label: {
-						Label("Manage", systemImage: "person.2")
-					}
-				)
-
-				DisclosureGroup(
-					content: {
 						Text("Milestones")
 						if repo.hasProjects {
 							Text("Projects")
