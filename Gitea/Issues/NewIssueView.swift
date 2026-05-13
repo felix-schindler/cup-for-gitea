@@ -29,6 +29,20 @@ struct NewIssueView: View {
 
 	@State private var error: Error?
 
+	private func toggleLabel(_ label: Components.Schemas.Label, labels: [Components.Schemas.Label]) {
+		if setLabels.contains(label.id) {
+			setLabels.removeAll { $0 == label.id }
+			return
+		}
+
+		if label.exclusive {
+			let exclusiveIds = Set(labels.filter { $0.exclusive }.map { $0.id })
+			setLabels.removeAll { exclusiveIds.contains($0) }
+		}
+
+		setLabels.append(label.id)
+	}
+
 	private func load() async {
 		async let labels = try? await Network.shared.client
 			.issueListLabels(.init(path: .init(owner: owner, repo: repo)))
@@ -120,11 +134,7 @@ struct NewIssueView: View {
 				Section {
 					ForEach(labels, id: \.id) { label in
 						Button {
-							if setLabels.contains(label.id) {
-								setLabels.removeAll { $0 == label.id }
-							} else {
-								setLabels.append(label.id)
-							}
+							toggleLabel(label, labels: labels)
 						} label: {
 							HStack {
 								Circle()
