@@ -110,7 +110,9 @@ struct FullRepoView: View {
 
 				DisclosureGroup(
 					content: {
-						Text("Labels")
+						NavigationLink("Labels") {
+							LabelsLoader(owner: repo.owner.login, repo: repo.name)
+						}
 						Text("Milestones")
 						if repo.hasProjects {
 							Text("Projects")

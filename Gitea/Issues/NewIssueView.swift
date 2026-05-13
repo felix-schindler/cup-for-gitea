@@ -137,10 +137,7 @@ struct NewIssueView: View {
 							toggleLabel(label, labels: labels)
 						} label: {
 							HStack {
-								Circle()
-									.fill(Color(hex: label.color))
-									.frame(width: 12, height: 12)
-								Text(label.name.emojized())
+								SmallLabelView(label: label)
 								Spacer()
 								if setLabels.contains(label.id) {
 									Image(systemName: "checkmark")
