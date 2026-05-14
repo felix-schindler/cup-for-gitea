@@ -1,9 +1,3 @@
-# Privacy
-
-This app does not collect any data for itself. All the data collected is managed by the Gitea instance you configured yourself.
-
-Diese App sammelt keine Daten für sich selbst. Alle gesammelten Daten werden von der Gitea-Instanz verwaltet, die Sie selbst konfiguriert haben.
-
 # Icon
 
 * License: CC0 - Creative Commons License
