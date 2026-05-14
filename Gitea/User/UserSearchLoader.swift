@@ -11,12 +11,20 @@ struct UserSearchLoader: View {
 	@Binding var search: String
 	@State private var results: Result<[Components.Schemas.User], Error>? = nil
 	private let icon = Icons.users.rawValue
+	private let debounceNanoseconds: UInt64 = 350_000_000
 
-	private func load() async {
+	private func load(debounced: Bool = false) async {
+		self.results = nil
+		if debounced {
+			try? await Task.sleep(nanoseconds: debounceNanoseconds)
+			if Task.isCancelled { return }
+		}
 		do {
 			let results = try await Network.shared.client.userSearch(.init(query: .init(q: search))).ok.body.json.data
+			if Task.isCancelled { return }
 			self.results = .success(results)
 		} catch {
+			if Task.isCancelled { return }
 			print(error, error.localizedDescription)
 			self.results = .failure(error)
 		}
@@ -40,8 +48,8 @@ struct UserSearchLoader: View {
 			} else {
 				LoadingView("Loading users", systemImage: icon)
 			}
-		}.task {
-			await load()
+		}.task(id: search) {
+			await load(debounced: true)
 		}.refreshable {
 			await load()
 		}
