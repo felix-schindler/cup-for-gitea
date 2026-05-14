@@ -70,13 +70,13 @@ struct OrgView: View {
 				NavigationLink(destination: OrgReposLoader(org.name)) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
-				Label("Projects", systemImage: Icons.projects.rawValue)
-				Label("Packages", systemImage: Icons.packages.rawValue)
+				// Label("Projects", systemImage: Icons.projects.rawValue)
+				// Label("Packages", systemImage: Icons.packages.rawValue)
 				NavigationLink(destination: OrgMembersLoader(org.name)) {
 					Label("Members", systemImage: Icons.users.rawValue)
 				}
-				Label("Teams", systemImage: "person.2")
-				Label("Worktime", systemImage: "clock")
+				// Label("Teams", systemImage: "person.2")
+				// Label("Worktime", systemImage: "clock")
 			}
 		}
 	}

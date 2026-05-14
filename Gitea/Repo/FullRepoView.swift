@@ -118,45 +118,45 @@ struct FullRepoView: View {
 						NavigationLink("Milestones") {
 							MilestonesLoader(owner: repo.owner.login, repo: repo.name)
 						}
-						if repo.hasProjects {
-							Text("Projects")
-						}
-						if repo.hasWiki {
-							Text("Wiki")
-						}
+						// if repo.hasProjects {
+						// 	Text("Projects")
+						// }
+						// if repo.hasWiki {
+						// 	Text("Wiki")
+						// }
 					},
 					label: {
 						Label("Plan", systemImage: "calendar.badge.checkmark")
 					}
 				)
 
-				if repo.hasCode {
-					DisclosureGroup(
-						content: {
-							Text("Code")
-							Text("Commits")
-							Text("Branches")
-							Text("Tags")
-						},
-						label: {
-							Label("Repository", systemImage: Icons.code.rawValue)
-						})
-				}
+				// if repo.hasCode {
+				// 	DisclosureGroup(
+				// 		content: {
+				// 			Text("Code")
+				// 			Text("Commits")
+				// 			Text("Branches")
+				// 			Text("Tags")
+				// 		},
+				// 		label: {
+				// 			Label("Repository", systemImage: Icons.code.rawValue)
+				// 		})
+				// }
 
-				if repo.hasReleases || repo.hasActions || repo.hasPackages {
+				if repo.hasReleases /*|| repo.hasActions || repo.hasPackages*/ {
 					DisclosureGroup(
 						content: {
-							if repo.hasActions {
-								Text("Actions")
-							}
+							// if repo.hasActions {
+							// 	Text("Actions")
+							// }
 							if repo.hasReleases {
 								NavigationLink("Releases") {
 									ReleaseLoader(owner: repo.owner.login, repo: repo.name)
 								}
 							}
-							if repo.hasPackages {
-								Text("Packages")
-							}
+							// if repo.hasPackages {
+							// 	Text("Packages")
+							// }
 						},
 						label: {
 							Label("Build", systemImage: "flag")

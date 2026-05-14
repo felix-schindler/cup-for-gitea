@@ -135,9 +135,9 @@ struct UserLoader: View {
 							Label("Organizations", systemImage: Icons.organizations.rawValue)
 						}
 
-						Label("Projects", systemImage: Icons.projects.rawValue)
-						Label("Packages", systemImage: Icons.packages.rawValue)
-						Label("Public Activity", systemImage: Icons.activity.rawValue)
+						// Label("Projects", systemImage: Icons.projects.rawValue)
+						// Label("Packages", systemImage: Icons.packages.rawValue)
+						// Label("Public Activity", systemImage: Icons.activity.rawValue)
 
 						NavigationLink(
 							destination: StarredReposLoader(username),
