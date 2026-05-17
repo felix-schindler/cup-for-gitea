@@ -30,28 +30,17 @@ struct UserOrgLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let results {
-				switch results {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no organizations", systemImage: Icons.organizations.rawValue)
-					} else {
-						ForEach(success, id: \.id) { org in
-							SmallOrgView(org)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading organizations", systemImage: Icons.organizations.rawValue)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Organizations")
+		LoadableList(
+			result: results,
+			id: \.id,
+			loadingText: "Loading organizations",
+			emptyText: "There are no organizations",
+			icon: Icons.organizations.rawValue,
+			load: load
+		) { org in
+			SmallOrgView(org)
+		}
+		.navigationTitle("Organizations")
 	}
 }
 

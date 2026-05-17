@@ -26,28 +26,17 @@ struct MilestonesLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let results {
-				switch results {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no milestones", systemImage: icon)
-					} else {
-						ForEach(success, id: \.id) { milestone in
-							Text(milestone.title.emojized())
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading Milestones", systemImage: icon)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Milestones")
+		LoadableList(
+			result: results,
+			id: \.id,
+			loadingText: "Loading Milestones",
+			emptyText: "There are no milestones",
+			icon: icon,
+			load: load
+		) { milestone in
+			Text(milestone.title.emojized())
+		}
+		.navigationTitle("Milestones")
 	}
 }
 

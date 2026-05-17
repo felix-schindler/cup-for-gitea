@@ -26,28 +26,17 @@ struct LabelsLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let results {
-				switch results {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no labels", systemImage: icon)
-					} else {
-						ForEach(success, id: \.id) { label in
-							SmallLabelView(label: label)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading Labels", systemImage: icon)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Labels")
+		LoadableList(
+			result: results,
+			id: \.id,
+			loadingText: "Loading Labels",
+			emptyText: "There are no labels",
+			icon: icon,
+			load: load
+		) { label in
+			SmallLabelView(label: label)
+		}
+		.navigationTitle("Labels")
 	}
 }
 

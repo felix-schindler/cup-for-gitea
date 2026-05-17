@@ -37,27 +37,16 @@ struct FollowLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let users {
-				switch users {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no users", systemImage: Icons.users.rawValue)
-					} else {
-						ForEach(success, id: \.id) { user in
-							SmallUserView(user, avatarSize: .medium)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading users", systemImage: Icons.users.rawValue)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Users")
+		LoadableList(
+			result: users,
+			id: \.id,
+			loadingText: "Loading users",
+			emptyText: "There are no users",
+			icon: Icons.users.rawValue,
+			load: load
+		) { user in
+			SmallUserView(user, avatarSize: .medium)
+		}
+		.navigationTitle("Users")
 	}
 }

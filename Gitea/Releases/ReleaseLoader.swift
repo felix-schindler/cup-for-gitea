@@ -23,27 +23,16 @@ struct ReleaseLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let releases {
-				switch releases {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no releases", systemImage: Icons.topics.rawValue)
-					} else {
-						ForEach(success, id: \.id) { release in
-							ReleaseView(release)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading Releases", systemImage: Icons.topics.rawValue)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Releases")
+		LoadableList(
+			result: releases,
+			id: \.id,
+			loadingText: "Loading Releases",
+			emptyText: "There are no releases",
+			icon: Icons.topics.rawValue,
+			load: load
+		) { release in
+			ReleaseView(release)
+		}
+		.navigationTitle("Releases")
 	}
 }

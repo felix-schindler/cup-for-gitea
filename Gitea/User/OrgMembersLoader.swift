@@ -25,27 +25,16 @@ struct OrgMembersLoader: View {
 	}
 
 	var body: some View {
-		List {
-			if let users {
-				switch users {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("This organization has no members", systemImage: Icons.users.rawValue)
-					} else {
-						ForEach(success, id: \.id) { user in
-							SmallUserView(user, avatarSize: .medium)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading members", systemImage: Icons.users.rawValue)
-			}
-		}.task {
-			await load()
-		}.refreshable {
-			await load()
-		}.navigationTitle("Members")
+		LoadableList(
+			result: users,
+			id: \.id,
+			loadingText: "Loading members",
+			emptyText: "This organization has no members",
+			icon: Icons.users.rawValue,
+			load: load
+		) { user in
+			SmallUserView(user, avatarSize: .medium)
+		}
+		.navigationTitle("Members")
 	}
 }
