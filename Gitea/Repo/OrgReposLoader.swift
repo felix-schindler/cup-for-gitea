@@ -10,25 +10,21 @@ import SwiftUI
 struct OrgReposLoader: View {
 	let org: String
 	private let icon = Icons.repositories.rawValue
-	@State private var repos: Result<[Components.Schemas.Repository], Error>?
+	@State private var state = LoadState<[Components.Schemas.Repository]>.loading
 
 	init(_ org: String) {
 		self.org = org
 	}
 
 	private func load() async {
-		do {
-			let repos = try await Network.shared.client.orgListRepos(.init(path: .init(org: org))).ok.body.json
-			self.repos = .success(repos)
-		} catch {
-			print(error, error.localizedDescription)
-			self.repos = .failure(error)
+		state = await LoadState {
+			try await Network.shared.client.orgListRepos(.init(path: .init(org: org))).ok.body.json
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: repos,
+			state: state,
 			id: \.id,
 			loadingText: "Loading Repositories",
 			emptyText: "There are no Repositories",

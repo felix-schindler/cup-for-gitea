@@ -10,18 +10,15 @@ import SwiftUI
 struct HomeView: View {
 	@State var showNotifications = false
 	@State var showNotificationsBadge = false
-	@State var starredRepos: Result<[Components.Schemas.Repository], Error>?
+	@State private var starredState = LoadState<[Components.Schemas.Repository]>.loading
 
 	private func load() async {
 		if let count = try? await Network.shared.client.notifyNewAvailable().ok.body.json.new, count > 0 {
 			showNotificationsBadge = true
 		}
 
-		do {
-			let repos = try await Network.shared.client.userCurrentListStarred().ok.body.json
-			starredRepos = .success(repos)
-		} catch {
-			starredRepos = .failure(error)
+		starredState = await LoadState {
+			try await Network.shared.client.userCurrentListStarred().ok.body.json
 		}
 	}
 
@@ -46,21 +43,19 @@ struct HomeView: View {
 			}
 
 			Section("Starred repositories") {
-				if let starredRepos {
-					switch starredRepos {
-					case .success(let success):
-						if success.isEmpty {
-							NoContentView("You don't have starred repositories", systemImage: Icons.starred.rawValue)
-						} else {
-							ForEach(success, id: \.id) { repo in
-								SmallRepoView(repo, showFullName: true)
-							}
-						}
-					case .failure(let failure):
-						FailedView(failure)
-					}
-				} else {
+				switch starredState {
+				case .loading:
 					LoadingView("Loading starred repositories", systemImage: Icons.starred.rawValue)
+				case .loaded(let repos):
+					if repos.isEmpty {
+						NoContentView("You don't have starred repositories", systemImage: Icons.starred.rawValue)
+					} else {
+						ForEach(repos, id: \.id) { repo in
+							SmallRepoView(repo, showFullName: true)
+						}
+					}
+				case .failed(let failure):
+					FailedView(failure)
 				}
 			}
 		}.toolbar {

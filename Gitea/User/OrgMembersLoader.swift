@@ -9,24 +9,21 @@ import SwiftUI
 
 struct OrgMembersLoader: View {
 	private let org: String
-	@State private var users: Result<[Components.Schemas.User], Error>? = nil
+	@State private var state = LoadState<[Components.Schemas.User]>.loading
 
 	init(_ org: String) {
 		self.org = org
 	}
 
 	private func load() async {
-		do {
-			let members = try await Network.shared.client.orgListMembers(path: .init(org: org)).ok.body.json
-			self.users = .success(members)
-		} catch {
-			self.users = .failure(error)
+		state = await LoadState {
+			try await Network.shared.client.orgListMembers(path: .init(org: org)).ok.body.json
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: users,
+			state: state,
 			id: \.id,
 			loadingText: "Loading members",
 			emptyText: "This organization has no members",

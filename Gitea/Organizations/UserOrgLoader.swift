@@ -9,29 +9,25 @@ import SwiftUI
 
 struct UserOrgLoader: View {
 	let username: String?
-	@State private var results: Result<[Components.Schemas.Organization], Error>? = nil
+	@State private var state = LoadState<[Components.Schemas.Organization]>.loading
 
 	init(_ username: String? = nil) {
 		self.username = username
 	}
 
 	func load() async {
-		do {
-			var orgs: [Components.Schemas.Organization]
+		state = await LoadState {
 			if let username {
-				orgs = try await Network.shared.client.orgListUserOrgs(.init(path: .init(username: username))).ok.body.json
+				try await Network.shared.client.orgListUserOrgs(.init(path: .init(username: username))).ok.body.json
 			} else {
-				orgs = try await Network.shared.client.orgListCurrentUserOrgs().ok.body.json
+				try await Network.shared.client.orgListCurrentUserOrgs().ok.body.json
 			}
-			self.results = .success(orgs)
-		} catch {
-			self.results = .failure(error)
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: results,
+			state: state,
 			id: \.id,
 			loadingText: "Loading organizations",
 			emptyText: "There are no organizations",

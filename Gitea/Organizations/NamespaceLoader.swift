@@ -9,32 +9,27 @@ import SwiftUI
 
 struct NamespaceLoader: View {
 	let owner: String
-	@State private var org: Result<Components.Schemas.Organization, Error>? = nil
+	@State private var state = LoadState<Components.Schemas.Organization>.loading
 
 	init(_ owner: String) {
 		self.owner = owner
 	}
 
 	private func load() async {
-		do {
-			let org = try await Network.shared.client.orgGet(path: .init(org: owner)).ok.body.json
-			self.org = .success(org)
-		} catch {
-			self.org = .failure(error)
+		state = await LoadState {
+			try await Network.shared.client.orgGet(path: .init(org: owner)).ok.body.json
 		}
 	}
 
 	var body: some View {
 		VStack {
-			if let org {
-				switch org {
-				case .success(let success):
-					OrgView(org: success)
-				case .failure:
-					UserLoader(username: owner)
-				}
-			} else {
+			switch state {
+			case .loading:
 				LoadingView("Loading namespace", systemImage: "person.3")
+			case .loaded(let org):
+				OrgView(org: org)
+			case .failed:
+				UserLoader(username: owner)
 			}
 		}.task {
 			await load()

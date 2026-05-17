@@ -11,27 +11,23 @@ struct LabelsLoader: View {
 	let owner: String
 	let repo: String
 
-	@State private var results: Result<[Components.Schemas.Label], Error>?
-	private let icon = Icons.topics.rawValue
+	@State private var state = LoadState<[Components.Schemas.Label]>.loading
 
 	private func load() async {
-		do {
-			let results = try await Network.shared.client
+		state = await LoadState {
+			try await Network.shared.client
 				.issueListLabels(.init(path: .init(owner: owner, repo: repo)))
 				.ok.body.json
-			self.results = .success(results)
-		} catch {
-			self.results = .failure(error)
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: results,
+			state: state,
 			id: \.id,
 			loadingText: "Loading Labels",
 			emptyText: "There are no labels",
-			icon: icon,
+			icon: Icons.topics.rawValue,
 			load: load
 		) { label in
 			SmallLabelView(label: label)

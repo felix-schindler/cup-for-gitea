@@ -13,31 +13,25 @@ struct PullRequestLoader: View {
 	let repo: String
 	let index: Int64
 
-	@State private var result: Result<Components.Schemas.PullRequest, Error>?
-	private let icon = Icons.pull_requests.rawValue
+	@State private var state = LoadState<Components.Schemas.PullRequest>.loading
 
 	private func load() async {
-		do {
-			let pr = try await Network.shared.client
+		state = await LoadState {
+			try await Network.shared.client
 				.repoGetPullRequest(.init(path: .init(owner: owner, repo: repo, index: index)))
 				.ok.body.json
-			self.result = .success(pr)
-		} catch {
-			self.result = .failure(error)
 		}
 	}
 
 	var body: some View {
 		Group {
-			if let result {
-				switch result {
-				case .success(let pr):
-					IssueView(pr)
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
-				LoadingView("Loading Pull Request", systemImage: icon)
+			switch state {
+			case .loading:
+				LoadingView("Loading Pull Request", systemImage: Icons.pull_requests.rawValue)
+			case .loaded(let pr):
+				IssueView(pr)
+			case .failed(let failure):
+				FailedView(failure)
 			}
 		}.task {
 			await load()

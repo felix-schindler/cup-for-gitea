@@ -9,47 +9,40 @@ import SwiftUI
 
 struct TopicsSearchLoader: View {
 	@Binding var search: String
-	@State private var results: Result<[Components.Schemas.TopicResponse], Error>?
+	@State private var state = LoadState<[Components.Schemas.TopicResponse]>.loading
 	private let icon = Icons.topics.rawValue
 	private let debounceNanoseconds: UInt64 = 350_000_000
 
 	private func load(debounced: Bool = false) async {
-		self.results = nil
+		state = .loading
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
 		}
-		do {
-			let results = try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json
-			if Task.isCancelled { return }
-			self.results = .success(results.topics)
-		} catch {
-			if Task.isCancelled { return }
-			self.results = .failure(error)
+		state = await LoadState {
+			try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json.topics
 		}
 	}
 
 	var body: some View {
 		List {
-			if let results {
-				switch results {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no Topics", systemImage: icon)
-					} else {
-						ForEach(success, id: \.id) { topic in
-							HStack {
-								Text(topic.topicName)
-								Spacer()
-								Text("\(topic.repoCount)")
-							}
+			switch state {
+			case .loading:
+				LoadingView("Loading Topics", systemImage: icon)
+			case .loaded(let topics):
+				if topics.isEmpty {
+					NoContentView("There are no Topics", systemImage: icon)
+				} else {
+					ForEach(topics, id: \.id) { topic in
+						HStack {
+							Text(topic.topicName)
+							Spacer()
+							Text("\(topic.repoCount)")
 						}
 					}
-				case .failure(let failure):
-					FailedView(failure)
 				}
-			} else {
-				LoadingView("Loading Topics", systemImage: icon)
+			case .failed(let failure):
+				FailedView(failure)
 			}
 		}.task(id: search) {
 			await load(debounced: true)

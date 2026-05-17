@@ -13,76 +13,71 @@ struct CommentsLoader: View {
 	let repo: String
 	let iid: Int64
 
-	@State private var comments: Result<[Components.Schemas.Comment], Error>?
+	@State private var state = LoadState<[Components.Schemas.Comment]>.loading
 
 	private func load() async {
-		do {
-			let comments = try await Network.shared.client
+		state = await LoadState {
+			try await Network.shared.client
 				.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid)))
 				.ok.body.json
-			self.comments = .success(comments)
-		} catch {
-			self.comments = .failure(error)
 		}
 	}
 
 	var body: some View {
 		Group {
-			if let comments {
-				switch comments {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no comments", systemImage: Icons.comments.rawValue)
-					} else {
-						ForEach(success, id: \.id) { c in
-							VStack(alignment: .leading) {
-								HStack {
-									ScrollView(.horizontal) {
-										SmallUserView(c.user)
-									}
-									Text(c.createdAt.toString())
-										.font(.footnote)
+			switch state {
+			case .loading:
+				LoadingView("Loading comments", systemImage: Icons.comments.rawValue)
+			case .loaded(let comments):
+				if comments.isEmpty {
+					NoContentView("There are no comments", systemImage: Icons.comments.rawValue)
+				} else {
+					ForEach(comments, id: \.id) { c in
+						VStack(alignment: .leading) {
+							HStack {
+								ScrollView(.horizontal) {
+									SmallUserView(c.user)
 								}
-								StructuredText(markdown: c.body.emojized())
-									.textual.structuredTextStyle(.gitHub)
-									.textual.textSelection(.enabled)
+								Text(c.createdAt.toString())
+									.font(.footnote)
+							}
+							StructuredText(markdown: c.body.emojized())
+								.textual.structuredTextStyle(.gitHub)
+								.textual.textSelection(.enabled)
 
-								if c.assets.isNotEmpty {
-									ScrollView(.horizontal) {
-										HStack {
-											ForEach(c.assets, id: \.id) { a in
-												if let url = URL(string: a.browserDownloadUrl) {
-													Link(
-														destination: url,
-														label: {
-															Label("\(a.name) (\(ByteFormatter.shared.format(a.size)))", systemImage: "square.and.arrow.down")
-																.modifier {
-																	if #available(iOS 26.0, *) {
-																		$0.labelIconToTitleSpacing(5)
-																	}
+							if c.assets.isNotEmpty {
+								ScrollView(.horizontal) {
+									HStack {
+										ForEach(c.assets, id: \.id) { a in
+											if let url = URL(string: a.browserDownloadUrl) {
+												Link(
+													destination: url,
+													label: {
+														Label("\(a.name) (\(ByteFormatter.shared.format(a.size)))", systemImage: "square.and.arrow.down")
+															.modifier {
+																if #available(iOS 26.0, *) {
+																	$0.labelIconToTitleSpacing(5)
 																}
-														}
-													)
-													.controlSize(.mini)
-													.buttonBorderShape(.capsule)
-													.adaptiveButtonStyle()
-												}
+															}
+													}
+												)
+												.controlSize(.mini)
+												.buttonBorderShape(.capsule)
+												.adaptiveButtonStyle()
 											}
 										}
 									}
 								}
-							}.swipeActions {
-								if let url = URL(string: c.htmlUrl) {
-									ShareLink(item: url)
-								}
+							}
+						}.swipeActions {
+							if let url = URL(string: c.htmlUrl) {
+								ShareLink(item: url)
 							}
 						}
 					}
-				case .failure(let failure):
-					FailedView(failure)
 				}
-			} else {
-				LoadingView("Loading comments", systemImage: Icons.comments.rawValue)
+			case .failed(let failure):
+				FailedView(failure)
 			}
 		}.task {
 			await load()

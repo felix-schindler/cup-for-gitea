@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID: Hashable, Row: View {
-	let result: Result<Data, Error>?
+	let state: LoadState<Data>
 	let id: KeyPath<Data.Element, ID>
 	let loadingText: LocalizedStringResource
 	let emptyText: LocalizedStringResource
@@ -18,21 +18,19 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 
 	var body: some View {
 		List {
-			if let result {
-				switch result {
-				case .success(let data):
-					if data.isEmpty {
-						NoContentView(emptyText, systemImage: icon)
-					} else {
-						ForEach(data, id: id) { element in
-							row(element)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
+			switch state {
+			case .loading:
 				LoadingView(loadingText, systemImage: icon)
+			case .loaded(let data):
+				if data.isEmpty {
+					NoContentView(emptyText, systemImage: icon)
+				} else {
+					ForEach(data, id: id) { element in
+						row(element)
+					}
+				}
+			case .failed(let failure):
+				FailedView(failure)
 			}
 		}
 		.task {

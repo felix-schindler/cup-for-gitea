@@ -11,27 +11,23 @@ struct MilestonesLoader: View {
 	let owner: String
 	let repo: String
 
-	@State private var results: Result<[Components.Schemas.Milestone], Error>?
-	private let icon = Icons.milestones.rawValue
+	@State private var state = LoadState<[Components.Schemas.Milestone]>.loading
 
 	private func load() async {
-		do {
-			let results = try await Network.shared.client
+		state = await LoadState {
+			try await Network.shared.client
 				.issueGetMilestonesList(.init(path: .init(owner: owner, repo: repo)))
 				.ok.body.json
-			self.results = .success(results)
-		} catch {
-			self.results = .failure(error)
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: results,
+			state: state,
 			id: \.id,
 			loadingText: "Loading Milestones",
 			emptyText: "There are no milestones",
-			icon: icon,
+			icon: Icons.milestones.rawValue,
 			load: load
 		) { milestone in
 			Text(milestone.title.emojized())

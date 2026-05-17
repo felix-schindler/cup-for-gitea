@@ -14,7 +14,7 @@ enum UsersType {
 struct FollowLoader: View {
 	private let username: String
 	private let filterUserType: UsersType
-	@State private var users: Result<[Components.Schemas.User], Error>? = nil
+	@State private var state = LoadState<[Components.Schemas.User]>.loading
 
 	init(_ username: String, type: UsersType) {
 		self.username = username
@@ -22,23 +22,19 @@ struct FollowLoader: View {
 	}
 
 	private func load() async {
-		do {
-			var users: [Components.Schemas.User]
+		state = await LoadState {
 			switch filterUserType {
 			case .followers:
-				users = try await Network.shared.client.userListFollowers(path: .init(username: username)).ok.body.json
+				try await Network.shared.client.userListFollowers(path: .init(username: username)).ok.body.json
 			case .following:
-				users = try await Network.shared.client.userListFollowing(path: .init(username: username)).ok.body.json
+				try await Network.shared.client.userListFollowing(path: .init(username: username)).ok.body.json
 			}
-			self.users = .success(users)
-		} catch {
-			self.users = .failure(error)
 		}
 	}
 
 	var body: some View {
 		LoadableList(
-			result: users,
+			state: state,
 			id: \.id,
 			loadingText: "Loading users",
 			emptyText: "There are no users",
