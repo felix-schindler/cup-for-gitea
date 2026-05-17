@@ -65,13 +65,7 @@ struct CommentsLoader: View {
 													)
 													.controlSize(.mini)
 													.buttonBorderShape(.capsule)
-													.modifier {
-														if #available(iOS 26.0, *) {
-															$0.buttonStyle(.glass)
-														} else {
-															$0.buttonStyle(.bordered)
-														}
-													}
+													.adaptiveButtonStyle()
 												}
 											}
 										}

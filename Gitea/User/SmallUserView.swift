@@ -40,13 +40,7 @@ struct SmallUserView: View {
 		)
 		.controlSize(.mini)
 		.buttonBorderShape(.capsule)
-		.modifier {
-			if #available(iOS 26.0, *) {
-				$0.buttonStyle(.glassProminent)
-			} else {
-				$0.buttonStyle(.borderedProminent)
-			}
-		}
+		.adaptiveButtonStyleProminent()
 	}
 }
 
