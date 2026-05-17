@@ -8,43 +8,153 @@
 import SwiftUI
 
 struct SmallIssueView: View {
-	private let issue: Components.Schemas.Issue
+	private enum Item {
+		case issue(Components.Schemas.Issue, isPullRequest: Bool)
+		case pullRequest(Components.Schemas.PullRequest)
+	}
 
-	init(_ issue: Components.Schemas.Issue) {
-		self.issue = issue
+	private let item: Item
+
+	init(_ issue: Components.Schemas.Issue, isPullRequest: Bool = false) {
+		self.item = .issue(issue, isPullRequest: isPullRequest)
+	}
+
+	init(_ pullRequest: Components.Schemas.PullRequest) {
+		self.item = .pullRequest(pullRequest)
 	}
 
 	var body: some View {
-		NavigationLink(destination: IssueView(issue)) {
+		NavigationLink(destination: destination) {
 			VStack(alignment: .leading) {
 				HStack(spacing: 5) {
-					StateIconView(.issue, issue.state)
+					stateIcon
 					ScrollView(.horizontal, showsIndicators: false) {
-						Text("\(issue.repository.fullName)#\(issue.number)")
+						Text(reference)
 							.foregroundStyle(.secondary)
 					}
+					if isLocked {
+						Image(systemName: "lock")
+					}
 					Spacer()
-					Text(issue.createdAt.toString())
+					Text(createdAt.toString())
 				}.font(.footnote)
 
-				if let inline = try? AttributedString(markdown: issue.title.emojized()) {
+				if let inline = try? AttributedString(markdown: title.emojized()) {
 					Text(inline)
 				} else {
-					Text(issue.title.emojized())
+					Text(title.emojized())
 				}
 
 				HStack(spacing: 5) {
 					ScrollView(.horizontal, showsIndicators: false) {
-						SmallUserView(issue.user)
+						userView
 					}
 					Spacer()
 					Image(systemName: Icons.comments.rawValue)
 						.font(.footnote)
 						.foregroundStyle(.foreground)
-					Text("\(issue.comments)")
+					Text("\(comments)")
 						.font(.footnote)
 				}
 			}
 		}
+	}
+
+	@ViewBuilder
+	private var destination: some View {
+		switch item {
+		case .issue(let issue, let isPullRequest):
+			if isPullRequest {
+				PullRequestLoader(owner: issue.repository.owner, repo: issue.repository.name, index: issue.number)
+			} else {
+				IssueView(issue)
+			}
+		case .pullRequest(let pullRequest):
+			IssueView(pullRequest)
+		}
+	}
+
+	@ViewBuilder
+	private var stateIcon: some View {
+		switch item {
+		case .issue(let issue, let isPullRequest):
+			if isPullRequest {
+				StateIconView(.pull, issue.pullRequestState, isDraft: issue.pullRequest?.draft == true)
+			} else {
+				StateIconView(.issue, issue.state)
+			}
+		case .pullRequest(let pullRequest):
+			StateIconView(.pull, pullRequest.notificationState)
+		}
+	}
+
+	@ViewBuilder
+	private var userView: some View {
+		switch item {
+		case .issue(let issue, _):
+			SmallUserView(issue.user)
+		case .pullRequest(let pullRequest):
+			SmallUserView(pullRequest.user)
+		}
+	}
+
+	private var reference: String {
+		switch item {
+		case .issue(let issue, _):
+			"\(issue.repository.fullName)#\(issue.number)"
+		case .pullRequest(let pullRequest):
+			"\(pullRequest.base.repo.fullName)#\(pullRequest.number)"
+		}
+	}
+
+	private var isLocked: Bool {
+		switch item {
+		case .issue(let issue, _):
+			issue.isLocked
+		case .pullRequest(let pullRequest):
+			pullRequest.isLocked
+		}
+	}
+
+	private var createdAt: Date {
+		switch item {
+		case .issue(let issue, _):
+			issue.createdAt
+		case .pullRequest(let pullRequest):
+			pullRequest.createdAt
+		}
+	}
+
+	private var title: String {
+		switch item {
+		case .issue(let issue, _):
+			issue.title
+		case .pullRequest(let pullRequest):
+			pullRequest.title
+		}
+	}
+
+	private var comments: Int64 {
+		switch item {
+		case .issue(let issue, _):
+			issue.comments
+		case .pullRequest(let pullRequest):
+			pullRequest.comments
+		}
+	}
+}
+
+extension Components.Schemas.Issue {
+	var pullRequestState: Components.Schemas.NotificationSubject.StatePayload {
+		if pullRequest?.merged == true {
+			return .merged
+		}
+		return state == .open ? .open : .closed
+	}
+}
+
+extension Components.Schemas.PullRequest {
+	var notificationState: Components.Schemas.NotificationSubject.StatePayload {
+		merged ? .merged : (state == .open ? .open : .closed)
 	}
 }

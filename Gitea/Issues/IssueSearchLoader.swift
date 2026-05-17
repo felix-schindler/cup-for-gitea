@@ -7,96 +7,55 @@
 
 import SwiftUI
 
-struct IssueSearchFilters: Equatable {
-	enum Kind: String, CaseIterable, Identifiable {
-		case any
-		case issues
-		case pulls
-
-		var id: String { rawValue }
-
-		var payload: Operations.IssueSearchIssues.Input.Query._TypePayload? {
-			switch self {
-			case .any:
-				return nil
-			case .issues:
-				return .issues
-			case .pulls:
-				return .pulls
-			}
-		}
-	}
-
-	var state: Operations.IssueSearchIssues.Input.Query.StatePayload = .open
-	var type: Kind = .issues
-	var labels: String = ""
-	var milestones: String = ""
-	var owner: String = ""
-	var createdBy: String = ""
-	var team: String = ""
-	var assigned: Bool = false
-	var created: Bool = false
-	var mentioned: Bool = false
-	var reviewRequested: Bool = false
-	var reviewed: Bool = false
-	var since: Date?
-	var before: Date?
-	var limitText: String = ""
-
-	var taskKey: String {
-		[
-			state.rawValue,
-			type.rawValue,
-			labels,
-			milestones,
-			owner,
-			createdBy,
-			team,
-			assigned.description,
-			created.description,
-			mentioned.description,
-			reviewRequested.description,
-			reviewed.description,
-			since?.timeIntervalSince1970.description ?? "",
-			before?.timeIntervalSince1970.description ?? "",
-			limitText
-		].joined(separator: "|")
-	}
-
-	var labelsValue: String? { trimmedOrNil(labels) }
-	var milestonesValue: String? { trimmedOrNil(milestones) }
-	var ownerValue: String? { trimmedOrNil(owner) }
-	var createdByValue: String? { trimmedOrNil(createdBy) }
-	var teamValue: String? { trimmedOrNil(team) }
-	var limitValue: Int? { intOrNil(limitText, minimum: 1) }
-
-	private func trimmedOrNil(_ value: String) -> String? {
-		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		return trimmed.isEmpty ? nil : trimmed
-	}
-
-	private func intOrNil(_ value: String, minimum: Int) -> Int? {
-		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard let intValue = Int(trimmed), intValue >= minimum else { return nil }
-		return intValue
-	}
-}
-
 struct IssueSearchLoader: View {
+	let type: Operations.IssueSearchIssues.Input.Query._TypePayload
+	let owner: String?
+	let repo: String?
+
 	@State private var search: String = ""
 	@State private var results: [Components.Schemas.Issue] = []
 	@State private var error: Error?
 	@State private var isLoadingPage = false
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var currentUsername: String?
 	@State private var filters = IssueSearchFilters()
 	@State private var showFilters = false
-	private let icon = Icons.issues.rawValue
+
 	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
+	private var title: String { typeLabel }
+	private var searchPrompt: LocalizedStringResource { "Search \(typeLabel.lowercased())" }
+	private var emptyText: LocalizedStringResource { "There are no \(typeLabel.lowercased())" }
+	private var loadingText: LocalizedStringResource { "Loading \(typeLabel)" }
+	private var loadingMoreText: LocalizedStringResource { "Loading more \(typeLabel.lowercased())" }
+	private var icon: String {
+		switch type {
+		case .issues:
+			return Icons.issues.rawValue
+		case .pulls:
+			return Icons.pull_requests.rawValue
+		@unknown default:
+			return Icons.issues.rawValue
+		}
+	}
+	private var typeLabel: String {
+		switch type {
+		case .issues:
+			"Issues"
+		case .pulls:
+			"Pull Requests"
+		}
+	}
 
 	private var queryKey: String {
-		"\(search)|\(filters.taskKey)"
+		"\(owner ?? "")|\(repo ?? "")|\(search)|\(filters.taskKey)"
+	}
+
+	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil) {
+		self.type = type
+		self.owner = owner
+		self.repo = repo
 	}
 
 	private var queryPayload: Operations.IssueSearchIssues.Input.Query {
@@ -105,7 +64,7 @@ struct IssueSearchLoader: View {
 			labels: filters.labelsValue,
 			milestones: filters.milestonesValue,
 			q: search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : search,
-			_type: filters.type.payload,
+			_type: type,
 			since: filters.since,
 			before: filters.before,
 			assigned: filters.assigned ? true : nil,
@@ -119,6 +78,27 @@ struct IssueSearchLoader: View {
 			page: currentPage,
 			limit: filters.limitValue ?? defaultLimit
 		)
+	}
+
+	private var repoQueryPayload: Operations.IssueListIssues.Input.Query {
+		.init(
+			state: .init(rawValue: filters.state.rawValue),
+			labels: filters.labelsValue,
+			q: search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : search,
+			_type: .init(rawValue: type.rawValue),
+			milestones: filters.milestonesValue,
+			since: filters.since,
+			before: filters.before,
+			createdBy: filters.created ? currentUsername : filters.createdByValue,
+			assignedBy: filters.assigned ? currentUsername : nil,
+			mentionedBy: filters.mentioned ? currentUsername : nil,
+			page: currentPage,
+			limit: filters.limitValue ?? defaultLimit
+		)
+	}
+
+	private var needsCurrentUser: Bool {
+		owner != nil && repo != nil && (filters.assigned || filters.created || filters.mentioned)
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
@@ -137,7 +117,10 @@ struct IssueSearchLoader: View {
 			if Task.isCancelled { return }
 		}
 		do {
-			let results = try await Network.shared.client.issueSearchIssues(.init(query: queryPayload)).ok.body.json
+			if needsCurrentUser, currentUsername == nil {
+				currentUsername = try await Network.shared.client.userGetCurrent().ok.body.json.login
+			}
+			let results = try await loadIssues()
 			if Task.isCancelled { return }
 			if results.isEmpty {
 				hasMorePages = false
@@ -158,171 +141,56 @@ struct IssueSearchLoader: View {
 		}
 	}
 
+	private func loadIssues() async throws -> [Components.Schemas.Issue] {
+		if let owner, let repo {
+			return try await Network.shared.client.issueListIssues(
+				path: .init(owner: owner, repo: repo),
+				query: repoQueryPayload
+			).ok.body.json
+		}
+		return try await Network.shared.client.issueSearchIssues(.init(query: queryPayload)).ok.body.json
+	}
+
 	var body: some View {
-		IssueSearchResultsList(results: results, error: error, icon: icon, isLoading: isLoadingPage, hasMorePages: hasMorePages) {
+		IssueSearchResultsList(
+			type: type,
+			results: results,
+			error: error,
+			icon: icon,
+			isLoading: isLoadingPage,
+			hasMorePages: hasMorePages,
+			loadingText: loadingText,
+			loadingMoreText: loadingMoreText,
+			emptyText: emptyText
+		) {
 			await loadNextPage()
 		}
-			.searchable(text: $search, prompt: Text("Search issues"))
-			.task(id: queryKey) {
-				await resetAndLoad(debounced: true)
-			}
-			.refreshable {
-				await resetAndLoad()
-			}
-			.navigationTitle("Issues")
-			.toolbar {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					Button("Filters", systemImage: "line.3.horizontal.decrease") {
-						HapticFeedback.play(.light)
-						showFilters = true
-					}
-				}
-			}
-			.sheet(isPresented: $showFilters) {
-				NavigationStack {
-					IssueSearchFiltersSheet(filters: $filters)
-				}
-			}
-	}
-}
-
-private struct IssueSearchResultsList: View {
-	let results: [Components.Schemas.Issue]
-	let error: Error?
-	let icon: String
-	let isLoading: Bool
-	let hasMorePages: Bool
-	let onLoadMore: () async -> Void
-
-	var body: some View {
-		List {
-			if results.isEmpty {
-				if let error {
-					FailedView(error)
-				} else if isLoading {
-					LoadingView("Loading Issues", systemImage: icon)
-				} else {
-					NoContentView("There are no issues", systemImage: icon)
-				}
-			} else {
-				ForEach(results, id: \.id) { issue in
-					SmallIssueView(issue)
-						.onAppear {
-							if issue.id == results.last?.id, hasMorePages {
-								Task { await onLoadMore() }
-							}
-						}
-				}
-				if isLoading {
-					Section {
-						LoadingView("Loading more issues", systemImage: icon)
-					}
-				} else if let error {
-					Section {
-						FailedView(error)
-					}
-				}
-			}
+		.searchable(text: $search, prompt: Text(searchPrompt))
+		.task(id: queryKey) {
+			await resetAndLoad(debounced: true)
 		}
-	}
-}
-
-private struct IssueSearchFiltersSheet: View {
-	@Binding var filters: IssueSearchFilters
-	@Environment(\.dismiss) private var dismiss
-
-	var body: some View {
-		Form {
-			Section("State") {
-				Picker("State", selection: $filters.state) {
-					ForEach(Operations.IssueSearchIssues.Input.Query.StatePayload.allCases, id: \.self) { option in
-						Text(option.rawValue.capitalized).tag(option)
-					}
-				}
-				.pickerStyle(.segmented)
-			}
-
-			Section("Type") {
-				Picker("Type", selection: $filters.type) {
-					ForEach(IssueSearchFilters.Kind.allCases) { option in
-						Text(option.rawValue.capitalized).tag(option)
-					}
-				}
-			}
-
-			Section("People") {
-				Toggle("Assigned to me", isOn: $filters.assigned)
-				Toggle("Created by me", isOn: $filters.created)
-				Toggle("Mentioned me", isOn: $filters.mentioned)
-				Toggle("Review requested", isOn: $filters.reviewRequested)
-				Toggle("Reviewed", isOn: $filters.reviewed)
-			}
-
-			Section("Dates") {
-				Toggle("Updated since", isOn: Binding(
-					get: { filters.since != nil },
-					set: { isOn in
-						filters.since = isOn ? (filters.since ?? Date()) : nil
-					}
-				))
-				if let since = filters.since {
-					DatePicker("Since", selection: Binding(
-						get: { since },
-						set: { filters.since = $0 }
-					), displayedComponents: [.date])
-				}
-
-				Toggle("Updated before", isOn: Binding(
-					get: { filters.before != nil },
-					set: { isOn in
-						filters.before = isOn ? (filters.before ?? Date()) : nil
-					}
-				))
-				if let before = filters.before {
-					DatePicker("Before", selection: Binding(
-						get: { before },
-						set: { filters.before = $0 }
-					), displayedComponents: [.date])
-				}
-			}
-
-			Section("Labels & Milestones") {
-				TextField("Labels (comma-separated)", text: $filters.labels)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-				TextField("Milestones (comma-separated)", text: $filters.milestones)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-			}
-
-			Section("Scope") {
-				TextField("Owner", text: $filters.owner)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-				TextField("Created by", text: $filters.createdBy)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-				TextField("Team", text: $filters.team)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-			}
-
-			Section("Pagination") {
-				TextField("Limit", text: $filters.limitText)
-					.keyboardType(.numberPad)
-			}
+		.refreshable {
+			await resetAndLoad()
 		}
-		.navigationTitle("Filters")
+		.navigationTitle(title)
 		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button("Reset") {
-					filters = IssueSearchFilters()
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button("Filters", systemImage: "line.3.horizontal.decrease") {
+					HapticFeedback.play(.light)
+					showFilters = true
 				}
 			}
-			ToolbarItem(placement: .confirmationAction) {
-				Button("Done", systemImage: "checkmark") {
-					dismiss()
+			if type == .issues, let owner, let repo {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					NavigationLink(destination: NewIssueView(owner: owner, repo: repo)) {
+						Label("New Issue", systemImage: "plus")
+					}
 				}
+			}
+		}
+		.sheet(isPresented: $showFilters) {
+			NavigationStack {
+				IssueSearchFiltersSheet(filters: $filters)
 			}
 		}
 	}

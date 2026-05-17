@@ -28,8 +28,11 @@ struct HomeView: View {
 	var body: some View {
 		List {
 			Section("Your work") {
-				NavigationLink(destination: IssueSearchLoader()) {
+				NavigationLink(destination: IssueSearchLoader(type: .issues)) {
 					Label("Issues", systemImage: Icons.issues.rawValue)
+				}
+				NavigationLink(destination: IssueSearchLoader(type: .pulls)) {
+					Label("Pull Requests", systemImage: Icons.pull_requests.rawValue)
 				}
 				NavigationLink(destination: UserReposLoader()) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)

@@ -32,7 +32,7 @@ struct PullRequestLoader: View {
 			if let result {
 				switch result {
 				case .success(let pr):
-					PullRequestView(pr)
+					IssueView(pr)
 				case .failure(let failure):
 					FailedView(failure)
 				}

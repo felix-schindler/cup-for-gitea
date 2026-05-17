@@ -11,19 +11,27 @@ struct StateIconView: View {
 	let icon: String
 	let color: Color
 
-	init(_ _type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.NotificationSubject.StatePayload) {
+	init(
+		_ _type: Components.Schemas.NotificationSubject._TypePayload,
+		_ state: Components.Schemas.NotificationSubject.StatePayload,
+		isDraft: Bool = false
+	) {
 		self.icon =
 			switch _type {
 			case .issue:
 				Icons.issues.rawValue
 			case .pull:
-				switch state {
-				case .open:
+				if isDraft {
 					Icons.pull_requests.rawValue
-				case .closed:
-					Icons.pull_request_closed.rawValue
-				case .merged:
-					Icons.pull_request_merged.rawValue
+				} else {
+					switch state {
+					case .open:
+						Icons.pull_requests.rawValue
+					case .closed:
+						Icons.pull_request_closed.rawValue
+					case .merged:
+						Icons.pull_request_merged.rawValue
+					}
 				}
 			case .commit:
 				Icons.commits.rawValue
@@ -32,13 +40,17 @@ struct StateIconView: View {
 			}
 
 		self.color =
-			switch state {
-			case .open:
-				.green
-			case .closed:
-				.red
-			case .merged:
-				.purple
+			if isDraft {
+				.secondary
+			} else {
+				switch state {
+				case .open:
+					.green
+				case .closed:
+					.red
+				case .merged:
+					.purple
+				}
 			}
 	}
 
@@ -58,11 +70,11 @@ struct StateIconView: View {
 	}
 
 	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.PullRequest.StatePayload) {
-		if type != .issue {
+		if type != .pull {
 			fatalError("Wrong initializer")
 		}
 
-		self.icon = Icons.issues.rawValue
+		self.icon = Icons.pull_requests.rawValue
 		self.color =
 			switch state {
 			case .open:

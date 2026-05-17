@@ -78,7 +78,7 @@ struct FullRepoView: View {
 								Label("Issues", systemImage: Icons.issues.rawValue)
 							})
 					} else {
-						NavigationLink(destination: RepoIssueLoader(owner: repo.owner.login, repo: repo.name)) {
+						NavigationLink(destination: IssueSearchLoader(type: .issues, owner: repo.owner.login, repo: repo.name)) {
 							Label(
 								title: {
 									HStack {
@@ -95,7 +95,7 @@ struct FullRepoView: View {
 				}
 
 				if repo.hasPullRequests {
-					NavigationLink(destination: RepoPullRequestsLoader(owner: repo.owner.login, repo: repo.name)) {
+					NavigationLink(destination: IssueSearchLoader(type: .pulls, owner: repo.owner.login, repo: repo.name)) {
 						Label(
 							title: {
 								HStack {
