@@ -9,8 +9,16 @@ import Foundation
 
 @MainActor
 class Network {
+	private static var _client: GiteaClient?
+	private static var _instanceKey: String?
+
 	public static var shared: GiteaClient {
 		let instance = InstanceManager.selected ?? InstanceManager.defaultInstance
-		return GiteaClient(serverURL: instance.serverURL, token: instance.token)
+		let key = "\(instance.host):\(instance.token)"
+		if _instanceKey != key {
+			_client = GiteaClient(serverURL: instance.serverURL, token: instance.token)
+			_instanceKey = key
+		}
+		return _client!
 	}
 }
