@@ -8,13 +8,12 @@
 import SwiftUI
 
 enum SearchType: String, CaseIterable {
-	case repo = "Repo"
 	case user = "User"
 	case topic = "Topic"
 }
 
 struct SearchView: View {
-	@State var type: SearchType = .repo
+	@State var type: SearchType = .user
 	@State var search: String = ""
 
 	var body: some View {
@@ -28,8 +27,6 @@ struct SearchView: View {
 			.padding(.horizontal)
 
 			switch type {
-			case .repo:
-				RepoSearchLoader(search: $search)
 			case .user:
 				UserSearchLoader(search: $search)
 			case .topic:

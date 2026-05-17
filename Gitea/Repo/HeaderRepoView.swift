@@ -70,7 +70,7 @@ struct HeaderRepoView: View {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
 							ForEach(repo.topics, id: \.self) { topic in
-								NavigationLink(destination: RepoSearchLoader(search: .constant(topic))) {
+								NavigationLink(destination: RepoSearchLoader(context: .search, search: topic)) {
 									Text(topic)
 								}
 								.controlSize(.mini)

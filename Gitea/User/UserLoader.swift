@@ -120,7 +120,7 @@ struct UserLoader: View {
 
 					Section {
 						NavigationLink(
-							destination: UserReposLoader(username),
+							destination: RepoSearchLoader(context: .user(u.id)),
 							label: {
 								Label("Repositories", systemImage: Icons.repositories.rawValue)
 							})
@@ -134,7 +134,7 @@ struct UserLoader: View {
 						// Label("Public Activity", systemImage: Icons.activity.rawValue)
 
 						NavigationLink(
-							destination: StarredReposLoader(username),
+							destination: RepoSearchLoader(context: .search, starredBy: u.id),
 							label: {
 								Label(
 									title: {

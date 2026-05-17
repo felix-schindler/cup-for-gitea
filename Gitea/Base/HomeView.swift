@@ -31,7 +31,7 @@ struct HomeView: View {
 				NavigationLink(destination: IssueSearchLoader(type: .pulls)) {
 					Label("Pull Requests", systemImage: Icons.pull_requests.rawValue)
 				}
-				NavigationLink(destination: UserReposLoader()) {
+				NavigationLink(destination: RepoSearchLoader(context: .user(nil))) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
 				NavigationLink(destination: UserOrgLoader()) {

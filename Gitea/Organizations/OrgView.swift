@@ -67,7 +67,7 @@ struct OrgView: View {
 			}
 
 			Section {
-				NavigationLink(destination: OrgReposLoader(org.name)) {
+				NavigationLink(destination: RepoSearchLoader(context: .org(org.id))) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
 				// Label("Projects", systemImage: Icons.projects.rawValue)
