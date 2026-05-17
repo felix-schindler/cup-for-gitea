@@ -106,12 +106,14 @@ struct IssueSearchLoader: View {
 		error = nil
 		currentPage = 1
 		hasMorePages = true
+		isLoadingPage = false
 		await loadNextPage(debounced: debounced)
 	}
 
 	private func loadNextPage(debounced: Bool = false) async {
 		guard !isLoadingPage, hasMorePages else { return }
 		isLoadingPage = true
+		defer { isLoadingPage = false }
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
