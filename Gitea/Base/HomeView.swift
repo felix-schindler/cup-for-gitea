@@ -28,7 +28,7 @@ struct HomeView: View {
 	var body: some View {
 		List {
 			Section("Your work") {
-				NavigationLink(destination: IssueSearchLoader(search: .constant(""))) {
+				NavigationLink(destination: IssueSearchLoader()) {
 					Label("Issues", systemImage: Icons.issues.rawValue)
 				}
 				NavigationLink(destination: UserReposLoader()) {

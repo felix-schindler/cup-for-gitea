@@ -11,7 +11,6 @@ enum SearchType: String, CaseIterable {
 	case repo = "Repo"
 	case user = "User"
 	case topic = "Topic"
-	case issue = "Issue"
 }
 
 struct SearchView: View {
@@ -35,8 +34,6 @@ struct SearchView: View {
 				UserSearchLoader(search: $search)
 			case .topic:
 				TopicsSearchLoader(search: $search)
-			case .issue:
-				IssueSearchLoader(search: $search)
 			}
 		}
 		.searchable(text: $search, prompt: Text("Search for a \(type.rawValue)"))
