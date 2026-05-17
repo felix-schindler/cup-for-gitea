@@ -10,7 +10,6 @@ import SwiftUI
 enum Icons: String {
 	// MARK: - ContentView
 	case home = "house"
-	case explore = "binoculars"
 	case users = "person"
 	case settings = "gear"
 	case search = "magnifyingglass"

@@ -41,18 +41,10 @@ struct AsyncButton<Label: View>: View {
 	}
 }
 
-extension AsyncButton {
-	enum ActionOption: CaseIterable {
-		case disableButton
-		case showProgressView
-	}
-}
-
 extension AsyncButton where Label == Text {
 	init(
 		_ label: LocalizedStringResource,
 		role: ButtonRole? = nil,
-		actionOptions: Set<ActionOption> = Set(ActionOption.allCases),
 		action: @escaping () async -> Void
 	) {
 		self.init(action: action, role: role) {
@@ -65,7 +57,6 @@ extension AsyncButton where Label == Image {
 	init(
 		systemImage: String,
 		role: ButtonRole? = nil,
-		actionOptions: Set<ActionOption> = Set(ActionOption.allCases),
 		action: @escaping () async -> Void
 	) {
 		self.init(action: action, role: role) {
@@ -79,7 +70,6 @@ extension AsyncButton where Label == SwiftUI.Label<Text, Image> {
 		_ title: LocalizedStringResource,
 		systemImage: String,
 		role: ButtonRole? = nil,
-		actionOptions: Set<ActionOption> = Set(ActionOption.allCases),
 		action: @escaping () async -> Void
 	) where Label == Label {
 		self.init(action: action, role: role) {
