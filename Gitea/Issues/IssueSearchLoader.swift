@@ -41,7 +41,6 @@ struct IssueSearchFilters: Equatable {
 	var reviewed: Bool = false
 	var since: Date?
 	var before: Date?
-	var pageText: String = ""
 	var limitText: String = ""
 
 	var taskKey: String {
@@ -60,7 +59,6 @@ struct IssueSearchFilters: Equatable {
 			reviewed.description,
 			since?.timeIntervalSince1970.description ?? "",
 			before?.timeIntervalSince1970.description ?? "",
-			pageText,
 			limitText
 		].joined(separator: "|")
 	}
@@ -70,8 +68,7 @@ struct IssueSearchFilters: Equatable {
 	var ownerValue: String? { trimmedOrNil(owner) }
 	var createdByValue: String? { trimmedOrNil(createdBy) }
 	var teamValue: String? { trimmedOrNil(team) }
-	var pageValue: Int? { intOrNil(pageText, minimum: 1) }
-	var limitValue: Int? { intOrNil(limitText, minimum: 0) }
+	var limitValue: Int? { intOrNil(limitText, minimum: 1) }
 
 	private func trimmedOrNil(_ value: String) -> String? {
 		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -87,11 +84,16 @@ struct IssueSearchFilters: Equatable {
 
 struct IssueSearchLoader: View {
 	@State private var search: String = ""
-	@State private var results: Result<[Components.Schemas.Issue], Error>?
+	@State private var results: [Components.Schemas.Issue] = []
+	@State private var error: Error?
+	@State private var isLoadingPage = false
+	@State private var hasMorePages = true
+	@State private var currentPage = 1
 	@State private var filters = IssueSearchFilters()
 	@State private var showFilters = false
 	private let icon = Icons.issues.rawValue
 	private let debounceNanoseconds: UInt64 = 350_000_000
+	private let defaultLimit = 7
 
 	private var queryKey: String {
 		"\(search)|\(filters.taskKey)"
@@ -114,13 +116,22 @@ struct IssueSearchLoader: View {
 			owner: filters.ownerValue,
 			createdBy: filters.createdByValue,
 			team: filters.teamValue,
-			page: filters.pageValue,
-			limit: filters.limitValue
+			page: currentPage,
+			limit: filters.limitValue ?? defaultLimit
 		)
 	}
 
-	private func load(debounced: Bool = false) async {
-		self.results = nil
+	private func resetAndLoad(debounced: Bool = false) async {
+		results = []
+		error = nil
+		currentPage = 1
+		hasMorePages = true
+		await loadNextPage(debounced: debounced)
+	}
+
+	private func loadNextPage(debounced: Bool = false) async {
+		guard !isLoadingPage, hasMorePages else { return }
+		isLoadingPage = true
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
@@ -128,21 +139,35 @@ struct IssueSearchLoader: View {
 		do {
 			let results = try await Network.shared.client.issueSearchIssues(.init(query: queryPayload)).ok.body.json
 			if Task.isCancelled { return }
-			self.results = .success(results)
+			if results.isEmpty {
+				hasMorePages = false
+			} else {
+				self.results.append(contentsOf: results)
+				let limit = filters.limitValue ?? defaultLimit
+				if results.count < limit {
+					hasMorePages = false
+				} else {
+					currentPage += 1
+				}
+			}
+			isLoadingPage = false
 		} catch {
 			if Task.isCancelled { return }
-			self.results = .failure(error)
+			self.error = error
+			isLoadingPage = false
 		}
 	}
 
 	var body: some View {
-		IssueSearchResultsList(results: results, icon: icon)
+		IssueSearchResultsList(results: results, error: error, icon: icon, isLoading: isLoadingPage, hasMorePages: hasMorePages) {
+			await loadNextPage()
+		}
 			.searchable(text: $search, prompt: Text("Search issues"))
 			.task(id: queryKey) {
-				await load(debounced: true)
+				await resetAndLoad(debounced: true)
 			}
 			.refreshable {
-				await load()
+				await resetAndLoad()
 			}
 			.navigationTitle("Issues")
 			.toolbar {
@@ -162,26 +187,41 @@ struct IssueSearchLoader: View {
 }
 
 private struct IssueSearchResultsList: View {
-	let results: Result<[Components.Schemas.Issue], Error>?
+	let results: [Components.Schemas.Issue]
+	let error: Error?
 	let icon: String
+	let isLoading: Bool
+	let hasMorePages: Bool
+	let onLoadMore: () async -> Void
 
 	var body: some View {
 		List {
-			if let results {
-				switch results {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no issues", systemImage: icon)
-					} else {
-						ForEach(success, id: \.id) { issue in
-							SmallIssueView(issue)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
+			if results.isEmpty {
+				if let error {
+					FailedView(error)
+				} else if isLoading {
+					LoadingView("Loading Issues", systemImage: icon)
+				} else {
+					NoContentView("There are no issues", systemImage: icon)
 				}
 			} else {
-				LoadingView("Loading Issues", systemImage: icon)
+				ForEach(results, id: \.id) { issue in
+					SmallIssueView(issue)
+						.onAppear {
+							if issue.id == results.last?.id, hasMorePages {
+								Task { await onLoadMore() }
+							}
+						}
+				}
+				if isLoading {
+					Section {
+						LoadingView("Loading more issues", systemImage: icon)
+					}
+				} else if let error {
+					Section {
+						FailedView(error)
+					}
+				}
 			}
 		}
 	}
@@ -268,8 +308,6 @@ private struct IssueSearchFiltersSheet: View {
 			}
 
 			Section("Pagination") {
-				TextField("Page", text: $filters.pageText)
-					.keyboardType(.numberPad)
 				TextField("Limit", text: $filters.limitText)
 					.keyboardType(.numberPad)
 			}
