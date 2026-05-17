@@ -8,10 +8,59 @@
 import SwiftUI
 import Textual
 
+protocol IssueDisplayable {
+	var displayNavigationTitle: LocalizedStringResource { get }
+	var displayRepositoryFullName: String { get }
+	var displayOwner: String { get }
+	var displayRepo: String { get }
+	var displayNumber: Int64 { get }
+	var displayIsLocked: Bool { get }
+	var displayCreatedAt: Date { get }
+	var displayTitle: String { get }
+	var displayBody: String { get }
+	var displayComments: Int64 { get }
+	var displayHtmlUrl: String { get }
+}
+
+extension Components.Schemas.Issue: IssueDisplayable {
+	var displayNavigationTitle: LocalizedStringResource { "Issue" }
+	var displayRepositoryFullName: String { repository.fullName }
+	var displayOwner: String { repository.owner }
+	var displayRepo: String { repository.name }
+	var displayNumber: Int64 { number }
+	var displayIsLocked: Bool { isLocked }
+	var displayCreatedAt: Date { createdAt }
+	var displayTitle: String { title }
+	var displayBody: String { body }
+	var displayComments: Int64 { comments }
+	var displayHtmlUrl: String { htmlUrl }
+}
+
+extension Components.Schemas.PullRequest: IssueDisplayable {
+	var displayNavigationTitle: LocalizedStringResource { "Pull Request" }
+	var displayRepositoryFullName: String { base.repo.fullName }
+	var displayOwner: String { base.repo.owner.login }
+	var displayRepo: String { base.repo.name }
+	var displayNumber: Int64 { number }
+	var displayIsLocked: Bool { isLocked }
+	var displayCreatedAt: Date { createdAt }
+	var displayTitle: String { title }
+	var displayBody: String { body }
+	var displayComments: Int64 { comments }
+	var displayHtmlUrl: String { htmlUrl }
+}
+
 struct IssueView: View {
 	private enum Item {
 		case issue(Components.Schemas.Issue)
 		case pullRequest(Components.Schemas.PullRequest)
+
+		var data: any IssueDisplayable {
+			switch self {
+			case .issue(let issue): issue
+			case .pullRequest(let pr): pr
+			}
+		}
 	}
 
 	private let item: Item
@@ -30,9 +79,9 @@ struct IssueView: View {
 				header
 			}
 
-			if bodyText.isNotEmpty {
+			if item.data.displayBody.isNotEmpty {
 				Section {
-					StructuredText(markdown: bodyText.emojized())
+					StructuredText(markdown: item.data.displayBody.emojized())
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
@@ -44,17 +93,17 @@ struct IssueView: View {
 				}
 			}
 
-			if comments != 0 {
+			if item.data.displayComments != 0 {
 				Section("Comments") {
-					CommentsLoader(owner: owner, repo: repo, iid: number)
+					CommentsLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, iid: item.data.displayNumber)
 				}
 			}
 		}.toolbar {
-			if let url = URL(string: htmlUrl) {
+			if let url = URL(string: item.data.displayHtmlUrl) {
 				ShareLink(item: url)
 			}
 		}
-		.navigationTitle(navigationTitle)
+		.navigationTitle(item.data.displayNavigationTitle)
 		.navigationBarTitleDisplayMode(.inline)
 	}
 
@@ -62,16 +111,16 @@ struct IssueView: View {
 		VStack(alignment: .leading) {
 			HStack(spacing: 5) {
 				stateIcon
-				Text("\(repositoryFullName)#\(number)")
+				Text("\(item.data.displayRepositoryFullName)#\(item.data.displayNumber)")
 					.foregroundStyle(.secondary)
-				if isLocked {
+				if item.data.displayIsLocked {
 					Image(systemName: "lock")
 				}
 				Spacer()
-				Text(createdAt.toString())
+				Text(item.data.displayCreatedAt.toString())
 			}.font(.footnote)
 
-			InlineText(markdown: title.emojized())
+			InlineText(markdown: item.data.displayTitle.emojized())
 				.textual.inlineStyle(.gitHub)
 				.textual.textSelection(.enabled)
 
@@ -102,7 +151,7 @@ struct IssueView: View {
 						let url = URL(string: pr.htmlUrl)
 					{
 						NavigationLink(
-							destination: PullRequestLoader(owner: owner, repo: repo, index: number)
+							destination: PullRequestLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
 						) {
 							Label(
 								title: {
@@ -117,7 +166,7 @@ struct IssueView: View {
 					}
 					if let milestone = issue.milestone {
 						NavigationLink {
-							MilestonesLoader(owner: owner, repo: repo)
+							MilestonesLoader(owner: item.data.displayOwner, repo: item.data.displayRepo)
 						} label: {
 							Label(milestone.title.emojized(), systemImage: Icons.milestones.rawValue)
 						}
@@ -353,105 +402,6 @@ struct IssueView: View {
 				|| pullRequest.deletions != nil
 				|| pullRequest.changedFiles != nil
 				|| pullRequest.reviewComments != 0
-		}
-	}
-
-	private var navigationTitle: LocalizedStringResource {
-		switch item {
-		case .issue:
-			"Issue"
-		case .pullRequest:
-			"Pull Request"
-		}
-	}
-
-	private var repositoryFullName: String {
-		switch item {
-		case .issue(let issue):
-			issue.repository.fullName
-		case .pullRequest(let pullRequest):
-			pullRequest.base.repo.fullName
-		}
-	}
-
-	private var owner: String {
-		switch item {
-		case .issue(let issue):
-			issue.repository.owner
-		case .pullRequest(let pullRequest):
-			pullRequest.base.repo.owner.login
-		}
-	}
-
-	private var repo: String {
-		switch item {
-		case .issue(let issue):
-			issue.repository.name
-		case .pullRequest(let pullRequest):
-			pullRequest.base.repo.name
-		}
-	}
-
-	private var number: Int64 {
-		switch item {
-		case .issue(let issue):
-			issue.number
-		case .pullRequest(let pullRequest):
-			pullRequest.number
-		}
-	}
-
-	private var isLocked: Bool {
-		switch item {
-		case .issue(let issue):
-			issue.isLocked
-		case .pullRequest(let pullRequest):
-			pullRequest.isLocked
-		}
-	}
-
-	private var createdAt: Date {
-		switch item {
-		case .issue(let issue):
-			issue.createdAt
-		case .pullRequest(let pullRequest):
-			pullRequest.createdAt
-		}
-	}
-
-	private var title: String {
-		switch item {
-		case .issue(let issue):
-			issue.title
-		case .pullRequest(let pullRequest):
-			pullRequest.title
-		}
-	}
-
-	private var bodyText: String {
-		switch item {
-		case .issue(let issue):
-			issue.body
-		case .pullRequest(let pullRequest):
-			pullRequest.body
-		}
-	}
-
-	private var comments: Int64 {
-		switch item {
-		case .issue(let issue):
-			issue.comments
-		case .pullRequest(let pullRequest):
-			pullRequest.comments
-		}
-	}
-
-	private var htmlUrl: String {
-		switch item {
-		case .issue(let issue):
-			issue.htmlUrl
-		case .pullRequest(let pullRequest):
-			pullRequest.htmlUrl
 		}
 	}
 }

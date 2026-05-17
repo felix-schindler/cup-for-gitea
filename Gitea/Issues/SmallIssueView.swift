@@ -11,6 +11,13 @@ struct SmallIssueView: View {
 	private enum Item {
 		case issue(Components.Schemas.Issue, isPullRequest: Bool)
 		case pullRequest(Components.Schemas.PullRequest)
+
+		var data: any IssueDisplayable {
+			switch self {
+			case .issue(let issue, _): issue
+			case .pullRequest(let pr): pr
+			}
+		}
 	}
 
 	private let item: Item
@@ -29,20 +36,20 @@ struct SmallIssueView: View {
 				HStack(spacing: 5) {
 					stateIcon
 					ScrollView(.horizontal, showsIndicators: false) {
-						Text(reference)
+						Text("\(item.data.displayRepositoryFullName)#\(item.data.displayNumber)")
 							.foregroundStyle(.secondary)
 					}
-					if isLocked {
+					if item.data.displayIsLocked {
 						Image(systemName: "lock")
 					}
 					Spacer()
-					Text(createdAt.toString())
+					Text(item.data.displayCreatedAt.toString())
 				}.font(.footnote)
 
-				if let inline = try? AttributedString(markdown: title.emojized()) {
+				if let inline = try? AttributedString(markdown: item.data.displayTitle.emojized()) {
 					Text(inline)
 				} else {
-					Text(title.emojized())
+					Text(item.data.displayTitle.emojized())
 				}
 
 				HStack(spacing: 5) {
@@ -53,7 +60,7 @@ struct SmallIssueView: View {
 					Image(systemName: Icons.comments.rawValue)
 						.font(.footnote)
 						.foregroundStyle(.foreground)
-					Text("\(comments)")
+					Text("\(item.data.displayComments)")
 						.font(.footnote)
 				}
 			}
@@ -95,51 +102,6 @@ struct SmallIssueView: View {
 			SmallUserView(issue.user)
 		case .pullRequest(let pullRequest):
 			SmallUserView(pullRequest.user)
-		}
-	}
-
-	private var reference: String {
-		switch item {
-		case .issue(let issue, _):
-			"\(issue.repository.fullName)#\(issue.number)"
-		case .pullRequest(let pullRequest):
-			"\(pullRequest.base.repo.fullName)#\(pullRequest.number)"
-		}
-	}
-
-	private var isLocked: Bool {
-		switch item {
-		case .issue(let issue, _):
-			issue.isLocked
-		case .pullRequest(let pullRequest):
-			pullRequest.isLocked
-		}
-	}
-
-	private var createdAt: Date {
-		switch item {
-		case .issue(let issue, _):
-			issue.createdAt
-		case .pullRequest(let pullRequest):
-			pullRequest.createdAt
-		}
-	}
-
-	private var title: String {
-		switch item {
-		case .issue(let issue, _):
-			issue.title
-		case .pullRequest(let pullRequest):
-			pullRequest.title
-		}
-	}
-
-	private var comments: Int64 {
-		switch item {
-		case .issue(let issue, _):
-			issue.comments
-		case .pullRequest(let pullRequest):
-			pullRequest.comments
 		}
 	}
 }
