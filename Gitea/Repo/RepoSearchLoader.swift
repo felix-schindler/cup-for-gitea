@@ -30,10 +30,15 @@ struct RepoSearchLoader: View {
     private let debounceNanoseconds: UInt64 = 350_000_000
     private let defaultLimit = 20
 
-    init(context: RepoContext = .search, search: String = "", starredBy: Int64? = nil) {
+    init(context: RepoContext = .search, search: String = "", starredBy: Int64? = nil, limitToTopic: Bool = false) {
         self.context = context
         self.starredBy = starredBy
         _search = State(initialValue: search)
+        var initialFilters = RepoSearchFilters()
+        if limitToTopic {
+            initialFilters.topic = true
+        }
+        _filters = State(initialValue: initialFilters)
     }
 
     private var queryKey: String {
