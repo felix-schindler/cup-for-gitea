@@ -21731,13 +21731,10 @@ components:
           $ref: '#/components/schemas/PayloadCommitVerification'
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
-        - added
         - author
         - committer
         - id
         - message
-        - modified
-        - removed
         - timestamp
         - url
         - verification
@@ -21768,7 +21765,6 @@ components:
         - payload
         - reason
         - signature
-        - signer
         - verified
     PayloadUser:
       description: PayloadUser represents the author or committer of a commit

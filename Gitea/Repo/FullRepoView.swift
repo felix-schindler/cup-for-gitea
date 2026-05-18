@@ -130,18 +130,27 @@ struct FullRepoView: View {
 					}
 				)
 
-				// if repo.hasCode {
-				// 	DisclosureGroup(
-				// 		content: {
-				// 			Text("Code")
-				// 			Text("Commits")
-				// 			Text("Branches")
-				// 			Text("Tags")
-				// 		},
-				// 		label: {
-				// 			Label("Repository", systemImage: Icons.code.rawValue)
-				// 		})
-				// }
+				if repo.hasCode {
+					DisclosureGroup(
+						content: {
+							NavigationLink("Code") {
+								TreeLoader(owner: repo.owner.login, repo: repo.name, ref: repo.defaultBranch)
+							}
+							NavigationLink("Commits") {
+								CommitsLoader(owner: repo.owner.login, repo: repo.name, ref: repo.defaultBranch)
+							}
+							NavigationLink("Branches") {
+								BranchesLoader(owner: repo.owner.login, repo: repo.name)
+							}
+							NavigationLink("Tags") {
+								TagsLoader(owner: repo.owner.login, repo: repo.name)
+							}
+						},
+						label: {
+							Label("Repository", systemImage: Icons.code.rawValue)
+						}
+					)
+				}
 
 				if repo.hasReleases /*|| repo.hasActions || repo.hasPackages*/ {
 					DisclosureGroup(
@@ -189,7 +198,7 @@ struct FullRepoView: View {
 						HapticFeedback.notify(.success)
 					}
 					Button("Copy HTTPS URL") {
-						UIPasteboard.general.string = repo.sshUrl
+						UIPasteboard.general.string = repo.cloneUrl
 						HapticFeedback.notify(.success)
 					}
 				}
