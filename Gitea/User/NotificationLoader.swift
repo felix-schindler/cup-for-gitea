@@ -37,12 +37,10 @@ struct NotificationLoader: View {
 		guard case .success(let current) = notifications else { return }
 		let shouldRemove: Bool
 		switch status {
-		case .read:
+		case .read, .pinned:
 			shouldRemove = showAll == false
 		case .unread:
 			shouldRemove = showAll == true
-		case .pinned:
-			shouldRemove = false
 		}
 
 		guard shouldRemove else { return }
