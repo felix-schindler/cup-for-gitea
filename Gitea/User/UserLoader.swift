@@ -92,7 +92,7 @@ struct UserLoader: View {
 									}
 
 									if u.location.isNotEmpty {
-										PillView(u.location, systemImage: "mappin")
+										PillView(verbatim: u.location, systemImage: "mappin")
 									}
 								}.font(.footnote)
 							}
@@ -151,10 +151,7 @@ struct UserLoader: View {
 					}
 				case .failure(let failure):
 					if isNamespace {
-						FailedView(
-							"Failed to load namespace",
-							description: LocalizedStringResource(stringLiteral: failure.localizedDescription)
-						)
+						FailedView(failure)
 					} else {
 						FailedView(failure)
 					}

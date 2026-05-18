@@ -47,7 +47,7 @@ struct RepoSearchLoader: View {
         }
     }
 
-    private var navigationTitle: String {
+    private var navigationTitle: LocalizedStringResource {
         switch context {
         case .search:
             starredBy != nil ? "Starred Repositories" : "Search Repositories"

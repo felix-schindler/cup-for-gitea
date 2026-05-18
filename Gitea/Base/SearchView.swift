@@ -10,6 +10,13 @@ import SwiftUI
 enum SearchType: String, CaseIterable {
 	case user = "User"
 	case topic = "Topic"
+
+	var displayName: LocalizedStringResource {
+		switch self {
+		case .user: "User"
+		case .topic: "Topic"
+		}
+	}
 }
 
 struct SearchView: View {
@@ -20,7 +27,7 @@ struct SearchView: View {
 		VStack {
 			Picker("Search for a", selection: $type) {
 				ForEach(SearchType.allCases, id: \.self) { _type in
-					Text(_type.rawValue).tag(_type)
+					Text(_type.displayName).tag(_type)
 				}
 			}
 			.pickerStyle(.segmented)

@@ -58,7 +58,7 @@ struct OrgView: View {
 										.controlSize(.mini)
 								}
 								if org.location.isNotEmpty {
-									PillView(org.location, systemImage: "mappin")
+									PillView(verbatim: org.location, systemImage: "mappin")
 								}
 							}
 						}

@@ -22,7 +22,7 @@ struct ReleaseView: View {
 					HStack {
 						SmallUserView(release.author)
 
-						PillView(release.tagName, systemImage: Icons.topics.rawValue)
+						PillView(verbatim: release.tagName, systemImage: Icons.topics.rawValue)
 
 						if release.draft {
 							PillView("Draft", systemImage: "pencil")

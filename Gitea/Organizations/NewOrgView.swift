@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+private func visibilityDisplayName(_ v: Components.Schemas.CreateOrgOption.VisibilityPayload) -> LocalizedStringResource {
+	switch v {
+	case ._public: "Public"
+	case .limited: "Limited"
+	case ._private: "Private"
+	}
+}
+
 struct NewOrgView: View {
 	@Environment(\.dismiss) var dismiss
 
@@ -60,7 +68,7 @@ struct NewOrgView: View {
 				VStack(alignment: .leading) {
 					Picker("Visibility", selection: $visibility) {
 						ForEach(Components.Schemas.CreateOrgOption.VisibilityPayload.allCases, id: \.self) { v in
-							Text(v.rawValue.capitalized).tag(v)
+							Text(visibilityDisplayName(v)).tag(v)
 						}
 					}
 					if visibility == ._private {

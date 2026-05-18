@@ -73,7 +73,7 @@ enum AuthError: LocalizedError {
 	var errorDescription: String? {
 		switch self {
 		case .missingToken:
-			return "Missing access token"
+			String(localized: "Missing access token")
 		}
 	}
 }

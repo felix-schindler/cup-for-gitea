@@ -24,7 +24,12 @@ struct IssueSearchLoader: View {
 
 	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
-	private var title: String { typeLabel }
+	private var navigationTitle: LocalizedStringResource {
+		switch type {
+		case .issues: "Issues"
+		case .pulls: "Pull Requests"
+		}
+	}
 	private var searchPrompt: LocalizedStringResource { "Search \(typeLabel.lowercased())" }
 	private var emptyText: LocalizedStringResource { "There are no \(typeLabel.lowercased())" }
 	private var loadingText: LocalizedStringResource { "Loading \(typeLabel)" }
@@ -174,7 +179,7 @@ struct IssueSearchLoader: View {
 		.refreshable {
 			await resetAndLoad()
 		}
-		.navigationTitle(title)
+		.navigationTitle(navigationTitle)
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button("Filters", systemImage: "line.3.horizontal.decrease") {

@@ -93,24 +93,24 @@ struct HeaderRepoView: View {
 
 					if repo.licenses.isNotEmpty {
 						ForEach(repo.licenses, id: \.self) { license in
-							PillView(license)
+							PillView(verbatim: license)
 						}
 					}
 
 					if repo.size > 0 {
-						PillView(ByteFormatter.shared.format(repo.size))
+						PillView(verbatim: ByteFormatter.shared.format(repo.size))
 					}
 
-					PillView(repo.createdAt.toString())
+					PillView(verbatim: repo.createdAt.toString())
 				}.font(.footnote)
 			}
 
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack {
 					SmallUserView(repo.owner)
-					PillView("\(repo.starsCount)", systemImage: Icons.starred.rawValue)
-					PillView("\(repo.forksCount)", systemImage: Icons.forks.rawValue)
-					PillView("\(repo.watchersCount)", systemImage: Icons.watchers.rawValue)
+					PillView(verbatim: "\(repo.starsCount)", systemImage: Icons.starred.rawValue)
+					PillView(verbatim: "\(repo.forksCount)", systemImage: Icons.forks.rawValue)
+					PillView(verbatim: "\(repo.watchersCount)", systemImage: Icons.watchers.rawValue)
 				}
 			}
 

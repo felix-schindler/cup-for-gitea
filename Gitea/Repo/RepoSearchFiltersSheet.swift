@@ -9,13 +9,12 @@ struct RepoSearchFiltersSheet: View {
             Section("Sort & Order") {
                 Picker("Sort by", selection: $filters.sort) {
                     ForEach(RepoSearchFilters.SortOption.allCases, id: \.self) { option in
-                        Text(option == .bestMatch ? "Best Match" : option.rawValue.capitalized)
-                            .tag(option)
+                        Text(option.displayName).tag(option)
                     }
                 }
                 Picker("Order", selection: $filters.order) {
                     ForEach(RepoSearchFilters.OrderOption.allCases, id: \.self) { option in
-                        Text(option.rawValue.capitalized).tag(option)
+                        Text(option.displayName).tag(option)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -24,8 +23,7 @@ struct RepoSearchFiltersSheet: View {
             Section("Type") {
                 Picker("Mode", selection: $filters.mode) {
                     ForEach(RepoSearchFilters.ModeFilter.allCases, id: \.self) { option in
-                        Text(option == .all ? "All" : option.rawValue.capitalized)
-                            .tag(option)
+                        Text(option.displayName).tag(option)
                     }
                 }
             }
@@ -33,7 +31,7 @@ struct RepoSearchFiltersSheet: View {
             Section("Visibility") {
                 Picker("Privacy", selection: $filters.isPrivate) {
                     ForEach(RepoSearchFilters.PrivateFilter.allCases, id: \.self) { option in
-                        Text(option.rawValue.capitalized).tag(option)
+                        Text(option.displayName).tag(option)
                     }
                 }
                 .pickerStyle(.segmented)

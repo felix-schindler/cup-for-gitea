@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+private func stateDisplayName(_ state: Operations.IssueSearchIssues.Input.Query.StatePayload) -> LocalizedStringResource {
+	switch state {
+	case .open: "Open"
+	case .closed: "Closed"
+	case .all: "All"
+	}
+}
+
 struct IssueSearchFiltersSheet: View {
 	@Binding var filters: IssueSearchFilters
 	@Environment(\.dismiss) private var dismiss
@@ -16,7 +24,7 @@ struct IssueSearchFiltersSheet: View {
 			Section("State") {
 				Picker("State", selection: $filters.state) {
 					ForEach(Operations.IssueSearchIssues.Input.Query.StatePayload.allCases, id: \.self) { option in
-						Text(option.rawValue.capitalized).tag(option)
+						Text(stateDisplayName(option)).tag(option)
 					}
 				}
 				.pickerStyle(.segmented)

@@ -186,7 +186,7 @@ struct IssueView: View {
 	@ViewBuilder
 	private func branchPill(_ name: String) -> some View {
 		PillView(
-			name,
+			verbatim: name,
 			bgColor: .blue,
 			fgColor: .white,
 			cornerRadius: 5
@@ -203,11 +203,11 @@ struct IssueView: View {
 				ScrollView(.horizontal, showsIndicators: false) {
 					HStack {
 						if issue.timeEstimate != 0 {
-							PillView("\(issue.timeEstimate)", systemImage: "clock")
+							PillView(verbatim: "\(issue.timeEstimate)", systemImage: "clock")
 								.font(.footnote)
 						}
 						if let dueDate = issue.dueDate {
-							PillView(dueDate.toString(), systemImage: "calendar.badge.checkmark")
+							PillView(verbatim: dueDate.toString(), systemImage: "calendar.badge.checkmark")
 						}
 					}
 				}
@@ -283,7 +283,7 @@ struct IssueView: View {
 							ForEach(labels, id: \.id) { label in
 								let bgColor = Color(hex: label.color)
 								PillView(
-									label.name.emojized(),
+									verbatim: label.name.emojized(),
 									bgColor: bgColor,
 									fgColor: bgColor.adaptiveText()
 								)

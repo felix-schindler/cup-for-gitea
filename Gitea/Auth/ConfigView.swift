@@ -14,7 +14,7 @@ struct ConfigView: View {
 
 	@State private var newHost = "gitea.com"
 	@State private var newToken = ""
-	@State private var errorMessage: String?
+	@State private var errorMessage: LocalizedStringKey?
 
 	private func sanitizeHost(_ input: String) -> String {
 		let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)

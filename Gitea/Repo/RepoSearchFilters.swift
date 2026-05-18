@@ -14,19 +14,56 @@ struct RepoSearchFilters: Equatable {
     enum SortOption: String, CaseIterable {
         case bestMatch = ""
         case alpha, created, updated, size, stars, forks
+
+        var displayName: LocalizedStringResource {
+            switch self {
+            case .bestMatch: "Best Match"
+            case .alpha: "Alpha"
+            case .created: "Created"
+            case .updated: "Updated"
+            case .size: "Size"
+            case .stars: "Stars"
+            case .forks: "Forks"
+            }
+        }
     }
 
     enum OrderOption: String, CaseIterable {
         case asc, desc
+
+        var displayName: LocalizedStringResource {
+            switch self {
+            case .asc: "Asc"
+            case .desc: "Desc"
+            }
+        }
     }
 
     enum ModeFilter: String, CaseIterable {
         case all = ""
         case fork, source, mirror, collaborative
+
+        var displayName: LocalizedStringResource {
+            switch self {
+            case .all: "All"
+            case .fork: "Fork"
+            case .source: "Source"
+            case .mirror: "Mirror"
+            case .collaborative: "Collaborative"
+            }
+        }
     }
 
     enum PrivateFilter: String, CaseIterable {
         case all, `public`, `private`
+
+        var displayName: LocalizedStringResource {
+            switch self {
+            case .all: "All"
+            case .public: "Public"
+            case .private: "Private"
+            }
+        }
     }
 
     var taskKey: String {

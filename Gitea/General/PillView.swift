@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct PillView: View {
-	private let label: String
+	private let label: LocalizedStringKey
 	private let icon: String?
 	private let fgColor: Color
 	private let bgColor: Color
 	private let cornerRadius: CGFloat
 
 	init(
-		_ label: String, systemImage: String? = nil, bgColor: Color? = nil,
+		_ label: LocalizedStringKey, systemImage: String? = nil, bgColor: Color? = nil,
 		fgColor: Color? = nil, cornerRadius: CGFloat = 25
 	) {
 		self.label = label
@@ -23,6 +23,13 @@ struct PillView: View {
 		self.fgColor = fgColor ?? .primary
 		self.bgColor = bgColor ?? Color(.systemGray5)
 		self.cornerRadius = cornerRadius
+	}
+
+	init(
+		verbatim label: String, systemImage: String? = nil, bgColor: Color? = nil,
+		fgColor: Color? = nil, cornerRadius: CGFloat = 25
+	) {
+		self.init(LocalizedStringKey(label), systemImage: systemImage, bgColor: bgColor, fgColor: fgColor, cornerRadius: cornerRadius)
 	}
 
 	public var body: some View {
