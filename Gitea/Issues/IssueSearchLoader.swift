@@ -19,7 +19,7 @@ struct IssueSearchLoader: View {
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
 	@State private var currentUsername: String?
-	@State private var filters = IssueSearchFilters()
+	@State private var filters: IssueSearchFilters
 	@State private var showFilters = false
 
 	private let debounceNanoseconds: UInt64 = 350_000_000
@@ -57,10 +57,11 @@ struct IssueSearchLoader: View {
 		"\(owner ?? "")|\(repo ?? "")|\(search)|\(filters.taskKey)"
 	}
 
-	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil) {
+	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil, milestonesFilter: String? = nil) {
 		self.type = type
 		self.owner = owner
 		self.repo = repo
+		self._filters = State(initialValue: IssueSearchFilters(milestones: milestonesFilter ?? ""))
 	}
 
 	private var queryPayload: Operations.IssueSearchIssues.Input.Query {

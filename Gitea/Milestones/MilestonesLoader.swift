@@ -30,7 +30,7 @@ struct MilestonesLoader: View {
 			icon: Icons.milestones.rawValue,
 			load: load
 		) { milestone in
-			Text(milestone.title.emojized())
+			MilestoneView(milestone, owner: owner, repo: repo)
 		}
 		.navigationTitle("Milestones")
 	}
