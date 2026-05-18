@@ -38,7 +38,7 @@ struct IssueSearchFilters: Equatable {
 			reviewed.description,
 			since?.timeIntervalSince1970.description ?? "",
 			before?.timeIntervalSince1970.description ?? "",
-			limitText
+			limitText,
 		].joined(separator: "|")
 	}
 

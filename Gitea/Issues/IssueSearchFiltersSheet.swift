@@ -39,30 +39,38 @@ struct IssueSearchFiltersSheet: View {
 			}
 
 			Section("Dates") {
-				Toggle("Updated since", isOn: Binding(
-					get: { filters.since != nil },
-					set: { isOn in
-						filters.since = isOn ? (filters.since ?? Date()) : nil
-					}
-				))
+				Toggle(
+					"Updated since",
+					isOn: Binding(
+						get: { filters.since != nil },
+						set: { isOn in
+							filters.since = isOn ? (filters.since ?? Date()) : nil
+						}
+					))
 				if let since = filters.since {
-					DatePicker("Since", selection: Binding(
-						get: { since },
-						set: { filters.since = $0 }
-					), displayedComponents: [.date])
+					DatePicker(
+						"Since",
+						selection: Binding(
+							get: { since },
+							set: { filters.since = $0 }
+						), displayedComponents: [.date])
 				}
 
-				Toggle("Updated before", isOn: Binding(
-					get: { filters.before != nil },
-					set: { isOn in
-						filters.before = isOn ? (filters.before ?? Date()) : nil
-					}
-				))
+				Toggle(
+					"Updated before",
+					isOn: Binding(
+						get: { filters.before != nil },
+						set: { isOn in
+							filters.before = isOn ? (filters.before ?? Date()) : nil
+						}
+					))
 				if let before = filters.before {
-					DatePicker("Before", selection: Binding(
-						get: { before },
-						set: { filters.before = $0 }
-					), displayedComponents: [.date])
+					DatePicker(
+						"Before",
+						selection: Binding(
+							get: { before },
+							set: { filters.before = $0 }
+						), displayedComponents: [.date])
 				}
 			}
 
