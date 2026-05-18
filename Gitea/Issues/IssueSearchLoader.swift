@@ -179,7 +179,7 @@ struct IssueSearchLoader: View {
 		.refreshable {
 			await resetAndLoad()
 		}
-		.navigationTitle(navigationTitle)
+		.navigationTitle(Text(navigationTitle))
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button("Filters", systemImage: "line.3.horizontal.decrease") {

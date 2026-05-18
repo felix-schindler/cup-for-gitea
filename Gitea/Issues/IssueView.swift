@@ -103,7 +103,7 @@ struct IssueView: View {
 				ShareLink(item: url)
 			}
 		}
-		.navigationTitle(item.data.displayNavigationTitle)
+		.navigationTitle(Text(item.data.displayNavigationTitle))
 		.navigationBarTitleDisplayMode(.inline)
 	}
 

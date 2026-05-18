@@ -171,6 +171,6 @@ struct RepoSearchLoader: View {
 		.refreshable {
 			await resetAndLoad()
 		}
-		.navigationTitle(navigationTitle)
+		.navigationTitle(Text(navigationTitle))
 	}
 }
