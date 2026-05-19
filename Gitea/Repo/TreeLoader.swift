@@ -26,18 +26,16 @@ struct TreeLoader: View {
 
 	private func load() async {
 		state = await LoadState {
-			if let folderPath {
-				let response = try await Network.shared.client.repoGetContents(
-					path: .init(owner: owner, repo: repo, filepath: folderPath),
-					query: .init(ref: ref)
-				).ok.body.json
-				return [response]
-			} else {
-				return try await Network.shared.client.repoGetContentsList(
-					path: .init(owner: owner, repo: repo),
-					query: .init(ref: ref)
-				).ok.body.json
+			let response = try await Network.shared.client.repoGetContentsExt(
+				path: .init(owner: owner, repo: repo, filepath: folderPath ?? "."),
+				query: .init(ref: ref)
+			).ok.body.json
+			if let dirContents = response.dirContents {
+				return dirContents
+			} else if let fileContents = response.fileContents {
+				return [fileContents]
 			}
+			return []
 		}
 	}
 
@@ -119,6 +117,6 @@ struct TreeLoader: View {
 				await loadBranches()
 			}
 		}
-		.navigationTitle(folderPath ?? "Files")
+		.navigationTitle("Files")
 	}
 }

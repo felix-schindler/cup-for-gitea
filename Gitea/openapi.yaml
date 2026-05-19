@@ -17356,9 +17356,6 @@ components:
         file_contents:
           $ref: '#/components/schemas/ContentsResponse'
       x-go-package: code.gitea.io/gitea/modules/structs
-      required:
-        - dir_contents
-        - file_contents
     ContentsResponse:
       description: ContentsResponse contains information about a repo's entry's (dir, file, symlink, submodule) metadata and content
       type: object
@@ -17446,23 +17443,12 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - _links
-        - content
-        - download_url
-        - encoding
         - git_url
         - html_url
-        - last_author_date
-        - last_commit_message
-        - last_commit_sha
-        - last_committer_date
-        - lfs_oid
-        - lfs_size
         - name
         - path
         - sha
         - size
-        - submodule_git_url
-        - target
         - type
         - url
     CreateAccessTokenOption:
