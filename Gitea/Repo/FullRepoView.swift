@@ -121,9 +121,9 @@ struct FullRepoView: View {
 						// if repo.hasProjects {
 						// 	Text("Projects")
 						// }
-						// if repo.hasWiki {
-						// 	Text("Wiki")
-						// }
+						if repo.hasWiki, let externalWiki = repo.externalWiki, let url = URL(string: externalWiki.externalWikiUrl) {
+							Link("Wiki", destination: url)
+						}
 					},
 					label: {
 						Label("Plan", systemImage: "calendar.badge.checkmark")
