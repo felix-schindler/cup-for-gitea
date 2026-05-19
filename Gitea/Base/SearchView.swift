@@ -21,10 +21,9 @@ enum SearchType: String, CaseIterable {
 
 struct SearchView: View {
 	@State var type: SearchType = .user
-	@State var search: String = ""
 
 	var body: some View {
-		VStack {
+		VStack(spacing: 0) {
 			Picker("Search for a", selection: $type) {
 				ForEach(SearchType.allCases, id: \.self) { _type in
 					Text(_type.displayName).tag(_type)
@@ -35,12 +34,20 @@ struct SearchView: View {
 
 			switch type {
 			case .user:
-				UserSearchLoader(search: $search)
+				UserSearchLoader(context: .search)
 			case .topic:
-				TopicsSearchLoader(search: $search)
+				TopicSearchView()
 			}
 		}
-		.searchable(text: $search, prompt: Text("Search for a \(type.rawValue)"))
 		.navigationTitle("Search")
+	}
+}
+
+private struct TopicSearchView: View {
+	@State private var search = ""
+
+	var body: some View {
+		TopicsSearchLoader(search: $search)
+			.searchable(text: $search, prompt: Text("Search for a topic"))
 	}
 }

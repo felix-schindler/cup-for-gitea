@@ -72,7 +72,7 @@ struct OrgView: View {
 				}
 				// Label("Projects", systemImage: Icons.projects.rawValue)
 				// Label("Packages", systemImage: Icons.packages.rawValue)
-				NavigationLink(destination: OrgMembersLoader(org.name)) {
+				NavigationLink(destination: UserSearchLoader(context: .orgMembers(org: org.name))) {
 					Label("Members", systemImage: Icons.users.rawValue)
 				}
 				// Label("Teams", systemImage: "person.2")

@@ -112,6 +112,9 @@ struct FullRepoView: View {
 
 				DisclosureGroup(
 					content: {
+						NavigationLink("Collaborators") {
+							UserSearchLoader(context: .repoCollaborators(owner: repo.owner.login, repo: repo.name))
+						}
 						NavigationLink("Labels") {
 							LabelsLoader(owner: repo.owner.login, repo: repo.name)
 						}
