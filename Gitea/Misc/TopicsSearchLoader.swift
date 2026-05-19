@@ -34,10 +34,12 @@ struct TopicsSearchLoader: View {
 					NoContentView("There are no Topics", systemImage: icon)
 				} else {
 					ForEach(topics, id: \.id) { topic in
-						HStack {
-							Text(topic.topicName)
-							Spacer()
-							Text("\(topic.repoCount)")
+						NavigationLink(destination: RepoSearchLoader(context: .search, search: topic.topicName, limitToTopic: true)) {
+							HStack {
+								Text(topic.topicName)
+								Spacer()
+								Text("\(topic.repoCount)")
+							}
 						}
 					}
 				}
