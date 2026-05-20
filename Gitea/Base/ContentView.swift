@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum ContentTab: String, Hashable {
-	case home, profile, search
+	case home, activity, profile, search
 }
 
 struct ContentView: View {
@@ -22,6 +22,12 @@ struct ContentView: View {
 				Tab("Home", systemImage: Icons.home.rawValue, value: ContentTab.home) {
 					NavigationStack {
 						HomeView()
+					}
+				}
+
+				Tab("Activity", systemImage: Icons.activity.rawValue, value: ContentTab.activity) {
+					NavigationStack {
+						ActivityLoader(context: .home)
 					}
 				}
 

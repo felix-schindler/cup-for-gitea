@@ -131,7 +131,9 @@ struct UserLoader: View {
 
 						// Label("Projects", systemImage: Icons.projects.rawValue)
 						// Label("Packages", systemImage: Icons.packages.rawValue)
-						// Label("Public Activity", systemImage: Icons.activity.rawValue)
+						NavigationLink(destination: ActivityLoader(context: .user(u.login))) {
+							Label("Public Activity", systemImage: Icons.activity.rawValue)
+						}
 
 						NavigationLink(
 							destination: RepoSearchLoader(context: .search, starredBy: u.id),

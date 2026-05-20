@@ -35,8 +35,12 @@ struct CommentsLoader: View {
 					ForEach(comments, id: \.id) { c in
 						VStack(alignment: .leading) {
 							HStack {
-								ScrollView(.horizontal) {
-									SmallUserView(c.user)
+								if let user = c.user {
+									ScrollView(.horizontal) {
+										SmallUserView(user)
+									}
+								} else {
+									Spacer()
 								}
 								Text(c.createdAt.toString())
 									.font(.footnote)

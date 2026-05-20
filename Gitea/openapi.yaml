@@ -16407,7 +16407,6 @@ components:
       required:
         - act_user
         - act_user_id
-        - comment
         - comment_id
         - content
         - created
@@ -17105,7 +17104,6 @@ components:
         - original_author_id
         - pull_request_url
         - updated_at
-        - user
     Commit:
       type: object
       title: Commit contains information generated from a Git commit.
