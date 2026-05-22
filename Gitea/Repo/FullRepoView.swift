@@ -188,21 +188,47 @@ struct FullRepoView: View {
 		}.task {
 			await load()
 		}.toolbar {
-			Menu("More", systemImage: "ellipsis") {
-				if let url = URL(string: repo.htmlUrl) {
-					Section {
-						ShareLink(item: url)
+			HStack {
+				Menu("More", systemImage: "ellipsis") {
+					if let url = URL(string: repo.htmlUrl) {
+						Section {
+							ShareLink(item: url)
+						}
+					}
+
+					Section("Clone code") {
+						Button("Copy SSH URL") {
+							UIPasteboard.general.string = repo.sshUrl
+							HapticFeedback.notify(.success)
+						}
+						Button("Copy HTTPS URL") {
+							UIPasteboard.general.string = repo.cloneUrl
+							HapticFeedback.notify(.success)
+						}
 					}
 				}
 
-				Section("Clone code") {
-					Button("Copy SSH URL") {
-						UIPasteboard.general.string = repo.sshUrl
-						HapticFeedback.notify(.success)
+				Menu("Create", systemImage: "plus") {
+					if repo.hasIssues, repo.externalTracker == nil {
+						NavigationLink(destination: NewIssueView(owner: repo.owner.login, repo: repo.name)) {
+							Label("New Issue", systemImage: Icons.issues.rawValue)
+						}
 					}
-					Button("Copy HTTPS URL") {
-						UIPasteboard.general.string = repo.cloneUrl
-						HapticFeedback.notify(.success)
+					if repo.hasPullRequests {
+						NavigationLink(destination: NewPullRequestView(owner: repo.owner.login, repo: repo.name)) {
+							Label("New Pull Request", systemImage: Icons.pull_requests.rawValue)
+						}
+					}
+					NavigationLink(destination: NewLabelView(owner: repo.owner.login, repo: repo.name)) {
+						Label("New Label", systemImage: Icons.topics.rawValue)
+					}
+					NavigationLink(destination: NewMilestoneView(owner: repo.owner.login, repo: repo.name)) {
+						Label("New Milestone", systemImage: Icons.milestones.rawValue)
+					}
+					if repo.hasReleases {
+						NavigationLink(destination: NewReleaseView(owner: repo.owner.login, repo: repo.name)) {
+							Label("New Release", systemImage: "flag")
+						}
 					}
 				}
 			}
