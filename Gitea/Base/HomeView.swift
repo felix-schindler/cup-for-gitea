@@ -60,22 +60,16 @@ struct HomeView: View {
 			}
 		}.toolbar {
 			HStack {
-				Menu("More", systemImage: "ellipsis") {
-					NavigationLink(
-						destination: NewRepoView(),
-						label: {
-							Label("New Repository", systemImage: "plus")
-						})
-					NavigationLink(
-						destination: NewRepoMigrationView(),
-						label: {
-							Label("New Migration", systemImage: "square.grid.3x1.folder.badge.plus")
-						})
-					NavigationLink(
-						destination: NewOrgView(),
-						label: {
-							Label("New Organization", systemImage: Icons.organizations.rawValue)
-						})
+				Menu("Create", systemImage: "plus") {
+					NavigationLink(destination: NewRepoView()) {
+						Label("New Repository", systemImage: "plus")
+					}
+					NavigationLink(destination: NewRepoMigrationView()) {
+						Label("New Migration", systemImage: "square.grid.3x1.folder.badge.plus")
+					}
+					NavigationLink(destination: NewOrgView()) {
+						Label("New Organization", systemImage: Icons.organizations.rawValue)
+					}
 				}
 
 				Button(
