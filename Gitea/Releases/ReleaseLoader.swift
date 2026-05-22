@@ -30,6 +30,11 @@ struct ReleaseLoader: View {
 		) { release in
 			ReleaseView(release)
 		}
+		.toolbar {
+			NavigationLink(destination: NewReleaseView(owner: owner, repo: repo)) {
+				Label("New Release", systemImage: "plus")
+			}
+		}
 		.navigationTitle("Releases")
 	}
 }
