@@ -32,6 +32,11 @@ struct LabelsLoader: View {
 		) { label in
 			SmallLabelView(label: label)
 		}
+		.toolbar {
+			NavigationLink(destination: NewLabelView(owner: owner, repo: repo)) {
+				Label("New Label", systemImage: "plus")
+			}
+		}
 		.navigationTitle("Labels")
 	}
 }
