@@ -188,10 +188,18 @@ struct IssueSearchLoader: View {
 					showFilters = true
 				}
 			}
-			if type == .issues, let owner, let repo {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					NavigationLink(destination: NewIssueView(owner: owner, repo: repo)) {
-						Label("New Issue", systemImage: "plus")
+			if let owner, let repo {
+				if type == .issues {
+					ToolbarItem(placement: .navigationBarTrailing) {
+						NavigationLink(destination: NewIssueView(owner: owner, repo: repo)) {
+							Label("New Issue", systemImage: "plus")
+						}
+					}
+				} else if type == .pulls {
+					ToolbarItem(placement: .navigationBarTrailing) {
+						NavigationLink(destination: NewPullRequestView(owner: owner, repo: repo)) {
+							Label("New Pull Request", systemImage: "plus")
+						}
 					}
 				}
 			}
