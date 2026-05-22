@@ -32,6 +32,11 @@ struct MilestonesLoader: View {
 		) { milestone in
 			MilestoneView(milestone, owner: owner, repo: repo)
 		}
+		.toolbar {
+			NavigationLink(destination: NewMilestoneView(owner: owner, repo: repo)) {
+				Label("New Milestone", systemImage: "plus")
+			}
+		}
 		.navigationTitle("Milestones")
 	}
 }
