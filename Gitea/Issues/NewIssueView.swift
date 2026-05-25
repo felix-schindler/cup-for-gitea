@@ -173,10 +173,13 @@ struct NewIssueView: View {
 			}
 		}.task {
 			await load()
+		}.refreshable {
+			await load()
 		}.toolbar {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
-			}.buttonStyle(.borderedProminent)
+			}.disabled(title.isEmpty)
+			.buttonStyle(.borderedProminent)
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Issue")

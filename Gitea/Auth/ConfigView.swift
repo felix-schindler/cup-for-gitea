@@ -27,84 +27,84 @@ struct ConfigView: View {
 	}
 
 	var body: some View {
-		VStack {
-			Spacer()
-
-			Label("Gitea URL", systemImage: "link")
-				.font(.headline)
-			TextField("gitea.example.com", text: $newHost)
-				.keyboardType(.URL)
-				.textInputAutocapitalization(.never)
-				.autocorrectionDisabled()
-
-			Label("Access Token", systemImage: "key")
-				.padding(.top)
-				.font(.headline)
-			TextField("77eabb36d04f1c5c32cd609b8b44c6b3", text: $newToken)
-				.textInputAutocapitalization(.never)
-				.autocorrectionDisabled()
-
-			VStack {
-				Label("Scopes", systemImage: "checkmark.circle.fill")
+		Form {
+			Section {
+				Label("Gitea URL", systemImage: "link")
 					.font(.headline)
-				VStack(alignment: .leading) {
-					Label("`activitypub: No Access`", systemImage: "checkmark.circle")
-					Label("`issue: read and write`", systemImage: "checkmark.circle")
-					Label("`misc: read`", systemImage: "checkmark.circle")
-					Label("`notification: read and write`", systemImage: "checkmark.circle")
-					Label("`organization: read and write`", systemImage: "checkmark.circle")
-					Label("`package: read`", systemImage: "checkmark.circle")
-					Label("`repository: read and write`", systemImage: "checkmark.circle")
-					Label("`user: read and write`", systemImage: "checkmark.circle")
-				}.font(.footnote)
-			}.padding(.top)
+				TextField("gitea.example.com", text: $newHost)
+					.keyboardType(.URL)
+					.textInputAutocapitalization(.never)
+					.autocorrectionDisabled()
 
-			if let errorMessage {
-				Text(errorMessage)
-					.foregroundStyle(.red)
-					.font(.footnote)
-					.multilineTextAlignment(.center)
-					.padding(.top, 6)
+				Label("Access Token", systemImage: "key")
+					.font(.headline)
+				TextField("77eabb36d04f1c5c32cd609b8b44c6b3", text: $newToken)
+					.textInputAutocapitalization(.never)
+					.autocorrectionDisabled()
 			}
 
-			Spacer()
-
-			AsyncButton(
-				action: {
-					errorMessage = nil
-					let host = sanitizeHost(newHost)
-					guard host.isNotEmpty else {
-						errorMessage = "Please provide a valid host"
-						return
-					}
-					guard newToken.isNotEmpty else {
-						errorMessage = "Please provide a valid token"
-						return
-					}
-
-					do {
-						let instance = GiteaInstance(host: host, token: newToken)
-						try await Auth.login(
-							instance: instance,
-							showSetup: showSetup,
-							dismiss: dismiss
-						)
-					} catch {
-						errorMessage = "Failed to log in: \(error.localizedDescription)"
-					}
-				},
-				label: {
-					Label("Save config", systemImage: "checkmark")
-						.frame(maxWidth: .infinity)
+			Section {
+				VStack(alignment: .leading) {
+					Label("Scopes", systemImage: "checkmark.circle.fill")
+						.font(.headline)
+					VStack(alignment: .leading) {
+						Label("`activitypub: No Access`", systemImage: "checkmark.circle")
+						Label("`issue: read and write`", systemImage: "checkmark.circle")
+						Label("`misc: read`", systemImage: "checkmark.circle")
+						Label("`notification: read and write`", systemImage: "checkmark.circle")
+						Label("`organization: read and write`", systemImage: "checkmark.circle")
+						Label("`package: read`", systemImage: "checkmark.circle")
+						Label("`repository: read and write`", systemImage: "checkmark.circle")
+						Label("`user: read and write`", systemImage: "checkmark.circle")
+					}.font(.footnote)
 				}
-			)
-			.tint(.accentColor)
-			.buttonBorderShape(.capsule)
-			.buttonStyle(.bordered)
-			.controlSize(.large)
+			}
+
+			if let errorMessage {
+				Section {
+					Text(errorMessage)
+						.foregroundStyle(.red)
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+				}
+			}
+
+			Section {
+				AsyncButton(
+					action: {
+						errorMessage = nil
+						let host = sanitizeHost(newHost)
+						guard host.isNotEmpty else {
+							errorMessage = "Please provide a valid host"
+							return
+						}
+						guard newToken.isNotEmpty else {
+							errorMessage = "Please provide a valid token"
+							return
+						}
+
+						do {
+							let instance = GiteaInstance(host: host, token: newToken)
+							try await Auth.login(
+								instance: instance,
+								showSetup: showSetup,
+								dismiss: dismiss
+							)
+						} catch {
+							errorMessage = "Failed to log in: \(error.localizedDescription)"
+						}
+					},
+					label: {
+						Label("Save config", systemImage: "checkmark")
+							.frame(maxWidth: .infinity)
+					}
+				)
+				.buttonBorderShape(.capsule)
+				.buttonStyle(.borderedProminent)
+				.controlSize(.large)
+			}
 		}
-		.padding()
-		.textFieldStyle(.roundedBorder)
+		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("Configure instance")
 	}
 }

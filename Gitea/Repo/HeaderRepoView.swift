@@ -66,7 +66,7 @@ struct HeaderRepoView: View {
 
 			HStack {
 				if repo.topics.isNotEmpty {
-					ScrollView(.horizontal) {
+					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
 							ForEach(repo.topics, id: \.self) { topic in

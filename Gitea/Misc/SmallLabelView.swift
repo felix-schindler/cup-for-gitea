@@ -11,7 +11,7 @@ struct SmallLabelView: View {
 	let label: Components.Schemas.Label
 
 	var body: some View {
-		HStack(spacing: 6) {
+		HStack {
 			Circle()
 				.fill(Color(hex: label.color))
 				.frame(width: 12, height: 12)

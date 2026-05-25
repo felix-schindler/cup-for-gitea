@@ -153,7 +153,7 @@ struct RepoSearchLoader: View {
 		}
 		.searchable(text: $search, prompt: Text("Search repositories"))
 		.toolbar {
-			ToolbarItem(placement: .navigationBarTrailing) {
+			ToolbarItem(placement: .topBarTrailing) {
 				Button("Filters", systemImage: "line.3.horizontal.decrease") {
 					HapticFeedback.play(.light)
 					showFilters = true

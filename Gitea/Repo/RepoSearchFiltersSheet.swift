@@ -72,6 +72,7 @@ struct RepoSearchFiltersSheet: View {
 					.keyboardType(.numberPad)
 			}
 		}
+		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("Filters")
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {

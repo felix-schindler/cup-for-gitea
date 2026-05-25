@@ -70,7 +70,7 @@ struct NotificationLoader: View {
 						} else {
 							ForEach(success, id: \.id) { notif in
 								VStack(alignment: .leading) {
-									ScrollView(.horizontal) {
+									ScrollView(.horizontal, showsIndicators: false) {
 										HStack {
 											StateIconView(notif.subject._type, notif.subject.state)
 											Text(notif.repository.fullName)

@@ -105,10 +105,12 @@ struct InstancesView: View {
 			instances = InstanceManager.instances
 			selectedId = InstanceManager.selectedId
 		}.toolbar {
-			NavigationLink(destination: ConfigView(showSetup: nil)) {
-				Label("Add Instance", systemImage: "plus")
-					.labelStyle(.titleAndIcon)
-					.tint(.accentColor)
+			ToolbarItem(placement: .topBarTrailing) {
+				NavigationLink(destination: ConfigView(showSetup: nil)) {
+					Label("Add Instance", systemImage: "plus")
+						.labelStyle(.titleAndIcon)
+						.tint(.accentColor)
+				}
 			}
 		}.navigationTitle("Instances")
 	}

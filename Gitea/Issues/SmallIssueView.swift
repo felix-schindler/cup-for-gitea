@@ -33,7 +33,7 @@ struct SmallIssueView: View {
 	var body: some View {
 		NavigationLink(destination: destination) {
 			VStack(alignment: .leading) {
-				HStack(spacing: 5) {
+				HStack {
 					stateIcon
 					ScrollView(.horizontal, showsIndicators: false) {
 						Text("\(item.data.displayRepositoryFullName)#\(item.data.displayNumber)")
@@ -52,7 +52,7 @@ struct SmallIssueView: View {
 					Text(item.data.displayTitle.emojized())
 				}
 
-				HStack(spacing: 5) {
+				HStack {
 					ScrollView(.horizontal, showsIndicators: false) {
 						userView
 					}

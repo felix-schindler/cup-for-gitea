@@ -21,12 +21,12 @@ struct MilestoneView: View {
 
 	var body: some View {
 		Section {
-			VStack(alignment: .leading, spacing: 8) {
+			VStack(alignment: .leading) {
 				HStack {
 					if milestone.state == .open {
 						PillView("Open", systemImage: Icons.milestones.rawValue, bgColor: .green, fgColor: .white)
 					} else {
-						PillView("Closed", systemImage: Icons.milestones.rawValue, bgColor: .purple, fgColor: .white)
+						PillView("Closed", systemImage: Icons.milestones.rawValue, bgColor: .red, fgColor: .white)
 					}
 				}.font(.footnote)
 

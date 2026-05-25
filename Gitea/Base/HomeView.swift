@@ -59,7 +59,7 @@ struct HomeView: View {
 				}
 			}
 		}.toolbar {
-			HStack {
+			ToolbarItem(placement: .topBarLeading) {
 				Menu("Create", systemImage: "plus") {
 					NavigationLink(destination: NewRepoView()) {
 						Label("New Repository", systemImage: "plus")
@@ -71,7 +71,8 @@ struct HomeView: View {
 						Label("New Organization", systemImage: Icons.organizations.rawValue)
 					}
 				}
-
+			}
+			ToolbarItem(placement: .topBarTrailing) {
 				Button(
 					action: {
 						showNotifications = true
