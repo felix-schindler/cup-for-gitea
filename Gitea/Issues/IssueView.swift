@@ -63,14 +63,26 @@ struct IssueView: View {
 		}
 	}
 
-	private let item: Item
+	@State private var item: Item
+	@State private var error: Error?
+	@State private var showErrorAlert = false
+	@State private var showMergeSheet = false
+	@State private var mergeConfig = MergeConfig()
+	@State private var mergeError: Error?
+	@State private var showMergeErrorAlert = false
+
+	private struct MergeConfig {
+		var method: Components.Schemas.MergePullRequestOption.DoPayload = .merge
+		var deleteBranch = false
+		var forceMerge = false
+	}
 
 	init(_ issue: Components.Schemas.Issue) {
-		self.item = .issue(issue)
+		self._item = State(initialValue: .issue(issue))
 	}
 
 	init(_ pullRequest: Components.Schemas.PullRequest) {
-		self.item = .pullRequest(pullRequest)
+		self._item = State(initialValue: .pullRequest(pullRequest))
 	}
 
 	var body: some View {
@@ -99,13 +111,291 @@ struct IssueView: View {
 				}
 			}
 		}.toolbar {
+			toolbarContent
+		}
+		.navigationTitle(Text(item.data.displayNavigationTitle))
+		.navigationBarTitleDisplayMode(.inline)
+		.alert("Error", isPresented: $showErrorAlert, presenting: error) { _ in
+			Button("OK") {}
+		} message: { error in
+			Text(error.localizedDescription)
+		}
+		.sheet(isPresented: $showMergeSheet) {
+			mergeSheet
+		}
+		.alert("Merge Error", isPresented: $showMergeErrorAlert, presenting: mergeError) { _ in
+			Button("OK") {}
+		} message: { error in
+			Text(error.localizedDescription)
+		}
+	}
+
+	@ToolbarContentBuilder
+	private var toolbarContent: some ToolbarContent {
+		ToolbarItem(placement: .primaryAction) {
 			if let url = URL(string: item.data.displayHtmlUrl) {
 				ShareLink(item: url)
 			}
 		}
-		.navigationTitle(Text(item.data.displayNavigationTitle))
-		.navigationBarTitleDisplayMode(.inline)
+
+		ToolbarItemGroup(placement: .primaryAction) {
+			toolbarActions
+		}
 	}
+
+	@ViewBuilder
+	private var toolbarActions: some View {
+		switch item {
+		case .issue(let issue):
+			if issue.state == .open {
+				AsyncButton("Close", systemImage: "archivebox") {
+					await closeIssue()
+				}
+			} else {
+				AsyncButton("Reopen", systemImage: "arrow.circlepath") {
+					await reopenIssue()
+				}
+			}
+		case .pullRequest(let pr):
+			if !pr.merged {
+				if pr.state == .open {
+					AsyncButton("Update Branch", systemImage: "arrow.triangle.merge") {
+						await updatePullRequestBranch()
+					}
+					AsyncButton("Close", systemImage: "archivebox") {
+						await closePullRequest()
+					}
+					Button("Merge", systemImage: "checkmark.circle") {
+						showMergeSheet = true
+					}
+				} else {
+					AsyncButton("Reopen", systemImage: "arrow.circlepath") {
+						await reopenPullRequest()
+					}
+				}
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var mergeSheet: some View {
+		NavigationStack {
+			Form {
+				Section("Merge Method") {
+					Picker("Method", selection: $mergeConfig.method) {
+						Text("Merge").tag(Components.Schemas.MergePullRequestOption.DoPayload.merge)
+						Text("Rebase").tag(Components.Schemas.MergePullRequestOption.DoPayload.rebase)
+						Text("Rebase Merge").tag(Components.Schemas.MergePullRequestOption.DoPayload.rebaseMerge)
+						Text("Squash").tag(Components.Schemas.MergePullRequestOption.DoPayload.squash)
+						Text("Fast-forward only").tag(Components.Schemas.MergePullRequestOption.DoPayload.fastForwardOnly)
+					}
+				}
+
+				Section("Options") {
+					Toggle("Delete branch after merge", isOn: $mergeConfig.deleteBranch)
+					Toggle("Force merge", isOn: $mergeConfig.forceMerge)
+				}
+
+				Section {
+					AsyncButton("Merge Pull Request", role: .destructive) {
+						await mergePullRequest()
+					}
+				}
+			}
+			.navigationTitle("Merge")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Cancel") {
+						showMergeSheet = false
+					}
+				}
+			}
+		}
+		.presentationDetents([.medium])
+	}
+
+	// MARK: - Actions
+
+	private func closeIssue() async {
+		guard case .issue(let issue) = item else { return }
+		do {
+			let response = try await Network.shared.client.issueEditIssue(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(
+						assignee: "", assignees: [], body: issue.body,
+						contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+						milestone: issue.milestone?.id ?? 0, ref: issue.ref,
+						state: "closed", title: issue.title, unsetDueDate: issue.dueDate == nil
+					))
+				)
+			).created.body.json
+			item = .issue(response)
+			HapticFeedback.notify(.success)
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func reopenIssue() async {
+		guard case .issue(let issue) = item else { return }
+		do {
+			let response = try await Network.shared.client.issueEditIssue(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(
+						assignee: "", assignees: [], body: issue.body,
+						contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+						milestone: issue.milestone?.id ?? 0, ref: "",
+						state: "open", title: issue.title, unsetDueDate: false
+					))
+				)
+			).created.body.json
+			item = .issue(response)
+			HapticFeedback.notify(.success)
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func closePullRequest() async {
+		guard case .pullRequest(let pr) = item else { return }
+		do {
+			let response = try await Network.shared.client.repoEditPullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(
+						allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+						assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+						body: pr.body, contentVersion: pr.contentVersion,
+						dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+						milestone: pr.milestone?.id ?? 0, state: "closed",
+						title: pr.title, unsetDueDate: pr.dueDate == nil
+					))
+				)
+			).created.body.json
+			item = .pullRequest(response)
+			HapticFeedback.notify(.success)
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func reopenPullRequest() async {
+		guard case .pullRequest(let pr) = item else { return }
+		do {
+			let response = try await Network.shared.client.repoEditPullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(
+						allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+						assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+						body: pr.body, contentVersion: pr.contentVersion,
+						dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+						milestone: pr.milestone?.id ?? 0, state: "open",
+						title: pr.title, unsetDueDate: false
+					))
+				)
+			).created.body.json
+			item = .pullRequest(response)
+			HapticFeedback.notify(.success)
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func mergePullRequest() async {
+		guard case .pullRequest = item else { return }
+		do {
+			let response = try await Network.shared.client.repoMergePullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(
+						deleteBranchAfterMerge: mergeConfig.deleteBranch,
+						_do: mergeConfig.method,
+						forceMerge: mergeConfig.forceMerge,
+						headCommitId: "", mergeCommitId: "",
+						mergeMessageField: "", mergeTitleField: "",
+						mergeWhenChecksSucceed: false
+					))
+				)
+			)
+
+			switch response {
+			case .ok:
+				let pr = try await Network.shared.client.repoGetPullRequest(
+					.init(path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber))
+				).ok.body.json
+				item = .pullRequest(pr)
+				showMergeSheet = false
+				HapticFeedback.notify(.success)
+			case .methodNotAllowed:
+				self.mergeError = NSError(domain: "", code: 405, userInfo: [NSLocalizedDescriptionKey: "Pull request is not mergeable. It may be marked as Work in Progress or have merge conflicts."])
+				showMergeErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .conflict(let error):
+				self.mergeError = NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Merge conflict"])
+				showMergeErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .code423:
+				self.mergeError = NSError(domain: "", code: 423, userInfo: [NSLocalizedDescriptionKey: "Repository is archived"])
+				showMergeErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .forbidden(let error):
+				self.mergeError = NSError(domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
+				showMergeErrorAlert = true
+				HapticFeedback.notify(.error)
+			default:
+				self.mergeError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown error occurred"])
+				showMergeErrorAlert = true
+				HapticFeedback.notify(.error)
+			}
+		} catch {
+			self.mergeError = error
+			showMergeErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func updatePullRequestBranch() async {
+		do {
+			let response = try await Network.shared.client.repoUpdatePullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
+				)
+			)
+
+			switch response {
+			case .ok:
+				HapticFeedback.notify(.success)
+			case .conflict(let error):
+				self.error = NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Update conflict"])
+				showErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .forbidden(let error):
+				self.error = NSError(domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
+				showErrorAlert = true
+				HapticFeedback.notify(.error)
+			default:
+				HapticFeedback.notify(.success)
+			}
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	// MARK: - Views
 
 	private var header: some View {
 		VStack(alignment: .leading) {
