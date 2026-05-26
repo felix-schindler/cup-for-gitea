@@ -26,6 +26,10 @@ struct ActivityView: View {
 						.lineLimit(2)
 				}
 
+				Text(activity.repo.fullName)
+					.font(.caption)
+					.foregroundStyle(.accent)
+
 				if activity.content.isNotEmpty {
 					Text(activity.content.emojized())
 						.font(.caption)
