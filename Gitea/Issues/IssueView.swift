@@ -92,11 +92,15 @@ struct IssueView: View {
 			}
 
 			if item.data.displayBody.isNotEmpty {
-				Section {
+				Section("Description") {
 					StructuredText(markdown: item.data.displayBody.emojized())
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
+			}
+
+			Section("Actions") {
+				toolbarActions
 			}
 
 			if hasDetails {
@@ -137,10 +141,6 @@ struct IssueView: View {
 				ShareLink(item: url)
 			}
 		}
-
-		ToolbarItemGroup(placement: .primaryAction) {
-			toolbarActions
-		}
 	}
 
 	@ViewBuilder
@@ -159,14 +159,28 @@ struct IssueView: View {
 		case .pullRequest(let pr):
 			if !pr.merged {
 				if pr.state == .open {
-					AsyncButton("Update Branch", systemImage: "arrow.triangle.merge") {
-						await updatePullRequestBranch()
+					if pr.draft {
+						AsyncButton("Mark Ready for Review", systemImage: "pencil.slash") {
+							await markReadyForReview()
+						}
+					} else {
+						AsyncButton("Mark as WIP", systemImage: "pencil") {
+							await markAsWIP()
+						}
+
+						if pr.base.sha != pr.mergeBase {
+							AsyncButton("Update Branch", systemImage: "arrow.triangle.merge") {
+								await updatePullRequestBranch()
+							}
+						}
 					}
 					AsyncButton("Close", systemImage: "archivebox") {
 						await closePullRequest()
 					}
-					Button("Merge", systemImage: "checkmark.circle") {
-						showMergeSheet = true
+					if pr.mergeable {
+						Button("Merge", systemImage: "checkmark.circle") {
+							showMergeSheet = true
+						}
 					}
 				} else {
 					AsyncButton("Reopen", systemImage: "arrow.circlepath") {
@@ -223,12 +237,13 @@ struct IssueView: View {
 			let response = try await Network.shared.client.issueEditIssue(
 				.init(
 					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(.init(
-						assignee: "", assignees: [], body: issue.body,
-						contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
-						milestone: issue.milestone?.id ?? 0, ref: issue.ref,
-						state: "closed", title: issue.title, unsetDueDate: issue.dueDate == nil
-					))
+					body: .json(
+						.init(
+							assignee: "", assignees: [], body: issue.body,
+							contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+							milestone: issue.milestone?.id ?? 0, ref: issue.ref,
+							state: "closed", title: issue.title, unsetDueDate: issue.dueDate == nil
+						))
 				)
 			).created.body.json
 			item = .issue(response)
@@ -246,12 +261,13 @@ struct IssueView: View {
 			let response = try await Network.shared.client.issueEditIssue(
 				.init(
 					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(.init(
-						assignee: "", assignees: [], body: issue.body,
-						contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
-						milestone: issue.milestone?.id ?? 0, ref: "",
-						state: "open", title: issue.title, unsetDueDate: false
-					))
+					body: .json(
+						.init(
+							assignee: "", assignees: [], body: issue.body,
+							contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+							milestone: issue.milestone?.id ?? 0, ref: "",
+							state: "open", title: issue.title, unsetDueDate: false
+						))
 				)
 			).created.body.json
 			item = .issue(response)
@@ -269,14 +285,15 @@ struct IssueView: View {
 			let response = try await Network.shared.client.repoEditPullRequest(
 				.init(
 					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(.init(
-						allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-						assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-						body: pr.body, contentVersion: pr.contentVersion,
-						dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-						milestone: pr.milestone?.id ?? 0, state: "closed",
-						title: pr.title, unsetDueDate: pr.dueDate == nil
-					))
+					body: .json(
+						.init(
+							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+							body: pr.body, contentVersion: pr.contentVersion,
+							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+							milestone: pr.milestone?.id ?? 0, state: "closed",
+							title: pr.title, unsetDueDate: pr.dueDate == nil
+						))
 				)
 			).created.body.json
 			item = .pullRequest(response)
@@ -294,14 +311,15 @@ struct IssueView: View {
 			let response = try await Network.shared.client.repoEditPullRequest(
 				.init(
 					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(.init(
-						allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-						assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-						body: pr.body, contentVersion: pr.contentVersion,
-						dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-						milestone: pr.milestone?.id ?? 0, state: "open",
-						title: pr.title, unsetDueDate: false
-					))
+					body: .json(
+						.init(
+							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+							body: pr.body, contentVersion: pr.contentVersion,
+							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+							milestone: pr.milestone?.id ?? 0, state: "open",
+							title: pr.title, unsetDueDate: false
+						))
 				)
 			).created.body.json
 			item = .pullRequest(response)
@@ -319,14 +337,15 @@ struct IssueView: View {
 			let response = try await Network.shared.client.repoMergePullRequest(
 				.init(
 					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(.init(
-						deleteBranchAfterMerge: mergeConfig.deleteBranch,
-						_do: mergeConfig.method,
-						forceMerge: mergeConfig.forceMerge,
-						headCommitId: "", mergeCommitId: "",
-						mergeMessageField: "", mergeTitleField: "",
-						mergeWhenChecksSucceed: false
-					))
+					body: .json(
+						.init(
+							deleteBranchAfterMerge: mergeConfig.deleteBranch,
+							_do: mergeConfig.method,
+							forceMerge: mergeConfig.forceMerge,
+							headCommitId: "", mergeCommitId: "",
+							mergeMessageField: "", mergeTitleField: "",
+							mergeWhenChecksSucceed: false
+						))
 				)
 			)
 
@@ -388,6 +407,77 @@ struct IssueView: View {
 			default:
 				HapticFeedback.notify(.success)
 			}
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func markReadyForReview() async {
+		guard case .pullRequest(let pr) = item else { return }
+
+		let cleanedTitle = pr.title
+			.replacingOccurrences(of: #"^\[WIP\]\s*"#, with: "", options: .regularExpression)
+			.replacingOccurrences(of: #"^WIP:\s*"#, with: "", options: .regularExpression)
+
+		guard cleanedTitle != pr.title else {
+			self.error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No WIP prefix found in title."])
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+			return
+		}
+
+		do {
+			let response = try await Network.shared.client.repoEditPullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(
+						.init(
+							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+							body: pr.body, contentVersion: pr.contentVersion,
+							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+							milestone: pr.milestone?.id ?? 0, state: "open",
+							title: cleanedTitle, unsetDueDate: pr.dueDate == nil
+						))
+				)
+			).created.body.json
+			item = .pullRequest(response)
+			HapticFeedback.notify(.success)
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func markAsWIP() async {
+		guard case .pullRequest(let pr) = item else { return }
+		guard !pr.title.hasPrefix("WIP:"), !pr.title.hasPrefix("[WIP]") else {
+			self.error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Pull request is already marked as WIP."])
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+			return
+		}
+
+		do {
+			let response = try await Network.shared.client.repoEditPullRequest(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(
+						.init(
+							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
+							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
+							body: pr.body, contentVersion: pr.contentVersion,
+							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
+							milestone: pr.milestone?.id ?? 0, state: "open",
+							title: "WIP: " + pr.title, unsetDueDate: pr.dueDate == nil
+						))
+				)
+			).created.body.json
+			item = .pullRequest(response)
+			HapticFeedback.notify(.success)
 		} catch {
 			self.error = error
 			showErrorAlert = true
