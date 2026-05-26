@@ -28,38 +28,6 @@ struct ConfigView: View {
 
 	var body: some View {
 		Form {
-			Section {
-				Label("Gitea URL", systemImage: "link")
-					.font(.headline)
-				TextField("gitea.example.com", text: $newHost)
-					.keyboardType(.URL)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-
-				Label("Access Token", systemImage: "key")
-					.font(.headline)
-				TextField("77eabb36d04f1c5c32cd609b8b44c6b3", text: $newToken)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-			}
-
-			Section {
-				VStack(alignment: .leading) {
-					Label("Scopes", systemImage: "checkmark.circle.fill")
-						.font(.headline)
-					VStack(alignment: .leading) {
-						Label("`activitypub: No Access`", systemImage: "checkmark.circle")
-						Label("`issue: read and write`", systemImage: "checkmark.circle")
-						Label("`misc: read`", systemImage: "checkmark.circle")
-						Label("`notification: read and write`", systemImage: "checkmark.circle")
-						Label("`organization: read and write`", systemImage: "checkmark.circle")
-						Label("`package: read`", systemImage: "checkmark.circle")
-						Label("`repository: read and write`", systemImage: "checkmark.circle")
-						Label("`user: read and write`", systemImage: "checkmark.circle")
-					}.font(.footnote)
-				}
-			}
-
 			if let errorMessage {
 				Section {
 					Text(errorMessage)
@@ -69,40 +37,67 @@ struct ConfigView: View {
 				}
 			}
 
-			Section {
-				AsyncButton(
-					action: {
-						errorMessage = nil
-						let host = sanitizeHost(newHost)
-						guard host.isNotEmpty else {
-							errorMessage = "Please provide a valid host"
-							return
-						}
-						guard newToken.isNotEmpty else {
-							errorMessage = "Please provide a valid token"
-							return
-						}
+			Section(
+				content: {
+					TextField("gitea.example.com", text: $newHost)
+						.keyboardType(.URL)
+						.textInputAutocapitalization(.never)
+						.autocorrectionDisabled()
+				},
+				header: {
+					Label("Gitea URL", systemImage: "link")
+				})
 
-						do {
-							let instance = GiteaInstance(host: host, token: newToken)
-							try await Auth.login(
-								instance: instance,
-								showSetup: showSetup,
-								dismiss: dismiss
-							)
-						} catch {
-							errorMessage = "Failed to log in: \(error.localizedDescription)"
-						}
-					},
-					label: {
-						Label("Save config", systemImage: "checkmark")
-							.frame(maxWidth: .infinity)
-					}
-				)
-				.buttonBorderShape(.capsule)
-				.buttonStyle(.borderedProminent)
-				.controlSize(.large)
-			}
+			Section(
+				content: {
+					TextField("77eabb36d04f1c5c32cd609b8b44c6b3", text: $newToken)
+						.textInputAutocapitalization(.never)
+						.autocorrectionDisabled()
+				},
+				header: {
+					Label("Access Token", systemImage: "key")
+				})
+
+			Section(
+				content: {
+					VStack(alignment: .leading) {
+						Text("activitypub    no access")
+						Text("issue          read and write")
+						Text("misc           read")
+						Text("notification   read and write")
+						Text("organization   read and write")
+						Text("package        read")
+						Text("repository     read and write")
+						Text("user           read and write")
+					}.monospaced()
+				},
+				header: {
+					Label("Scopes", systemImage: "checkmark.circle.fill")
+				})
+		}.toolbar {
+			AsyncButton("Save") {
+				errorMessage = nil
+				let host = sanitizeHost(newHost)
+				guard host.isNotEmpty else {
+					errorMessage = "Please provide a valid host"
+					return
+				}
+				guard newToken.isNotEmpty else {
+					errorMessage = "Please provide a valid token"
+					return
+				}
+
+				do {
+					let instance = GiteaInstance(host: host, token: newToken)
+					try await Auth.login(
+						instance: instance,
+						showSetup: showSetup,
+						dismiss: dismiss
+					)
+				} catch {
+					errorMessage = "Failed to log in: \(error.localizedDescription)"
+				}
+			}.buttonStyle(.borderedProminent)
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("Configure instance")
