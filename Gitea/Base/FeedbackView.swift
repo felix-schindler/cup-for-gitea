@@ -83,7 +83,7 @@ struct FeedbackView: View {
 					isOn: $accepted
 				)
 			}.toolbar {
-				AsyncButton("Submit", systemImage: "checkmark") {
+				AsyncButton("Save", systemImage: "checkmark") {
 					await submit()
 				}
 				.disabled(!accepted)

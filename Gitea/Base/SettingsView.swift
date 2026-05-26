@@ -8,25 +8,21 @@
 import SwiftUI
 
 struct SettingsView: View {
-	@AppStorage("counter") var counter = 1
 	@AppStorage("appearance") var appearance: String = ""
 
 	var body: some View {
 		Form {
 			Section {
-				NavigationLink(destination: InstancesView()) {
-					Label("Instances", systemImage: "server.rack")
-				}
-			}
-
-			Section {
-				Picker("Appearance", selection: $appearance) {
+				Picker("Appearance", systemImage: "circle.lefthalf.filled", selection: $appearance) {
 					Text("System").tag("")
 					Text("Light").tag("light")
 					Text("Dark").tag("dark")
 				}
-			}
-			Section {
+
+				NavigationLink(destination: InstancesView()) {
+					Label("Instances", systemImage: "server.rack")
+				}
+
 				NavigationLink(destination: FeedbackView()) {
 					Label("Feedback", systemImage: "exclamationmark.bubble")
 				}
