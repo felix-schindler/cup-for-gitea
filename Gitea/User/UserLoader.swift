@@ -179,7 +179,7 @@ struct UserLoader: View {
 				}
 			}
 		}.navigationTitle(username ?? "Profile")
-		.navigationBarTitleDisplayMode(.inline)
+			.navigationBarTitleDisplayMode(.inline)
 	}
 }
 

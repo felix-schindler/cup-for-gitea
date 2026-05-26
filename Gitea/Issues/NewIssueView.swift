@@ -179,7 +179,7 @@ struct NewIssueView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(title.isEmpty)
-			.buttonStyle(.borderedProminent)
+				.buttonStyle(.borderedProminent)
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Issue")

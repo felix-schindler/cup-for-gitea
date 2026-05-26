@@ -244,7 +244,7 @@ struct NewRepoMigrationView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(cloneAddr.isEmpty || repoName.isEmpty)
-			.buttonStyle(.borderedProminent)
+				.buttonStyle(.borderedProminent)
 		}
 		.onChange(of: service) { _, _ in
 			resetContentIfNeeded()

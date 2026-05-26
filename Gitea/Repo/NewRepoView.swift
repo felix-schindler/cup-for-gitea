@@ -164,7 +164,7 @@ struct NewRepoView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(name.isEmpty)
-			.buttonStyle(.borderedProminent)
+				.buttonStyle(.borderedProminent)
 		}.task {
 			await load()
 		}.refreshable {
