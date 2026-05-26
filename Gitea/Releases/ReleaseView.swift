@@ -17,7 +17,7 @@ struct ReleaseView: View {
 
 	var body: some View {
 		Section {
-			VStack(alignment: .leading, spacing: 8) {
+			VStack(alignment: .leading) {
 				ScrollView(.horizontal, showsIndicators: false) {
 					HStack {
 						SmallUserView(release.author)

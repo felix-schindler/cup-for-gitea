@@ -36,7 +36,7 @@ struct CommentsLoader: View {
 						VStack(alignment: .leading) {
 							HStack {
 								if let user = c.user {
-									ScrollView(.horizontal) {
+									ScrollView(.horizontal, showsIndicators: false) {
 										SmallUserView(user)
 									}
 								} else {
@@ -50,7 +50,7 @@ struct CommentsLoader: View {
 								.textual.textSelection(.enabled)
 
 							if c.assets.isNotEmpty {
-								ScrollView(.horizontal) {
+								ScrollView(.horizontal, showsIndicators: false) {
 									HStack {
 										ForEach(c.assets, id: \.id) { a in
 											if let url = URL(string: a.browserDownloadUrl) {

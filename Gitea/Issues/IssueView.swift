@@ -399,7 +399,7 @@ struct IssueView: View {
 
 	private var header: some View {
 		VStack(alignment: .leading) {
-			HStack(spacing: 5) {
+			HStack {
 				stateIcon
 				Text("\(item.data.displayRepositoryFullName)#\(item.data.displayNumber)")
 					.foregroundStyle(.secondary)
@@ -433,7 +433,7 @@ struct IssueView: View {
 	@ViewBuilder
 	private var headerMetadata: some View {
 		ScrollView(.horizontal, showsIndicators: false) {
-			HStack(spacing: 5) {
+			HStack {
 				switch item {
 				case .issue(let issue):
 					SmallUserView(issue.user)

@@ -244,6 +244,8 @@ struct NewPullRequestView: View {
 		}
 		.task {
 			await load()
+		}.refreshable {
+			await load()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Pull Request")

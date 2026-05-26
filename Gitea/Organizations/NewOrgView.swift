@@ -86,8 +86,10 @@ struct NewOrgView: View {
 		}.toolbar {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await save()
-			}.buttonStyle(.borderedProminent)
-		}.navigationTitle("New Organization")
+			}.disabled(name.isEmpty)
+				.buttonStyle(.borderedProminent)
+		}.scrollDismissesKeyboard(.immediately)
+			.navigationTitle("New Organization")
 	}
 }
 

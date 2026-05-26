@@ -82,22 +82,26 @@ struct OrgView: View {
 				// Label("Worktime", systemImage: "clock")
 			}
 		}
+		.navigationTitle(org.name)
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }
 
 #Preview {
-	OrgView(
-		org: .init(
-			avatarUrl: "https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa",
-			description: "Mobile App for GitLab",
-			email: "",
-			fullName: "",
-			id: 5,
-			location: "",
-			name: "Tanuki",
-			repoAdminChangeTeamAccess: true,
-			username: "Tanuki",
-			visibility: "private",
-			website: "https://www.schindlerfelix.de/projects/tanuki"
-		))
+	NavigationStack {
+		OrgView(
+			org: .init(
+				avatarUrl: "https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa",
+				description: "Mobile App for GitLab",
+				email: "",
+				fullName: "",
+				id: 5,
+				location: "",
+				name: "Tanuki",
+				repoAdminChangeTeamAccess: true,
+				username: "Tanuki",
+				visibility: "private",
+				website: "https://www.schindlerfelix.de/projects/tanuki"
+			))
+	}
 }

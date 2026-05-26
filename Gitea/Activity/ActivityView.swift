@@ -5,44 +5,44 @@ struct ActivityView: View {
 	var showActor: Bool = true
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 6) {
-			if showActor {
-				ScrollView(.horizontal, showsIndicators: false) {
-					HStack {
-						SmallUserView(activity.actUser, avatarSize: .small)
+		NavigationLink(destination: destinationView) {
+			VStack(alignment: .leading, spacing: 6) {
+				if showActor {
+					ScrollView(.horizontal, showsIndicators: false) {
+						HStack {
+							SmallUserView(activity.actUser, avatarSize: .small)
+						}
 					}
 				}
-			}
 
-			HStack(spacing: 4) {
-				Image(systemName: icon)
-					.foregroundStyle(iconColor)
-					.font(.callout)
-					.frame(width: 16)
+				HStack(spacing: 4) {
+					Image(systemName: icon)
+						.foregroundStyle(iconColor)
+						.font(.callout)
+						.frame(width: 16)
 
-				(Text(actorName).fontWeight(.medium) + description)
-					.font(.callout)
-					.lineLimit(2)
-			}
+					(Text(actorName).fontWeight(.medium) + description)
+						.font(.callout)
+						.lineLimit(2)
+				}
 
-			NavigationLink(destination: destinationView) {
 				Text(activity.repo.fullName)
 					.font(.caption)
 					.foregroundStyle(.accent)
-			}
-			.buttonStyle(.plain)
 
-			if activity.content.isNotEmpty {
-				Text(activity.content.emojized())
-					.font(.caption)
-					.foregroundStyle(.secondary)
-					.lineLimit(2)
-			}
+				if activity.content.isNotEmpty {
+					Text(activity.content.emojized())
+						.font(.caption)
+						.foregroundStyle(.secondary)
+						.lineLimit(2)
+				}
 
-			Text(activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
-				.font(.caption2)
-				.foregroundStyle(.tertiary)
+				Text(activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+					.font(.caption2)
+					.foregroundStyle(.tertiary)
+			}
 		}
+		.buttonStyle(.plain)
 	}
 
 	private var actorName: String {

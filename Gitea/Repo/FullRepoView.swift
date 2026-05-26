@@ -187,8 +187,10 @@ struct FullRepoView: View {
 			}
 		}.task {
 			await load()
+		}.refreshable {
+			await load()
 		}.toolbar {
-			HStack {
+			ToolbarItem(placement: .topBarLeading) {
 				Menu("More", systemImage: "ellipsis") {
 					if let url = URL(string: repo.htmlUrl) {
 						Section {
@@ -207,7 +209,8 @@ struct FullRepoView: View {
 						}
 					}
 				}
-
+			}
+			ToolbarItem(placement: .topBarTrailing) {
 				Menu("Create", systemImage: "plus") {
 					if repo.hasIssues, repo.externalTracker == nil {
 						NavigationLink(destination: NewIssueView(owner: repo.owner.login, repo: repo.name)) {
