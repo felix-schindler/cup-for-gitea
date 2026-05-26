@@ -26,6 +26,11 @@ struct SettingsView: View {
 					Text("Dark").tag("dark")
 				}
 			}
+			Section {
+				NavigationLink(destination: FeedbackView()) {
+					Label("Feedback", systemImage: "exclamationmark.bubble")
+				}
+			}
 		}.navigationTitle("Settings")
 	}
 }
