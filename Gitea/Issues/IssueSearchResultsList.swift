@@ -19,9 +19,38 @@ struct IssueSearchResultsList: View {
 	let emptyText: LocalizedStringResource
 	let onLoadMore: () async -> Void
 
+	var pinnedIssues: [Components.Schemas.Issue] = []
+	var pinnedPullRequests: [Components.Schemas.PullRequest] = []
+	var onPin: ((Components.Schemas.Issue) -> Void)?
+	var onUnpin: ((Components.Schemas.Issue) -> Void)?
+
+	private var pinnedIds: Set<Int64> {
+		var ids = Set(pinnedIssues.map(\.id))
+		for pr in pinnedPullRequests {
+			ids.insert(pr.id)
+		}
+		return ids
+	}
+
 	var body: some View {
 		List {
-			if results.isEmpty {
+			if !pinnedIssues.isEmpty || !pinnedPullRequests.isEmpty {
+				Section("Pinned") {
+					ForEach(pinnedIssues, id: \.id) { issue in
+						SmallIssueView(issue)
+							.swipeActions(edge: .leading) {
+								Button("Unpin", systemImage: "pin.slash") {
+									onUnpin?(issue)
+								}.tint(.orange)
+							}
+					}
+					ForEach(pinnedPullRequests, id: \.id) { pr in
+						SmallIssueView(pr)
+					}
+				}
+			}
+
+			if results.isEmpty && pinnedIssues.isEmpty && pinnedPullRequests.isEmpty {
 				if let error {
 					FailedView(error)
 				} else if isLoading {
@@ -31,12 +60,21 @@ struct IssueSearchResultsList: View {
 				}
 			} else {
 				ForEach(results, id: \.id) { issue in
-					rowView(for: issue)
-						.onAppear {
-							if issue.id == results.last?.id, hasMorePages {
-								Task { await onLoadMore() }
+					if !pinnedIds.contains(issue.id) {
+						rowView(for: issue)
+							.swipeActions(edge: .leading) {
+								if onPin != nil {
+									Button("Pin", systemImage: "pin") {
+										onPin?(issue)
+									}.tint(.orange)
+								}
 							}
-						}
+							.onAppear {
+								if issue.id == results.last?.id, hasMorePages {
+									Task { await onLoadMore() }
+								}
+							}
+					}
 				}
 				if isLoading {
 					Section {

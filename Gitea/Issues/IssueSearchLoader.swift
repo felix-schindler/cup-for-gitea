@@ -22,6 +22,9 @@ struct IssueSearchLoader: View {
 	@State private var filters: IssueSearchFilters
 	@State private var showFilters = false
 
+	@State private var pinnedIssues: [Components.Schemas.Issue] = []
+	@State private var pinnedPullRequests: [Components.Schemas.PullRequest] = []
+
 	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
 	private var navigationTitle: LocalizedStringResource {
@@ -113,6 +116,7 @@ struct IssueSearchLoader: View {
 		currentPage = 1
 		hasMorePages = true
 		isLoadingPage = false
+		await loadPinned()
 		await loadNextPage(debounced: debounced)
 	}
 
@@ -159,6 +163,52 @@ struct IssueSearchLoader: View {
 		return try await Network.shared.client.issueSearchIssues(.init(query: queryPayload)).ok.body.json
 	}
 
+	private func loadPinned() async {
+		guard let owner, let repo else { return }
+		do {
+			switch type {
+			case .issues:
+				pinnedIssues = try await Network.shared.client.repoListPinnedIssues(
+					path: .init(owner: owner, repo: repo)
+				).ok.body.json
+			case .pulls:
+				pinnedPullRequests = try await Network.shared.client.repoListPinnedPullRequests(
+					path: .init(owner: owner, repo: repo)
+				).ok.body.json
+			@unknown default:
+				break
+			}
+		} catch {
+			print("Failed to load pinned items: \(error)")
+		}
+	}
+
+	private func pin(_ issue: Components.Schemas.Issue) async {
+		guard let owner, let repo else { return }
+		do {
+			_ = try await Network.shared.client.pinIssue(
+				.init(path: .init(owner: owner, repo: repo, index: issue.number))
+			)
+			HapticFeedback.notify(.success)
+			await loadPinned()
+		} catch {
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func unpin(_ issue: Components.Schemas.Issue) async {
+		guard let owner, let repo else { return }
+		do {
+			_ = try await Network.shared.client.unpinIssue(
+				.init(path: .init(owner: owner, repo: repo, index: issue.number))
+			)
+			HapticFeedback.notify(.success)
+			await loadPinned()
+		} catch {
+			HapticFeedback.notify(.error)
+		}
+	}
+
 	var body: some View {
 		IssueSearchResultsList(
 			type: type,
@@ -169,10 +219,13 @@ struct IssueSearchLoader: View {
 			hasMorePages: hasMorePages,
 			loadingText: loadingText,
 			loadingMoreText: loadingMoreText,
-			emptyText: emptyText
-		) {
-			await loadNextPage()
-		}
+			emptyText: emptyText,
+			onLoadMore: { await loadNextPage() },
+			pinnedIssues: pinnedIssues,
+			pinnedPullRequests: pinnedPullRequests,
+			onPin: type == .issues ? { issue in Task { await pin(issue) } } : nil,
+			onUnpin: type == .issues ? { issue in Task { await unpin(issue) } } : nil
+		)
 		.searchable(text: $search, prompt: Text(searchPrompt))
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: true)
