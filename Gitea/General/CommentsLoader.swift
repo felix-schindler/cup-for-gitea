@@ -12,6 +12,7 @@ struct CommentsLoader: View {
 	let owner: String
 	let repo: String
 	let iid: Int64
+	var refreshID: Int = 0
 
 	@State private var state = LoadState<[Components.Schemas.Comment]>.loading
 
@@ -83,7 +84,7 @@ struct CommentsLoader: View {
 			case .failed(let failure):
 				FailedView(failure)
 			}
-		}.task {
+		}.task(id: refreshID) {
 			await load()
 		}
 	}
