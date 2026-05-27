@@ -155,7 +155,7 @@ struct FullRepoView: View {
 					)
 				}
 
-				if repo.hasReleases /*|| repo.hasActions || repo.hasPackages*/ {
+				if repo.hasReleases || repo.hasPackages /*|| repo.hasActions*/ {
 					DisclosureGroup(
 						content: {
 							// if repo.hasActions {
@@ -166,9 +166,11 @@ struct FullRepoView: View {
 									ReleaseLoader(owner: repo.owner.login, repo: repo.name)
 								}
 							}
-							// if repo.hasPackages {
-							// 	Text("Packages")
-							// }
+						if repo.hasPackages {
+							NavigationLink("Packages") {
+								PackagesLoader(owner: repo.owner.login)
+							}
+						}
 						},
 						label: {
 							Label("Build", systemImage: "flag")
