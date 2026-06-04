@@ -11,11 +11,12 @@ enum UserSearchContext: Hashable {
 	case search
 	case orgMembers(org: String)
 	case repoCollaborators(owner: String, repo: String)
+	case teamMembers(teamId: Int64)
 
 	var isSearchable: Bool {
 		switch self {
 		case .search: true
-		case .orgMembers, .repoCollaborators: false
+		case .orgMembers, .repoCollaborators, .teamMembers: false
 		}
 	}
 
@@ -24,6 +25,7 @@ enum UserSearchContext: Hashable {
 		case .search: "Search users"
 		case .orgMembers: "Members"
 		case .repoCollaborators: "Collaborators"
+		case .teamMembers: "Members"
 		}
 	}
 
@@ -32,6 +34,7 @@ enum UserSearchContext: Hashable {
 		case .search: "Loading users"
 		case .orgMembers: "Loading members"
 		case .repoCollaborators: "Loading collaborators"
+		case .teamMembers: "Loading members"
 		}
 	}
 
@@ -40,6 +43,7 @@ enum UserSearchContext: Hashable {
 		case .search: "There are no users"
 		case .orgMembers: "This organization has no members"
 		case .repoCollaborators: "This repository has no collaborators"
+		case .teamMembers: "This team has no members"
 		}
 	}
 
@@ -69,6 +73,8 @@ struct UserSearchLoader: View {
 			"org|\(org)"
 		case .repoCollaborators(let owner, let repo):
 			"repo|\(owner)|\(repo)"
+		case .teamMembers(let teamId):
+			"team|\(teamId)"
 		}
 	}
 
@@ -93,6 +99,11 @@ struct UserSearchLoader: View {
 		case .repoCollaborators(let owner, let repo):
 			try await Network.shared.client.repoListCollaborators(
 				path: .init(owner: owner, repo: repo),
+				query: .init(page: currentPage, limit: defaultLimit)
+			).ok.body.json
+		case .teamMembers(let teamId):
+			try await Network.shared.client.orgListTeamMembers(
+				path: .init(id: teamId),
 				query: .init(page: currentPage, limit: defaultLimit)
 			).ok.body.json
 		}

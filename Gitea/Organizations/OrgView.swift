@@ -75,10 +75,12 @@ struct OrgView: View {
 				NavigationLink(destination: UserSearchLoader(context: .orgMembers(org: org.name))) {
 					Label("Members", systemImage: Icons.users.rawValue)
 				}
+				NavigationLink(destination: TeamLoader(orgName: org.name)) {
+					Label("Teams", systemImage: "person.3")
+				}
 				NavigationLink(destination: ActivityLoader(context: .org(org.name))) {
 					Label("Public Activity", systemImage: Icons.activity.rawValue)
 				}
-				// Label("Teams", systemImage: "person.2")
 				// Label("Worktime", systemImage: "clock")
 			}
 		}

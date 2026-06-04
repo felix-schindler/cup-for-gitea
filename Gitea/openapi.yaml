@@ -23103,7 +23103,6 @@ components:
         - id
         - includes_all_repositories
         - name
-        - organization
         - permission
         - units
         - units_map

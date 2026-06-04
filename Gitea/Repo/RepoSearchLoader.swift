@@ -11,6 +11,14 @@ enum RepoContext: Hashable {
 	case search
 	case user(Int64?)
 	case org(Int64)
+	case teamRepos(teamId: Int64, org: String)
+
+	var isSearchable: Bool {
+		switch self {
+		case .search, .user, .org: true
+		case .teamRepos: false
+		}
+	}
 }
 
 struct RepoSearchLoader: View {
@@ -49,6 +57,8 @@ struct RepoSearchLoader: View {
 			"user|\(id?.description ?? "")|\(search)|\(filters.taskKey)"
 		case .org(let id):
 			"org|\(id)|\(search)|\(filters.taskKey)"
+		case .teamRepos(let teamId, _):
+			"team|\(teamId)"
 		}
 	}
 
@@ -56,7 +66,7 @@ struct RepoSearchLoader: View {
 		switch context {
 		case .search:
 			starredBy != nil ? "Starred Repositories" : "Search Repositories"
-		case .user, .org:
+		case .user, .org, .teamRepos:
 			"Repositories"
 		}
 	}
@@ -101,6 +111,16 @@ struct RepoSearchLoader: View {
 	}
 
 	private func loadRepos() async throws -> [Components.Schemas.Repository] {
+		switch context {
+		case .teamRepos(let teamId, _):
+			return try await Network.shared.client.orgListTeamRepos(
+				path: .init(id: teamId),
+				query: .init(page: currentPage, limit: defaultLimit)
+			).ok.body.json
+		default:
+			break
+		}
+
 		if resolvedUserID == nil {
 			switch context {
 			case .user(let id):
@@ -112,6 +132,8 @@ struct RepoSearchLoader: View {
 			case .org(let id):
 				resolvedUserID = id
 			case .search:
+				break
+			default:
 				break
 			}
 		}
@@ -151,12 +173,20 @@ struct RepoSearchLoader: View {
 		) {
 			await loadNextPage()
 		}
-		.searchable(text: $search, prompt: Text("Search repositories"))
+		.modifier { view in
+			if context.isSearchable {
+				view.searchable(text: $search, prompt: Text("Search repositories"))
+			} else {
+				view
+			}
+		}
 		.toolbar {
-			ToolbarItem(placement: .topBarTrailing) {
-				Button("Filters", systemImage: "line.3.horizontal.decrease") {
-					HapticFeedback.play(.light)
-					showFilters = true
+			if context.isSearchable {
+				ToolbarItem(placement: .topBarTrailing) {
+					Button("Filters", systemImage: "line.3.horizontal.decrease") {
+						HapticFeedback.play(.light)
+						showFilters = true
+					}
 				}
 			}
 		}
@@ -166,7 +196,7 @@ struct RepoSearchLoader: View {
 			}
 		}
 		.task(id: queryKey) {
-			await resetAndLoad(debounced: true)
+			await resetAndLoad(debounced: context.isSearchable)
 		}
 		.refreshable {
 			await resetAndLoad()
