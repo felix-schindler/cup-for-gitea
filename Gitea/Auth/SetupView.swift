@@ -28,7 +28,8 @@ struct SetupView: View {
 					}
 
 					Text("Welcome to Cup")
-						.font(.title2.bold())
+						.font(.title2)
+						.fontWeight(.bold)
 						.multilineTextAlignment(.center)
 				}
 

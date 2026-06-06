@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct ActionView: View {
 	private let run: Components.Schemas.ActionWorkflowRun
@@ -14,6 +15,9 @@ struct ActionView: View {
 
 	@State private var jobsState = LoadState<[Components.Schemas.ActionWorkflowJob]>.loading
 	@State private var artifactsState = LoadState<[Components.Schemas.ActionArtifact]>.loading
+	@State private var downloadingArtifactId: Int64?
+	@State private var showDownloadError = false
+	@State private var downloadError: Error?
 
 	init(run: Components.Schemas.ActionWorkflowRun, owner: String, repo: String) {
 		self.run = run
@@ -21,40 +25,18 @@ struct ActionView: View {
 		self.repo = repo
 	}
 
-	private var statusLabel: String {
-		if run.conclusion.isNotEmpty { return run.conclusion }
-		return run.status
-	}
-
-	private var statusIcon: String {
-		if run.conclusion == "success" { return Icons.actionsSuccess.rawValue }
-		if run.conclusion == "failure" { return Icons.actionsFailure.rawValue }
-		if run.conclusion == "cancelled" { return Icons.actionsCancelled.rawValue }
-		if run.status == "in_progress" { return Icons.actionsInProgress.rawValue }
-		if run.status == "queued" || run.status == "pending" { return Icons.actionsPending.rawValue }
-		return Icons.actions.rawValue
-	}
-
-	private var statusColor: Color {
-		if run.conclusion == "success" { return .green }
-		if run.conclusion == "failure" { return .red }
-		if run.conclusion == "cancelled" || run.conclusion == "skipped" { return .gray }
-		if run.status == "in_progress" { return .orange }
-		if run.status == "queued" || run.status == "pending" { return .yellow }
-		return .primary
+	private var status: ActionStatus {
+		ActionStatus(conclusion: run.conclusion ?? "", status: run.status)
 	}
 
 	private var duration: String {
-		guard run.completedAt > run.startedAt else { return "In progress..." }
+		guard run.completedAt > run.startedAt else { return "In progress" }
 		let interval = run.completedAt.timeIntervalSince(run.startedAt)
+		guard interval >= 0 else { return "Invalid duration" }
 		let formatter = DateComponentsFormatter()
 		formatter.allowedUnits = [.hour, .minute, .second]
 		formatter.unitsStyle = .abbreviated
-		return formatter.string(from: interval) ?? ""
-	}
-
-	private var shortSha: String {
-		String(run.headSha.prefix(7))
+		return formatter.string(from: interval) ?? "Unknown"
 	}
 
 	private func loadJobs() async {
@@ -74,38 +56,58 @@ struct ActionView: View {
 		}
 	}
 
+	private func downloadArtifact(_ artifact: Components.Schemas.ActionArtifact) async throws -> URL {
+		guard let url = URL(string: artifact.archiveDownloadUrl) else {
+			throw URLError(.badURL)
+		}
+		var request = URLRequest(url: url)
+		request.setValue("token \(Network.shared.token)", forHTTPHeaderField: "Authorization")
+		let (data, _) = try await URLSession.shared.data(for: request)
+		let tempURL = FileManager.default.temporaryDirectory
+			.appendingPathComponent(artifact.name)
+			.appendingPathExtension("zip")
+		try data.write(to: tempURL)
+		return tempURL
+	}
+
+	@MainActor
+	private func presentShareSheet(for url: URL) {
+		guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+			  let root = windowScene.windows.first?.rootViewController else { return }
+		let vc = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+		root.present(vc, animated: true)
+	}
+
 	var body: some View {
 		List {
 			Section {
 				VStack(alignment: .leading, spacing: 12) {
 					HStack {
-						PillView(verbatim: statusLabel.capitalized, systemImage: statusIcon, bgColor: statusColor.opacity(0.2), fgColor: statusColor)
+						PillView(status.label, systemImage: status.icon, bgColor: status.color.opacity(0.2), fgColor: status.color)
 						Spacer()
 						Text("#\(run.runNumber)")
-							.font(.caption)
+							.font(.footnote)
 							.foregroundStyle(.secondary)
 							.monospacedDigit()
 					}
 
 					Text(run.displayTitle)
-						.font(.title2)
-						.fontWeight(.semibold)
+						.font(.title3)
+						.fontWeight(.medium)
 
-					HStack {
-						Label(run.headBranch, systemImage: "arrow.triangle.branch")
-							.font(.caption)
-						Spacer()
-						Text(shortSha)
-							.font(.caption)
-							.monospaced()
-							.foregroundStyle(.secondary)
-					}
-
-					HStack(spacing: 4) {
-						SmallUserView(run.actor, showUsername: true)
-						Spacer()
-						PillView(verbatim: run.event, bgColor: Color(.systemGray5), fgColor: .secondary)
-					}
+					ScrollView(.horizontal) {
+						HStack {
+							if let user = run.actor {
+								SmallUserView(user, showUsername: true)
+							}
+							PillView(verbatim: run.event)
+							if let headBranch = run.headBranch {
+								PillView(verbatim: headBranch)
+							}
+							PillView(verbatim: String(run.headSha.prefix(7)))
+								.monospaced()
+						}
+					}.font(.footnote)
 
 					Divider()
 
@@ -134,114 +136,61 @@ struct ActionView: View {
 				}
 			}
 
-			if case .loaded(let artifacts) = artifactsState, artifacts.isNotEmpty {
-				Section {
-					DisclosureGroup("Artifacts (\(artifacts.count))") {
-						ForEach(artifacts, id: \.id) { artifact in
-							if let url = URL(string: artifact.archiveDownloadUrl) {
-								Link(
-									destination: url,
-									label: {
-										Label(
-											"\(artifact.name) (\(ByteFormatter.shared.format(artifact.sizeInBytes)))",
-											systemImage: "square.and.arrow.down"
-										)
+			if case .loaded(let artifacts) = artifactsState {
+				Section("Artifacts") {
+					if artifacts.isEmpty {
+						NoContentView("No artifacts", systemImage: "cube.transparent")
+					} else {
+						DisclosureGroup("Artifacts (\(artifacts.count))") {
+							ForEach(artifacts, id: \.id) { artifact in
+								HStack {
+									if downloadingArtifactId == artifact.id {
+										ProgressView()
+											.controlSize(.small)
+									} else {
+										Image(systemName: "square.and.arrow.down")
 									}
-								)
-							} else {
-								Text(artifact.name)
+									Text("\(artifact.name) (\(ByteFormatter.shared.format(artifact.sizeInBytes)))")
+									Spacer()
+								}
+								.contentShape(Rectangle())
+								.onTapGesture {
+									guard downloadingArtifactId == nil else { return }
+									downloadingArtifactId = artifact.id
+									downloadError = nil
+									showDownloadError = false
+									Task {
+										do {
+											let url = try await downloadArtifact(artifact)
+											presentShareSheet(for: url)
+										} catch {
+											downloadError = error
+											showDownloadError = true
+										}
+										downloadingArtifactId = nil
+									}
+								}
 							}
 						}
 					}
 				}
+			} else if case .failed(let error) = artifactsState {
+				Section {
+					FailedView(error)
+				}
 			}
 		}
 		.task {
-			await loadJobs()
+			async let jobs = loadJobs()
+			async let artifacts = loadArtifacts()
+			_ = await (jobs, artifacts)
 		}
-		.task {
-			await loadArtifacts()
-		}
+		.alert("Download failed", isPresented: $showDownloadError, actions: {
+			Button("OK") { downloadError = nil }
+		}, message: {
+			Text(downloadError?.localizedDescription ?? "")
+		})
 		.navigationTitle("Run #\(run.runNumber)")
 		.navigationBarTitleDisplayMode(.inline)
-	}
-}
-
-private struct ActionsJobView: View {
-	let job: Components.Schemas.ActionWorkflowJob
-
-	private var statusIcon: String {
-		if job.conclusion == "success" { return Icons.actionsSuccess.rawValue }
-		if job.conclusion == "failure" { return Icons.actionsFailure.rawValue }
-		if job.conclusion == "cancelled" { return Icons.actionsCancelled.rawValue }
-		if job.status == "in_progress" { return Icons.actionsInProgress.rawValue }
-		if job.status == "queued" || job.status == "pending" { return Icons.actionsPending.rawValue }
-		return Icons.actions.rawValue
-	}
-
-	private var statusColor: Color {
-		if job.conclusion == "success" { return .green }
-		if job.conclusion == "failure" { return .red }
-		if job.conclusion == "cancelled" || job.conclusion == "skipped" { return .gray }
-		if job.status == "in_progress" { return .orange }
-		if job.status == "queued" || job.status == "pending" { return .yellow }
-		return .primary
-	}
-
-	var body: some View {
-		DisclosureGroup {
-			ForEach(job.steps, id: \.number) { step in
-				HStack {
-					Image(systemName: step.conclusion == "success" ? Icons.actionsSuccess.rawValue
-						: step.conclusion == "failure" ? Icons.actionsFailure.rawValue
-						: step.conclusion == "cancelled" ? Icons.actionsCancelled.rawValue
-						: step.status == "in_progress" ? Icons.actionsInProgress.rawValue
-						: Icons.actionsPending.rawValue)
-						.foregroundStyle(step.conclusion == "success" ? .green
-							: step.conclusion == "failure" ? .red
-							: step.conclusion == "cancelled" ? .gray
-							: step.status == "in_progress" ? .orange
-							: .yellow)
-						.font(.caption)
-					Text(step.name)
-						.font(.callout)
-					Spacer()
-					if step.completedAt > step.startedAt {
-						Text(duration(from: step.startedAt, to: step.completedAt))
-							.font(.caption2)
-							.foregroundStyle(.secondary)
-							.monospacedDigit()
-					}
-				}
-				.padding(.leading, 8)
-			}
-		} label: {
-			HStack {
-				Image(systemName: statusIcon)
-					.foregroundStyle(statusColor)
-				Text(job.name)
-					.font(.subheadline)
-					.fontWeight(.medium)
-				Spacer()
-				if job.conclusion.isNotEmpty {
-					Text(job.conclusion.capitalized)
-						.font(.caption2)
-						.foregroundStyle(statusColor)
-				} else {
-					Text(job.status.capitalized)
-						.font(.caption2)
-						.foregroundStyle(statusColor)
-				}
-			}
-		}
-	}
-
-	private func duration(from start: Date, to end: Date) -> String {
-		let interval = end.timeIntervalSince(start)
-		let formatter = DateComponentsFormatter()
-		formatter.allowedUnits = [.minute, .second]
-		formatter.unitsStyle = .positional
-		formatter.zeroFormattingBehavior = .pad
-		return formatter.string(from: interval) ?? ""
 	}
 }
