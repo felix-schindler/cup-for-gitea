@@ -83,9 +83,7 @@ struct NotificationLoader: View {
 											}
 										}
 
-										InlineText(markdown: notif.subject.title.emojized(), baseURL: Network.shared.serverURL)
-											.textual.inlineStyle(.gitHub)
-											.textual.textSelection(.enabled)
+										Text(notif.subject.title.emojized())
 									}
 								}
 								.buttonStyle(.plain)
