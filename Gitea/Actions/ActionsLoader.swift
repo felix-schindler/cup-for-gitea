@@ -16,8 +16,14 @@ struct ActionsLoader: View {
 	@State private var isLoadingPage = false
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var showFilters = false
+	@State private var filters = ActionsSearchFilters()
 
 	private let defaultLimit = 20
+
+	private var queryKey: String {
+		"\(owner)/\(repo)|\(filters.taskKey)"
+	}
 
 	private func resetAndLoad() async {
 		results = []
@@ -35,7 +41,14 @@ struct ActionsLoader: View {
 		do {
 			let response = try await Network.shared.client.getWorkflowRuns(
 				path: .init(owner: owner, repo: repo),
-				query: .init(page: currentPage, limit: defaultLimit)
+				query: .init(
+					event: filters.eventFilter,
+					branch: filters.branchFilter,
+					status: filters.status == .all ? nil : filters.status.rawValue,
+					actor: filters.actorFilter,
+					page: currentPage,
+					limit: defaultLimit
+				)
 			).ok.body.json
 			if Task.isCancelled { return }
 			results.append(contentsOf: response.workflowRuns)
@@ -82,11 +95,23 @@ struct ActionsLoader: View {
 				}
 			}
 		}
-		.task {
+		.task(id: queryKey) {
 			await resetAndLoad()
 		}
 		.refreshable {
 			await resetAndLoad()
+		}
+		.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button("Filters", systemImage: "line.3.horizontal.decrease") {
+					showFilters = true
+				}
+			}
+		}
+		.sheet(isPresented: $showFilters) {
+			NavigationStack {
+				ActionsSearchFiltersSheet(filters: $filters)
+			}
 		}
 		.navigationTitle("Actions")
 	}
