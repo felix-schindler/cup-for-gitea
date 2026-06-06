@@ -69,25 +69,25 @@ struct NotificationLoader: View {
 							NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
 						} else {
 							ForEach(success, id: \.id) { notif in
-								VStack(alignment: .leading) {
-									ScrollView(.horizontal, showsIndicators: false) {
-										HStack {
-											StateIconView(notif.subject._type, notif.subject.state)
-											Text(notif.repository.fullName)
-											if let url = URL(string: notif.subject.htmlUrl) {
-												Link("#\(url.lastPathComponent)", destination: url)
-													.tint(.accentColor)
-													.buttonStyle(.bordered)
-													.controlSize(.mini)
-													.font(.footnote)
+								NavigationLink(destination: destinationView(for: notif)) {
+									VStack(alignment: .leading) {
+										ScrollView(.horizontal, showsIndicators: false) {
+											HStack {
+												StateIconView(notif.subject._type, notif.subject.state)
+												Text(notif.repository.fullName)
+												if let url = URL(string: notif.subject.htmlUrl) {
+													Text("#\(url.lastPathComponent)")
+														.font(.footnote)
+														.foregroundStyle(.secondary)
+												}
 											}
 										}
-									}
 
-									InlineText(markdown: notif.subject.title.emojized(), baseURL: Network.shared.serverURL)
-										.textual.inlineStyle(.gitHub)
-										.textual.textSelection(.enabled)
-								}.swipeActions {
+										Text(notif.subject.title.emojized())
+									}
+								}
+								.buttonStyle(.plain)
+								.swipeActions {
 									HStack {
 										if notif.unread || notif.pinned {
 											Button("Mark read", systemImage: "envelope.open") {
@@ -141,5 +141,34 @@ struct NotificationLoader: View {
 		}.refreshable {
 			await load()
 		}.navigationTitle("Notifications")
+	}
+
+	@ViewBuilder
+	private func destinationView(for notif: Components.Schemas.NotificationThread) -> some View {
+		let owner = notif.repository.owner.login
+		let repo = notif.repository.name
+
+		switch notif.subject._type {
+		case .issue:
+			if let url = URL(string: notif.subject.htmlUrl), let index = Int64(url.lastPathComponent) {
+				IssueLoader(owner: owner, repo: repo, index: index)
+			} else {
+				FullRepoView(notif.repository)
+			}
+		case .pull:
+			if let url = URL(string: notif.subject.htmlUrl), let index = Int64(url.lastPathComponent) {
+				PullRequestLoader(owner: owner, repo: repo, index: index)
+			} else {
+				FullRepoView(notif.repository)
+			}
+		case .commit:
+			if let url = URL(string: notif.subject.htmlUrl) {
+				CommitsLoader(owner: owner, repo: repo, ref: url.lastPathComponent)
+			} else {
+				FullRepoView(notif.repository)
+			}
+		case .repository:
+			FullRepoView(notif.repository)
+		}
 	}
 }
