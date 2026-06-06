@@ -35,7 +35,7 @@ struct MilestoneView: View {
 					let progress = Double(milestone.closedIssues) / Double(total)
 					ProgressView(value: progress) {
 						Text("\(milestone.closedIssues) / \(total) issues closed")
-							.font(.caption)
+							.font(.footnote)
 					}
 				}
 
