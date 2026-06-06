@@ -70,6 +70,9 @@ struct IssueView: View {
 	@State private var mergeConfig = MergeConfig()
 	@State private var mergeError: Error?
 	@State private var showMergeErrorAlert = false
+	@State private var commentText = ""
+	@State private var commentRefreshID = 0
+	@State private var hasPostedComment = false
 
 	private struct MergeConfig {
 		var method: Components.Schemas.MergePullRequestOption.DoPayload = .merge
@@ -109,9 +112,31 @@ struct IssueView: View {
 				}
 			}
 
-			if item.data.displayComments != 0 {
-				Section("Comments") {
-					CommentsLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, iid: item.data.displayNumber)
+			Section("Comments") {
+				HStack(alignment: .top) {
+					ZStack(alignment: .topLeading) {
+						if commentText.isEmpty {
+							Text("New comment")
+								.foregroundStyle(.secondary)
+								.font(.body.monospaced())
+								.padding(.top, 8)
+								.padding(.leading, 4)
+						}
+						TextEditor(text: $commentText)
+							.font(.body.monospaced())
+							.frame(maxHeight: 100)
+					}
+
+					AsyncButton(systemImage: "paperplane.fill") {
+						await postComment()
+					}
+					.disabled(commentText.isEmpty)
+					.buttonStyle(.borderedProminent)
+					.buttonBorderShape(.circle)
+				}
+
+				if item.data.displayComments != 0 || hasPostedComment {
+					CommentsLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, iid: item.data.displayNumber, refreshID: commentRefreshID)
 				}
 			}
 		}.toolbar {
@@ -119,6 +144,7 @@ struct IssueView: View {
 		}
 		.navigationTitle(Text(item.data.displayNavigationTitle))
 		.navigationBarTitleDisplayMode(.inline)
+		.scrollDismissesKeyboard(.immediately)
 		.alert("Error", isPresented: $showErrorAlert, presenting: error) { _ in
 			Button("OK") {}
 		} message: { error in
@@ -479,6 +505,27 @@ struct IssueView: View {
 			item = .pullRequest(response)
 			HapticFeedback.notify(.success)
 		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
+	private func postComment() async {
+		let body = commentText
+		commentText = ""
+		do {
+			_ = try await Network.shared.client.issueCreateComment(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(.init(body: body))
+				)
+			).created.body.json
+			commentRefreshID += 1
+			hasPostedComment = true
+			HapticFeedback.notify(.success)
+		} catch {
+			commentText = body
 			self.error = error
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
