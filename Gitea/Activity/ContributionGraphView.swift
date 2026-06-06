@@ -68,7 +68,7 @@ struct ContributionGraphView: View {
 				.foregroundStyle(.primary)
 				+ Text(" contributions in the last year")
 				.foregroundStyle(.secondary))
-				.font(.caption)
+				.font(.footnote)
 
 			ScrollView(.horizontal, showsIndicators: false) {
 				ScrollViewReader { proxy in

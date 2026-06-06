@@ -16251,24 +16251,18 @@ components:
           x-go-name: URL
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
-        - actor
         - completed_at
-        - conclusion
         - display_title
         - event
-        - head_branch
-        - head_repository
         - head_sha
         - html_url
         - id
         - path
-        - repository
         - repository_id
         - run_attempt
         - run_number
         - started_at
         - status
-        - trigger_actor
         - url
     ActionWorkflowRunsResponse:
       description: ActionWorkflowRunsResponse returns ActionWorkflowRuns

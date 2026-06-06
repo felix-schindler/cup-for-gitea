@@ -36,4 +36,11 @@ enum Icons: String {
 	case packages = "cube"
 	case activity = "radiowaves.right"
 	case comments = "note.text"
+	// MARK: - Actions
+	case actions = "play.rectangle"
+	case actionsSuccess = "checkmark.circle.fill"
+	case actionsFailure = "xmark.circle.fill"
+	case actionsCancelled = "xmark.circle"
+	case actionsPending = "circle.dotted"
+	case actionsInProgress = "ellipsis.circle"
 }
