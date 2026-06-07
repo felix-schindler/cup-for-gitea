@@ -16137,7 +16137,6 @@ components:
         - completed_at
         - conclusion
         - created_at
-        - head_branch
         - head_sha
         - html_url
         - id
