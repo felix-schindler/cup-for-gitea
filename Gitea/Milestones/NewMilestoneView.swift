@@ -27,7 +27,7 @@ struct NewMilestoneView: View {
 				body: .json(
 					.init(
 						description: description,
-						dueOn: dueDate,
+						dueOn: setDueDate ? dueDate : nil,
 						state: .open,
 						title: title
 					))

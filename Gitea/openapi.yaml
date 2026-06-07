@@ -17932,6 +17932,7 @@ components:
         due_on:
           type: string
           format: date-time
+          nullable: true
           x-go-name: Deadline
         state:
           type: string
@@ -19061,6 +19062,7 @@ components:
           description: Deadline is the updated due date for the milestone
           type: string
           format: date-time
+          nullable: true
           x-go-name: Deadline
         state:
           description: State indicates the updated state of the milestone
@@ -21080,6 +21082,7 @@ components:
         due_on:
           type: string
           format: date-time
+          nullable: true
           x-go-name: Deadline
         id:
           description: ID is the unique identifier for the milestone
