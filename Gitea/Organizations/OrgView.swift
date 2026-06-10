@@ -71,7 +71,9 @@ struct OrgView: View {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
 				// Label("Projects", systemImage: Icons.projects.rawValue)
-				// Label("Packages", systemImage: Icons.packages.rawValue)
+				NavigationLink(destination: PackageLoader(owner: org.name)) {
+					Label("Packages", systemImage: Icons.packages.rawValue)
+				}
 				NavigationLink(destination: UserSearchLoader(context: .orgMembers(org: org.name))) {
 					Label("Members", systemImage: Icons.users.rawValue)
 				}
