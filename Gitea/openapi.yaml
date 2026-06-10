@@ -17932,7 +17932,6 @@ components:
         due_on:
           type: string
           format: date-time
-          nullable: true
           x-go-name: Deadline
         state:
           type: string
@@ -17947,7 +17946,6 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - description
-        - due_on
         - state
         - title
     CreateOAuth2ApplicationOptions:
@@ -19062,7 +19060,6 @@ components:
           description: Deadline is the updated due date for the milestone
           type: string
           format: date-time
-          nullable: true
           x-go-name: Deadline
         state:
           description: State indicates the updated state of the milestone
@@ -19078,7 +19075,6 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - description
-        - due_on
         - state
         - title
     EditOrgOption:
@@ -21082,7 +21078,6 @@ components:
         due_on:
           type: string
           format: date-time
-          nullable: true
           x-go-name: Deadline
         id:
           description: ID is the unique identifier for the milestone
@@ -21120,7 +21115,6 @@ components:
         - closed_issues
         - created_at
         - description
-        - due_on
         - id
         - open_issues
         - state
