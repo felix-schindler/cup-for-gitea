@@ -84,6 +84,7 @@ struct IssueSearchFiltersSheet: View {
 			}
 
 			Section("Scope") {
+				Toggle("My repositories", isOn: $filters.myRepos)
 				TextField("Owner", text: $filters.owner)
 					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()

@@ -57,11 +57,12 @@ struct IssueSearchLoader: View {
 		"\(owner ?? "")|\(repo ?? "")|\(search)|\(filters.taskKey)"
 	}
 
-	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil, milestonesFilter: String? = nil) {
+	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil, milestonesFilter: String? = nil, myRepos: Bool? = nil) {
 		self.type = type
 		self.owner = owner
 		self.repo = repo
-		self._filters = State(initialValue: IssueSearchFilters(milestones: milestonesFilter ?? ""))
+		let defaultMyRepos = myRepos ?? (owner == nil && repo == nil)
+		self._filters = State(initialValue: IssueSearchFilters(milestones: milestonesFilter ?? "", myRepos: defaultMyRepos))
 	}
 
 	private var queryPayload: Operations.IssueSearchIssues.Input.Query {
@@ -78,7 +79,7 @@ struct IssueSearchLoader: View {
 			mentioned: filters.mentioned ? true : nil,
 			reviewRequested: filters.reviewRequested ? true : nil,
 			reviewed: filters.reviewed ? true : nil,
-			owner: filters.ownerValue,
+			owner: filters.myRepos ? currentUsername : filters.ownerValue,
 			createdBy: filters.createdByValue,
 			team: filters.teamValue,
 			page: currentPage,
@@ -104,7 +105,8 @@ struct IssueSearchLoader: View {
 	}
 
 	private var needsCurrentUser: Bool {
-		owner != nil && repo != nil && (filters.assigned || filters.created || filters.mentioned)
+		(owner != nil && repo != nil && (filters.assigned || filters.created || filters.mentioned))
+			|| (owner == nil && repo == nil && filters.myRepos)
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {

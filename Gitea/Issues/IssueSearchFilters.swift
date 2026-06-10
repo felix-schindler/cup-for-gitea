@@ -19,6 +19,7 @@ struct IssueSearchFilters: Equatable {
 	var mentioned: Bool = false
 	var reviewRequested: Bool = false
 	var reviewed: Bool = false
+	var myRepos: Bool = false
 	var since: Date?
 	var before: Date?
 	var limitText: String = ""
@@ -36,6 +37,7 @@ struct IssueSearchFilters: Equatable {
 			mentioned.description,
 			reviewRequested.description,
 			reviewed.description,
+			myRepos.description,
 			since?.timeIntervalSince1970.description ?? "",
 			before?.timeIntervalSince1970.description ?? "",
 			limitText,
