@@ -73,7 +73,8 @@ struct ActionView: View {
 	@MainActor
 	private func presentShareSheet(for url: URL) {
 		guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-			  let root = windowScene.windows.first?.rootViewController else { return }
+			let root = windowScene.windows.first?.rootViewController
+		else { return }
 		let vc = UIActivityViewController(activityItems: [url], applicationActivities: nil)
 		root.present(vc, animated: true)
 	}
@@ -185,11 +186,15 @@ struct ActionView: View {
 			async let artifacts = loadArtifacts()
 			_ = await (jobs, artifacts)
 		}
-		.alert("Download failed", isPresented: $showDownloadError, actions: {
-			Button("OK") { downloadError = nil }
-		}, message: {
-			Text(downloadError?.localizedDescription ?? "")
-		})
+		.alert(
+			"Download failed", isPresented: $showDownloadError,
+			actions: {
+				Button("OK") { downloadError = nil }
+			},
+			message: {
+				Text(downloadError?.localizedDescription ?? "")
+			}
+		)
 		.navigationTitle("Run #\(run.runNumber)")
 		.navigationBarTitleDisplayMode(.inline)
 	}

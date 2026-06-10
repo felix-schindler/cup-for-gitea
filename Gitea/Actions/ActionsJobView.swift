@@ -17,25 +17,27 @@ struct ActionsJobView: View {
 	var body: some View {
 		DisclosureGroup {
 			ForEach(job.steps, id: \.number) { step in
-				Label(title: {
-					HStack {
-						Text(step.name)
-							.font(.callout)
-						if step.completedAt > step.startedAt {
-							Spacer()
-							Text(duration(from: step.startedAt, to: step.completedAt))
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-								.monospacedDigit()
+				Label(
+					title: {
+						HStack {
+							Text(step.name)
+								.font(.callout)
+							if step.completedAt > step.startedAt {
+								Spacer()
+								Text(duration(from: step.startedAt, to: step.completedAt))
+									.font(.footnote)
+									.foregroundStyle(.secondary)
+									.monospacedDigit()
+							}
 						}
-					}
-				}, icon: {
-					let stepStatus = ActionStatus(conclusion: step.conclusion, status: step.status)
-					Image(systemName: stepStatus.icon)
-						.foregroundStyle(stepStatus.color)
-						.font(.footnote)
-						.accessibilityLabel(stepStatus.label)
-				})
+					},
+					icon: {
+						let stepStatus = ActionStatus(conclusion: step.conclusion, status: step.status)
+						Image(systemName: stepStatus.icon)
+							.foregroundStyle(stepStatus.color)
+							.font(.footnote)
+							.accessibilityLabel(stepStatus.label)
+					})
 			}
 		} label: {
 			Label(title: {

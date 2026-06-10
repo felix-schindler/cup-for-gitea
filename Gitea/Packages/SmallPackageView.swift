@@ -16,15 +16,17 @@ struct SmallPackageView: View {
 
 	var body: some View {
 		Link(destination: URL(string: pkg.htmlUrl)!) {
-			Label(title: {
-				Text(pkg.name)
-				ScrollView(.horizontal) {
-					Text("\(pkg._type) · \(pkg.version) · \(pkg.repository.fullName)")
-				}.font(.footnote)
-			}, icon: {
-				Image(systemName: Icons.packages.rawValue)
-					.foregroundStyle(.accent)
-			})
+			Label(
+				title: {
+					Text(pkg.name)
+					ScrollView(.horizontal) {
+						Text("\(pkg._type) · \(pkg.version) · \(pkg.repository.fullName)")
+					}.font(.footnote)
+				},
+				icon: {
+					Image(systemName: Icons.packages.rawValue)
+						.foregroundStyle(.accent)
+				})
 		}
 	}
 }
