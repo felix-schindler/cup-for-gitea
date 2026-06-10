@@ -121,6 +121,9 @@ struct FullRepoView: View {
 						NavigationLink("Milestones") {
 							MilestonesLoader(owner: repo.owner.login, repo: repo.name)
 						}
+						NavigationLink("Worktime") {
+							RepoWorktimeLoader(owner: repo.owner.login, repo: repo.name)
+						}
 						// if repo.hasProjects {
 						// 	Text("Projects")
 						// }

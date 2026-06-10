@@ -83,7 +83,6 @@ struct OrgView: View {
 				NavigationLink(destination: ActivityLoader(context: .org(org.name))) {
 					Label("Public Activity", systemImage: Icons.activity.rawValue)
 				}
-				// Label("Worktime", systemImage: "clock")
 			}
 		}
 		.navigationTitle(org.name)

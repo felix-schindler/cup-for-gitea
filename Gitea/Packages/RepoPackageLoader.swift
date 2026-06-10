@@ -1,5 +1,5 @@
 //
-//  RepoWorktimeLoader.swift
+//  RepoPackageLoader.swift
 //  Gitea
 //
 //  Created by Felix Schindler on 10.06.26.
