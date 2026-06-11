@@ -4,8 +4,11 @@ struct ContributionGraphView: View {
 	let data: [Components.Schemas.UserHeatmapData]
 
 	private let columns = 53
-	private let cellSize: CGFloat = 10
 	private let spacing: CGFloat = 2
+
+	private var cellSize: CGFloat {
+		UIDevice.current.userInterfaceIdiom == .pad ? 14 : 10
+	}
 
 	private var calendar: Calendar {
 		Calendar.current

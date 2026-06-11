@@ -49,6 +49,8 @@ struct SetupView: View {
 
 				Spacer()
 			}
+			.frame(maxWidth: 400)
+			.frame(maxWidth: .infinity)
 			.padding()
 		}
 	}
