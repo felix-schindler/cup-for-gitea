@@ -58,10 +58,11 @@ struct ActivityView: View {
 		let owner = activity.repo.owner.login
 		let repo = activity.repo.name
 		let ref = activity.refName
+		let contentIndex = activity.contentIndex
 
 		switch activity.opType {
 		case .createIssue, .commentIssue, .closeIssue, .reopenIssue:
-			if let index = Int64(ref) {
+			if let index = Int64(ref) ?? contentIndex {
 				IssueLoader(owner: owner, repo: repo, index: index)
 			} else {
 				FullRepoView(activity.repo)
@@ -69,7 +70,7 @@ struct ActivityView: View {
 		case .createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
 			.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
 			.pullRequestReadyForReview, .autoMergePullRequest:
-			if let index = Int64(ref) {
+			if let index = Int64(ref) ?? contentIndex {
 				PullRequestLoader(owner: owner, repo: repo, index: index)
 			} else {
 				FullRepoView(activity.repo)
@@ -280,5 +281,12 @@ struct ActivityView: View {
 		default:
 			return Text(" acted")
 		}
+	}
+}
+
+private extension Components.Schemas.Activity {
+	var contentIndex: Int64? {
+		let prefix = content.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false).first
+		return prefix.flatMap { Int64($0) }
 	}
 }
