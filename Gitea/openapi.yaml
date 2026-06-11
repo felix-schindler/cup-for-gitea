@@ -15510,7 +15510,7 @@ components:
     string:
       description: APIString is a string response
       content:
-        application/json:
+        text/plain:
           schema:
             type: string
     validationError:

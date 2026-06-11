@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OpenAPIRuntime
 
 struct CommitsLoader: View {
 	let owner: String
@@ -172,12 +173,21 @@ private struct CommitDetailView: View {
 
 			if commit.files.isNotEmpty {
 				Section("Files") {
+					NavigationLink {
+						CommitDiffView(owner: owner, repo: repo, sha: commit.sha)
+					} label: {
+						Label("View Diff", systemImage: "doc.text")
+					}
 					ForEach(commit.files, id: \.filename) { file in
-						HStack {
-							Image(systemName: fileSymbol(for: file.status))
-								.foregroundStyle(color(for: file.status))
-							Text(file.filename)
-								.font(.system(.caption, design: .monospaced))
+						NavigationLink {
+							CommitDiffView(owner: owner, repo: repo, sha: commit.sha)
+						} label: {
+							HStack {
+								Image(systemName: fileSymbol(for: file.status))
+									.foregroundStyle(color(for: file.status))
+								Text(file.filename)
+									.font(.system(.caption, design: .monospaced))
+							}
 						}
 					}
 				}
@@ -205,6 +215,42 @@ private struct CommitDetailView: View {
 		case "renamed": return .blue
 		default: return .secondary
 		}
+	}
+}
+
+private struct CommitDiffView: View {
+	let owner: String
+	let repo: String
+	let sha: String
+
+	@State private var state = LoadState<String>.loading
+
+	private func load() async {
+		state = await LoadState {
+			let raw = try await Network.shared.client.repoDownloadCommitDiffOrPatch(
+				.init(path: .init(owner: owner, repo: repo, sha: sha, diffType: .diff))
+			).ok.body.plainText
+			
+			return try await String(collecting: raw, upTo: 2 * 1024 * 1024)
+		}
+	}
+
+	var body: some View {
+		Group {
+			switch state {
+			case .loading:
+				LoadingView("Loading Diff", systemImage: "doc.text")
+			case .loaded(let diffText):
+				DiffView(diffText: diffText)
+			case .failed(let failure):
+				FailedView(failure)
+			}
+		}
+		.task {
+			await load()
+		}
+		.navigationTitle("Diff")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }
 

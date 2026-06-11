@@ -781,23 +781,31 @@ struct IssueView: View {
 			let deletions = pullRequest.deletions,
 			let changedFiles = pullRequest.changedFiles
 		{
-			Label(
-				title: {
-					HStack {
-						Text("\(changedFiles) files changed")
-						Spacer()
+			NavigationLink {
+				PullRequestDiffLoader(
+					owner: item.data.displayOwner,
+					repo: item.data.displayRepo,
+					index: item.data.displayNumber
+				)
+			} label: {
+				Label(
+					title: {
 						HStack {
-							Text("+\(additions)")
-								.foregroundStyle(.green)
-							Text("-\(deletions)")
-								.foregroundStyle(.red)
-						}.monospaced()
+							Text("\(changedFiles) files changed")
+							Spacer()
+							HStack {
+								Text("+\(additions)")
+									.foregroundStyle(.green)
+								Text("-\(deletions)")
+									.foregroundStyle(.red)
+							}.monospaced()
+						}
+					},
+					icon: {
+						Image(systemName: "doc.text")
 					}
-				},
-				icon: {
-					Image(systemName: "doc.text")
-				}
-			)
+				)
+			}
 		}
 
 		if pullRequest.reviewComments != 0 {
