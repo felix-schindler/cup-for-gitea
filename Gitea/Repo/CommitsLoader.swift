@@ -110,9 +110,16 @@ private struct CommitRow: View {
 			}.font(.footnote)
 
 			HStack {
-				Text("Authored by \(commit.author.login)")
-				if commit.author.fullName.isNotEmpty {
-					Text("(\(commit.author.fullName))")
+				if let author = commit.author {
+					Text("Authored by \(author.login)")
+					if author.fullName.isNotEmpty {
+						Text("(\(author.fullName))")
+					}
+				} else {
+					Text("Authored by \(commit.commit.author.email)")
+					if commit.commit.author.name.isNotEmpty {
+						Text("(\(commit.commit.author.name))")
+					}
 				}
 			}
 			.font(.footnote)
@@ -149,14 +156,17 @@ private struct CommitDetailView: View {
 						Text(commit.created.toString(timeStyle: .short))
 					}.font(.footnote)
 
-					HStack {
-						Text("Authored by \(commit.author.login)")
-						if commit.author.fullName.isNotEmpty {
-							Text("(\(commit.author.fullName))")
+					if let author = commit.author {
+						Text("Authored by \(author.login)")
+						if author.fullName.isNotEmpty {
+							Text("(\(author.fullName))")
+						}
+					} else {
+						Text("Authored by \(commit.commit.author.email)")
+						if commit.commit.author.name.isNotEmpty {
+							Text("(\(commit.commit.author.name))")
 						}
 					}
-					.font(.footnote)
-					.foregroundStyle(.secondary)
 				}
 			}
 

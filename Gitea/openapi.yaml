@@ -17139,9 +17139,7 @@ components:
           x-go-name: URL
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
-        - author
         - commit
-        - committer
         - created
         - files
         - html_url
