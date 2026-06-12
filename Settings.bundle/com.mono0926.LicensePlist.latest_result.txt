@@ -2,23 +2,23 @@ name: HighlightedTextEditor, nameSpecified: HighlightedTextEditor, owner: kyle-n
 
 name: Highlightr, nameSpecified: Highlightr, owner: raspu, version: 2.3.0, source: https://github.com/raspu/Highlightr
 
-name: OpenAPIKit, nameSpecified: OpenAPIKit, owner: mattpolzin, version: 3.9.0, source: https://github.com/mattpolzin/OpenAPIKit
+name: OpenAPIKit, nameSpecified: OpenAPIKit, owner: mattpolzin, version: 6.2.0, source: https://github.com/mattpolzin/OpenAPIKit
 
 name: swift-algorithms, nameSpecified: swift-algorithms, owner: apple, version: 1.2.1, source: https://github.com/apple/swift-algorithms
 
-name: swift-argument-parser, nameSpecified: swift-argument-parser, owner: apple, version: 1.7.1, source: https://github.com/apple/swift-argument-parser
+name: swift-argument-parser, nameSpecified: swift-argument-parser, owner: apple, version: 1.8.2, source: https://github.com/apple/swift-argument-parser
 
-name: swift-collections, nameSpecified: swift-collections, owner: apple, version: 1.5.0, source: https://github.com/apple/swift-collections
+name: swift-collections, nameSpecified: swift-collections, owner: apple, version: 1.6.0, source: https://github.com/apple/swift-collections
 
-name: swift-concurrency-extras, nameSpecified: swift-concurrency-extras, owner: pointfreeco, version: 1.3.2, source: https://github.com/pointfreeco/swift-concurrency-extras
+name: swift-concurrency-extras, nameSpecified: swift-concurrency-extras, owner: pointfreeco, version: 1.4.0, source: https://github.com/pointfreeco/swift-concurrency-extras
 
-name: swift-http-types, nameSpecified: swift-http-types, owner: apple, version: 1.5.1, source: https://github.com/apple/swift-http-types
+name: swift-http-types, nameSpecified: swift-http-types, owner: apple, version: 1.6.0, source: https://github.com/apple/swift-http-types
 
 name: swift-numerics, nameSpecified: swift-numerics, owner: apple, version: 1.1.1, source: https://github.com/apple/swift-numerics
 
-name: swift-openapi-generator, nameSpecified: swift-openapi-generator, owner: apple, version: 1.12.0, source: https://github.com/apple/swift-openapi-generator
+name: swift-openapi-generator, nameSpecified: swift-openapi-generator, owner: apple, version: 1.12.2, source: https://github.com/apple/swift-openapi-generator
 
-name: swift-openapi-runtime, nameSpecified: swift-openapi-runtime, owner: apple, version: 1.11.0, source: https://github.com/apple/swift-openapi-runtime
+name: swift-openapi-runtime, nameSpecified: swift-openapi-runtime, owner: apple, version: 1.12.0, source: https://github.com/apple/swift-openapi-runtime
 
 name: swift-openapi-urlsession, nameSpecified: swift-openapi-urlsession, owner: apple, version: 1.3.0, source: https://github.com/apple/swift-openapi-urlsession
 
@@ -28,8 +28,8 @@ name: swiftui-math, nameSpecified: swiftui-math, owner: gonzalezreal, version: 0
 
 name: textual, nameSpecified: textual, owner: gonzalezreal, version: 0.3.1, source: https://github.com/gonzalezreal/textual
 
-name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.1, source: https://github.com/jpsim/Yams
+name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.2, source: https://github.com/jpsim/Yams
 
 add-version-numbers: false
 
-LicensePlist Version: 3.27.7
+LicensePlist Version: 3.27.9
