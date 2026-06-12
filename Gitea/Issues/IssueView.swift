@@ -73,6 +73,9 @@ struct IssueView: View {
 	@State private var commentText = ""
 	@State private var commentRefreshID = 0
 	@State private var hasPostedComment = false
+	@State private var showReviewSheet = false
+	@State private var reviewRefreshID = 0
+	@State private var reviewEvent: Components.Schemas.CreatePullReviewOptions.EventPayload = .comment
 
 	private struct MergeConfig {
 		var method: Components.Schemas.MergePullRequestOption.DoPayload = .merge
@@ -110,6 +113,19 @@ struct IssueView: View {
 				Section("Details") {
 					details
 				}
+			}
+
+			if isPullRequest {
+				Section("Review") {
+					reviewActions
+				}
+
+				ReviewsLoader(
+					owner: item.data.displayOwner,
+					repo: item.data.displayRepo,
+					index: item.data.displayNumber,
+					refreshID: reviewRefreshID
+				)
 			}
 
 			Section("Comments") {
@@ -153,6 +169,17 @@ struct IssueView: View {
 		.sheet(isPresented: $showMergeSheet) {
 			mergeSheet
 		}
+		.sheet(isPresented: $showReviewSheet) {
+			ReviewSheet(
+				owner: item.data.displayOwner,
+				repo: item.data.displayRepo,
+				index: item.data.displayNumber,
+				initialEvent: reviewEvent,
+				commitId: reviewCommitId
+			) {
+				reviewRefreshID += 1
+			}
+		}
 		.alert("Merge Error", isPresented: $showMergeErrorAlert, presenting: mergeError) { _ in
 			Button("OK") {}
 		} message: { error in
@@ -165,6 +192,23 @@ struct IssueView: View {
 		ToolbarItem(placement: .primaryAction) {
 			if let url = URL(string: item.data.displayHtmlUrl) {
 				ShareLink(item: url)
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var reviewActions: some View {
+		if case .pullRequest(let pr) = item, pr.state == .open, !pr.merged, !pr.draft {
+			AsyncButton("Approve", systemImage: "checkmark.circle") {
+				await quickApprove()
+			}
+			Button("Comment", systemImage: "bubble.left") {
+				reviewEvent = .comment
+				showReviewSheet = true
+			}
+			Button("Request Changes", systemImage: "pencil") {
+				reviewEvent = .requestChanges
+				showReviewSheet = true
 			}
 		}
 	}
@@ -511,6 +555,54 @@ struct IssueView: View {
 		}
 	}
 
+	private func quickApprove() async {
+		guard case .pullRequest(let pr) = item else { return }
+		do {
+			let response = try await Network.shared.client.repoCreatePullReview(
+				.init(
+					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					body: .json(
+						.init(
+							body: "",
+							comments: [],
+							commitId: pr.head.sha,
+							event: .approved
+						))
+				)
+			)
+			switch response {
+			case .ok:
+				reviewRefreshID += 1
+				HapticFeedback.notify(.success)
+			case .unprocessableContent(let error):
+				self.error = NSError(
+					domain: "", code: 422,
+					userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Validation error"]
+				)
+				showErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .notFound:
+				self.error = NSError(
+					domain: "", code: 404,
+					userInfo: [NSLocalizedDescriptionKey: "Review not found"]
+				)
+				showErrorAlert = true
+				HapticFeedback.notify(.error)
+			case .undocumented:
+				self.error = NSError(
+					domain: "", code: 0,
+					userInfo: [NSLocalizedDescriptionKey: "An unexpected error occurred"]
+				)
+				showErrorAlert = true
+				HapticFeedback.notify(.error)
+			}
+		} catch {
+			self.error = error
+			showErrorAlert = true
+			HapticFeedback.notify(.error)
+		}
+	}
+
 	private func postComment() async {
 		let body = commentText
 		commentText = ""
@@ -821,6 +913,14 @@ struct IssueView: View {
 					Image(systemName: "text.bubble")
 				})
 		}
+	}
+
+	private var isPullRequest: Bool {
+		if case .pullRequest = item { true } else { false }
+	}
+
+	private var reviewCommitId: String {
+		if case .pullRequest(let pr) = item { pr.head.sha } else { "" }
 	}
 
 	private var hasDetails: Bool {
