@@ -93,19 +93,20 @@ struct DiffView: View {
 }
 
 #Preview {
-	DiffView(diffText: """
-diff --git a/Example.swift b/Example.swift
-index abc123..def456 100644
---- a/Example.swift
-+++ b/Example.swift
-@@ -1,5 +1,8 @@
- import Foundation
-+
- func hello() {
--    print("Hello, World!")
-+    print("Hello, Diff!")
-+    print("This is a new line")
-+    print("Another new line")
- }
-""")
+	DiffView(
+		diffText: """
+			diff --git a/Example.swift b/Example.swift
+			index abc123..def456 100644
+			--- a/Example.swift
+			+++ b/Example.swift
+			@@ -1,5 +1,8 @@
+			 import Foundation
+			+
+			 func hello() {
+			-    print("Hello, World!")
+			+    print("Hello, Diff!")
+			+    print("This is a new line")
+			+    print("Another new line")
+			 }
+			""")
 }

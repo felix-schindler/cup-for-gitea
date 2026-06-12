@@ -5,8 +5,8 @@
 //  Created by Felix Schindler on 18.05.26.
 //
 
-import SwiftUI
 import OpenAPIRuntime
+import SwiftUI
 
 struct CommitsLoader: View {
 	let owner: String
@@ -230,7 +230,7 @@ private struct CommitDiffView: View {
 			let raw = try await Network.shared.client.repoDownloadCommitDiffOrPatch(
 				.init(path: .init(owner: owner, repo: repo, sha: sha, diffType: .diff))
 			).ok.body.plainText
-			
+
 			return try await String(collecting: raw, upTo: 2 * 1024 * 1024)
 		}
 	}

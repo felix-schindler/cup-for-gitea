@@ -1,5 +1,5 @@
-import SwiftUI
 import OpenAPIRuntime
+import SwiftUI
 
 struct PullRequestDiffLoader: View {
 	let owner: String
@@ -16,7 +16,7 @@ struct PullRequestDiffLoader: View {
 					query: .init(binary: false)
 				)
 			).ok.body.plainText
-			
+
 			return try await String(collecting: raw, upTo: 2 * 1024 * 1024)
 		}
 	}
