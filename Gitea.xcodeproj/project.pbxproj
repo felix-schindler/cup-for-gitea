@@ -319,7 +319,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = de.schindlerfelix.Gitea;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -358,7 +358,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = de.schindlerfelix.Gitea;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -420,7 +420,7 @@
 			repositoryURL = "https://github.com/apple/swift-openapi-runtime";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.11.0;
+				minimumVersion = 1.12.0;
 			};
 		};
 		DC39503D2FAFE95500D5984A /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
@@ -436,7 +436,7 @@
 			repositoryURL = "https://github.com/apple/swift-openapi-generator";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.12.0;
+				minimumVersion = 1.12.2;
 			};
 		};
 		DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
