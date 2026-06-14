@@ -10,12 +10,12 @@ import OpenAPIRuntime
 import OpenAPIURLSession
 
 public final class GiteaClient: Sendable {
-	public let serverURL: URL
+	public let baseURL: URL
 	public let token: String
 	public let client: Client
 
-	public init(serverURL: URL, token: String) {
-		self.serverURL = serverURL
+	public init(baseURL: URL, token: String) {
+		self.baseURL = baseURL
 		self.token = token
 
 		let transport: any ClientTransport
@@ -28,6 +28,6 @@ public final class GiteaClient: Sendable {
 			configuration: .init(session: session)
 		)
 
-		self.client = Client(serverURL: serverURL, transport: transport)
+		self.client = Client(serverURL: baseURL.appending(path: "api/v1"), transport: transport)
 	}
 }

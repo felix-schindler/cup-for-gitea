@@ -14,7 +14,7 @@ class InstanceManager {
 	private static let selectedKey = "selectedInstance"
 
 	// This is a fallback which should hopefully never be used
-	static let defaultInstance = GiteaInstance(host: "gitea.com", token: "")
+	static let defaultInstance = GiteaInstance(baseURL: URL(string: "https://gitea.com")!, token: "")
 
 	static var instances: [GiteaInstance] {
 		get {

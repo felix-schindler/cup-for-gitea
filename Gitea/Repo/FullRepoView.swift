@@ -186,8 +186,8 @@ struct FullRepoView: View {
 
 			if let readmeContents, readmeContents.isNotEmpty {
 				Section {
-					// TODO: Fix base url — should be host/{owner}/{repo}
-					StructuredText(markdown: readmeContents.emojized(), baseURL: Network.shared.serverURL)
+					let readmeBaseURL = Network.shared.baseURL.appending(path: "\(repo.owner.login)/\(repo.name)")
+					StructuredText(markdown: readmeContents.emojized(), baseURL: readmeBaseURL)
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
