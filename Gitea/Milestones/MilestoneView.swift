@@ -59,11 +59,5 @@ struct MilestoneView: View {
 					.font(.footnote)
 			}
 		}
-		.swipeActions {
-			let baseUrl = Network.shared.serverURL.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-			if let url = URL(string: "\(baseUrl)/\(owner)/\(repo)/milestone/\(milestone.id)") {
-				ShareLink(item: url)
-			}
-		}
 	}
 }
