@@ -5,7 +5,6 @@
 //  Created by Felix Schindler on 12.05.26.
 //
 
-import CryptoKit
 import Foundation
 
 struct GiteaInstance: Codable, Identifiable, Equatable {
