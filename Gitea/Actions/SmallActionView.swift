@@ -15,7 +15,7 @@ struct SmallActionView: View {
 	}
 
 	private var status: ActionStatus {
-		ActionStatus(conclusion: run.conclusion ?? "", status: run.status)
+		ActionStatus(conclusion: run.conclusion, status: run.status)
 	}
 
 	var body: some View {

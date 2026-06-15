@@ -16308,7 +16308,6 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - completed_at
-        - conclusion
         - name
         - number
         - started_at

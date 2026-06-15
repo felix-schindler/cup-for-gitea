@@ -26,7 +26,7 @@ struct ActionView: View {
 	}
 
 	private var status: ActionStatus {
-		ActionStatus(conclusion: run.conclusion ?? "", status: run.status)
+		ActionStatus(conclusion: run.conclusion, status: run.status)
 	}
 
 	private var duration: String {

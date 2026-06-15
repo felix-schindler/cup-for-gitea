@@ -16,7 +16,7 @@ enum ActionStatus {
 	case queued
 	case unknown
 
-	init(conclusion: String, status: String) {
+	init(conclusion: String?, status: String) {
 		if conclusion == "success" {
 			self = .success
 		} else if conclusion == "failure" {
