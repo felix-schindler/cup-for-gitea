@@ -12,10 +12,6 @@ struct GiteaInstance: Identifiable, Equatable {
 	let token: String
 	
 	var id: String { baseURL.absoluteString }
-	
-	var serverURL: URL {
-		baseURL.appending(path: "api/v1")
-	}
 }
 
 extension GiteaInstance: Codable {
