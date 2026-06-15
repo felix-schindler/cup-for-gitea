@@ -23,6 +23,14 @@ class InstanceManager {
 			else {
 				return []
 			}
+			// Migrate selectedId from old host-only format (e.g. "gitea.com")
+			// to new URL format (e.g. "https://gitea.com")
+			if let selectedId, !instances.contains(where: { $0.id == selectedId }) {
+				let prefixed = "https://\(selectedId)"
+				if instances.contains(where: { $0.id == prefixed }) {
+					self.selectedId = prefixed
+				}
+			}
 			return instances
 		}
 		set {

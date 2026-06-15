@@ -28,6 +28,6 @@ public final class GiteaClient: Sendable {
 			configuration: .init(session: session)
 		)
 
-		self.client = Client(serverURL: baseURL.appending(path: "api/v1"), transport: transport)
+		self.client = Client(serverURL: baseURL.appending(path: "api/v1", directoryHint: .isDirectory), transport: transport)
 	}
 }

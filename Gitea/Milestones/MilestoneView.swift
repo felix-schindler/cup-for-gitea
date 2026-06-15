@@ -59,5 +59,9 @@ struct MilestoneView: View {
 					.font(.footnote)
 			}
 		}
+		.swipeActions {
+			let milestonePath = "\(owner)/\(repo)/milestone/\(milestone.id)"
+			ShareLink(item: Network.shared.baseURL.appending(path: milestonePath))
+		}
 	}
 }
