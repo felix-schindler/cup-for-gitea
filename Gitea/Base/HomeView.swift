@@ -17,7 +17,8 @@ struct HomeView: View {
 		if let version = try? await Network.shared.client.getVersion().ok.body.json.version {
 			let host = InstanceManager.selected?.host ?? ""
 			if InstanceManager.compareVersions(version, InstanceManager.minimumRequiredVersion) == .orderedAscending,
-			   InstanceManager.shouldShowVersionWarning(for: host, serverVersion: version) {
+				InstanceManager.shouldShowVersionWarning(for: host, serverVersion: version)
+			{
 				versionWarning = version
 			} else {
 				versionWarning = nil
@@ -37,14 +38,17 @@ struct HomeView: View {
 		List {
 			if let versionWarning {
 				Section {
-					Label("This instance runs Gitea \(versionWarning). Cup requires v\(InstanceManager.minimumRequiredVersion) or later — some features may not work.", systemImage: "exclamationmark.triangle.fill")
-						.swipeActions {
-							Button("Acknowledge", systemImage: "xmark") {
-								let host = InstanceManager.selected?.host ?? ""
-								InstanceManager.acknowledgeVersionWarning(for: host, serverVersion: versionWarning)
-								self.versionWarning = nil
-							}
+					Label(
+						"This instance runs Gitea \(versionWarning). Cup requires v\(InstanceManager.minimumRequiredVersion) or later — some features may not work.",
+						systemImage: "exclamationmark.triangle.fill"
+					)
+					.swipeActions {
+						Button("Acknowledge", systemImage: "xmark") {
+							let host = InstanceManager.selected?.host ?? ""
+							InstanceManager.acknowledgeVersionWarning(for: host, serverVersion: versionWarning)
+							self.versionWarning = nil
 						}
+					}
 				}
 			}
 

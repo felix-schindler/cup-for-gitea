@@ -23,7 +23,7 @@ class InstanceManager {
 	private static var acknowledgedVersionWarnings: Set<String> {
 		get {
 			guard let data = userDefaults.data(forKey: acknowledgedVersionWarningsKey),
-				  let set = try? JSONDecoder().decode(Set<String>.self, from: data)
+				let set = try? JSONDecoder().decode(Set<String>.self, from: data)
 			else { return [] }
 			return set
 		}
