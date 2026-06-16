@@ -8,10 +8,11 @@
 ## Swagger → OpenAPI
 
 ```
+cd openapi-schema
 curl https://git.schindlerfelix.de/swagger.v1.json > swagger.json
 npx swagger2openapi swagger.json --targetVersion 3.0.3 --yaml --resolve --patch --outfile openapi.yaml
 npx @redocly/cli@latest bundle openapi.yaml -o openapi.required.yaml
-mv openapi.required.yaml ./Gitea/Gitea/openapi.yaml
+mv openapi.required.yaml ../Gitea/openapi.yaml
 ```
 
 ## Bundle Licenses
@@ -20,10 +21,11 @@ mv openapi.required.yaml ./Gitea/Gitea/openapi.yaml
 license-plist --config-path license_plist.yml
 ```
 
-## Add GitHub remote
+## GitHub contributions
 
 ```
 git remote add github git@github.com:felix-schindler/cup-for-gitea.git
+git fetch github pull/<id>/head:pr-<id>
 ```
 
 # Release a new version
