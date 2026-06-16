@@ -29,7 +29,7 @@ struct ActivityView: View {
 						.foregroundStyle(iconColor)
 					Text(description)
 				}
-				
+
 				switch activity.opType {
 				case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
 					.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
@@ -38,7 +38,7 @@ struct ActivityView: View {
 					let parts = activity.content.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
 					if parts.count == 2 {
 						let content = String(parts[1])
-						
+
 						if content.isNotEmpty {
 							Text(content.emojized())
 								.font(.footnote)
@@ -147,19 +147,20 @@ struct ActivityView: View {
 	}
 
 	private var description: LocalizedStringResource {
-		let ref = switch activity.opType {
-		case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
-			.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
-			.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
-			.pullRequestReadyForReview, .autoMergePullRequest:
-			if let iid = activity.content.split(separator: "|").first {
-				String(iid)
-			} else {
-				""
+		let ref =
+			switch activity.opType {
+			case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
+				.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
+				.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
+				.pullRequestReadyForReview, .autoMergePullRequest:
+				if let iid = activity.content.split(separator: "|").first {
+					String(iid)
+				} else {
+					""
+				}
+			default:
+				activity.refName
 			}
-		default:
-			activity.refName
-		}
 
 		return switch activity.opType {
 		case .createRepo: "Created repository"

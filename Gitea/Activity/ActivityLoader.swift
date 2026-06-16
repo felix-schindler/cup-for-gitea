@@ -1,3 +1,10 @@
+//
+//  ActivityLoader.swift
+//  Gitea
+//
+//  Created by Felix Schindler on 16.06.26.
+//
+
 import SwiftUI
 
 struct ActivityLoader: View {
@@ -9,9 +16,16 @@ struct ActivityLoader: View {
 
 	let context: Context
 
-	@State private var state = LoadState<[Components.Schemas.Activity]>.loading
+	@State private var results: [Components.Schemas.Activity] = []
+	@State private var error: Error?
+	@State private var isLoadingPage = false
+	@State private var hasMorePages = true
+	@State private var currentPage = 1
 	@State private var heatmap: [Components.Schemas.UserHeatmapData]?
 	@State private var heatmapError: Error?
+	@State private var userLogin: String?
+
+	private let defaultLimit = 20
 
 	private var showHeatmap: Bool {
 		if case .org = context { return false }
@@ -24,75 +38,112 @@ struct ActivityLoader: View {
 	}
 
 	var body: some View {
-		Group {
-			switch state {
-			case .loading:
+		List {
+			if results.isEmpty && isLoadingPage {
 				LoadingView("Loading activity", systemImage: Icons.activity.rawValue)
-			case .loaded(let activities):
-				List {
-					if showHeatmap {
-						if let heatmap {
-							if heatmap.isNotEmpty {
-								ContributionGraphView(data: heatmap)
-									.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
-									.listRowBackground(Color.clear)
-							}
-						} else {
-							LoadingView("Loading contribution graph", systemImage: "chart.bar.xaxis")
-						}
-					}
-
-					if activities.isEmpty {
-						Section {
-							NoContentView("No recent activity", systemImage: Icons.activity.rawValue)
-						}
-					} else {
-						Section {
-							ForEach(activities, id: \.id) { activity in
-								ActivityView(activity: activity, showActor: showActor)
-							}
-						}
+			} else if results.isEmpty {
+				if let error {
+					FailedView(error)
+				} else {
+					Section {
+						NoContentView("No recent activity", systemImage: Icons.activity.rawValue)
 					}
 				}
-			case .failed(let failure):
-				FailedView(failure)
+			} else {
+				if showHeatmap, let heatmap, heatmap.isNotEmpty {
+					ContributionGraphView(data: heatmap)
+						.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
+						.listRowBackground(Color.clear)
+				}
+
+				Section {
+					ForEach(results, id: \.id) { activity in
+						ActivityView(activity: activity, showActor: showActor)
+							.onAppear {
+								if activity.id == results.last?.id, hasMorePages {
+									Task { await loadNextPage() }
+								}
+							}
+					}
+					if isLoadingPage {
+						LoadingView("Loading more", systemImage: Icons.activity.rawValue)
+					} else if let error {
+						FailedView(error)
+					}
+				}
 			}
 		}
 		.task {
-			await load()
+			await resetAndLoad()
 		}
 		.refreshable {
-			await load()
+			await resetAndLoad()
 		}
 		.navigationTitle("Activity")
 	}
 
-	private func load() async {
-		switch context {
-		case .home:
-			do {
-				let user = try await Network.shared.client.userGetCurrent().ok.body.json
-				let activities = try await Network.shared.client.userListActivityFeeds(.init(path: .init(username: user.login))).ok.body.json
-				state = .loaded(activities)
-				await loadHeatmap(username: user.login)
-			} catch {
-				state = .failed(error)
+	private func resetAndLoad() async {
+		results = []
+		error = nil
+		currentPage = 1
+		hasMorePages = true
+		isLoadingPage = false
+		userLogin = nil
+		if showHeatmap {
+			heatmap = nil
+			heatmapError = nil
+		}
+		await loadNextPage()
+	}
+
+	private func loadNextPage() async {
+		guard !isLoadingPage, hasMorePages else { return }
+		isLoadingPage = true
+		defer { isLoadingPage = false }
+		do {
+			let activities: [Components.Schemas.Activity]
+			switch context {
+			case .home:
+				if currentPage == 1 {
+					let user = try await Network.shared.client.userGetCurrent().ok.body.json
+					userLogin = user.login
+					await loadHeatmap(username: user.login)
+				}
+				guard let login = userLogin else { return }
+				activities = try await Network.shared.client.userListActivityFeeds(
+					.init(
+						path: .init(username: login),
+						query: .init(page: currentPage, limit: defaultLimit)
+					)
+				).ok.body.json
+			case .user(let username):
+				if currentPage == 1 {
+					await loadHeatmap(username: username)
+				}
+				activities = try await Network.shared.client.userListActivityFeeds(
+					.init(
+						path: .init(username: username),
+						query: .init(page: currentPage, limit: defaultLimit)
+					)
+				).ok.body.json
+			case .org(let org):
+				activities = try await Network.shared.client.orgListActivityFeeds(
+					.init(
+						path: .init(org: org),
+						query: .init(page: currentPage, limit: defaultLimit)
+					)
+				).ok.body.json
 			}
-		case .user(let username):
-			do {
-				let activities = try await Network.shared.client.userListActivityFeeds(.init(path: .init(username: username))).ok.body.json
-				state = .loaded(activities)
-				await loadHeatmap(username: username)
-			} catch {
-				state = .failed(error)
+			if Task.isCancelled { return }
+			results.append(contentsOf: activities)
+			if activities.count < defaultLimit {
+				hasMorePages = false
+			} else {
+				currentPage += 1
 			}
-		case .org(let org):
-			do {
-				let activities = try await Network.shared.client.orgListActivityFeeds(.init(path: .init(org: org))).ok.body.json
-				state = .loaded(activities)
-			} catch {
-				state = .failed(error)
-			}
+		} catch {
+			if Task.isCancelled { return }
+			self.error = error
 		}
 	}
 
