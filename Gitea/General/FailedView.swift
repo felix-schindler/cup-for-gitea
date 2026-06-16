@@ -13,7 +13,7 @@ struct FailedView: View {
 	private let icon: String
 
 	init(_ error: Error) {
-		self.message = LocalizedStringResource(stringLiteral: error.localizedDescription)
+		self.message = LocalizedStringResource(stringLiteral: error.userDescription)
 		self.description = nil
 		self.icon = "exclamationmark.triangle"
 	}
