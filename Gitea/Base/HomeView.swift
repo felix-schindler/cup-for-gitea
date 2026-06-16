@@ -15,9 +15,9 @@ struct HomeView: View {
 
 	private func load() async {
 		if let version = try? await Network.shared.client.getVersion().ok.body.json.version {
-			let host = InstanceManager.selected?.host ?? ""
+			let instanceURL = InstanceManager.selected?.displayURL ?? ""
 			if InstanceManager.compareVersions(version, InstanceManager.minimumRequiredVersion) == .orderedAscending,
-				InstanceManager.shouldShowVersionWarning(for: host, serverVersion: version)
+				InstanceManager.shouldShowVersionWarning(for: instanceURL, serverVersion: version)
 			{
 				versionWarning = version
 			} else {
@@ -44,8 +44,8 @@ struct HomeView: View {
 					)
 					.swipeActions {
 						Button("Acknowledge", systemImage: "xmark") {
-							let host = InstanceManager.selected?.host ?? ""
-							InstanceManager.acknowledgeVersionWarning(for: host, serverVersion: versionWarning)
+							let instanceURL = InstanceManager.selected?.displayURL ?? ""
+							InstanceManager.acknowledgeVersionWarning(for: instanceURL, serverVersion: versionWarning)
 							self.versionWarning = nil
 						}
 					}

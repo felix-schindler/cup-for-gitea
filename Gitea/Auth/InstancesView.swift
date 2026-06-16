@@ -59,7 +59,7 @@ struct InstancesView: View {
 			} else {
 				ForEach(instances) { instance in
 					HStack {
-						Text(instance.host)
+						Text(instance.displayURL)
 
 						Spacer()
 						statusView(for: instance)

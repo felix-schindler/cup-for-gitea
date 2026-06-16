@@ -14,7 +14,7 @@ class InstanceManager {
 	private static let selectedKey = "selectedInstance"
 
 	// This is a fallback which should hopefully never be used
-	static let defaultInstance = GiteaInstance(host: "gitea.com", token: "")
+	static let defaultInstance = GiteaInstance(baseURL: URL(string: "https://gitea.com")!, token: "")
 
 	static let minimumRequiredVersion = "1.26.0"
 
@@ -65,6 +65,13 @@ class InstanceManager {
 				let instances = try? JSONDecoder().decode([GiteaInstance].self, from: data)
 			else {
 				return []
+			}
+			if let selectedId,
+				!instances.contains(where: { $0.id == selectedId }),
+				let migratedId = GiteaInstance.normalizedBaseURL(from: selectedId)?.absoluteString,
+				instances.contains(where: { $0.id == migratedId })
+			{
+				self.selectedId = migratedId
 			}
 			return instances
 		}
