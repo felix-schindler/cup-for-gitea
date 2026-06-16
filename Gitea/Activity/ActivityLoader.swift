@@ -30,11 +30,15 @@ struct ActivityLoader: View {
 				LoadingView("Loading activity", systemImage: Icons.activity.rawValue)
 			case .loaded(let activities):
 				List {
-					if showHeatmap, let heatmap, heatmap.isNotEmpty {
-						Section {
-							ContributionGraphView(data: heatmap)
-								.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
-								.listRowBackground(Color.clear)
+					if showHeatmap {
+						if let heatmap {
+							if heatmap.isNotEmpty {
+								ContributionGraphView(data: heatmap)
+									.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
+									.listRowBackground(Color.clear)
+							}
+						} else {
+							LoadingView("Loading contribution graph", systemImage: "chart.bar.xaxis")
 						}
 					}
 

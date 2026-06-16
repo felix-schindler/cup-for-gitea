@@ -1,3 +1,10 @@
+//
+//  ActivityView.swift
+//  Gitea
+//
+//  Created by Felix Schindler on 16.06.26.
+//
+
 import SwiftUI
 
 struct ActivityView: View {
@@ -6,40 +13,45 @@ struct ActivityView: View {
 
 	var body: some View {
 		NavigationLink(destination: destinationView) {
-			VStack(alignment: .leading, spacing: 6) {
+			VStack(alignment: .leading) {
 				if showActor {
 					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
-							SmallUserView(activity.actUser, avatarSize: .small)
-						}
+							SmallUserView(activity.actUser)
+							PillView(verbatim: activity.repo.fullName)
+							PillView(verbatim: activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+						}.font(.footnote)
 					}
 				}
 
-				HStack(spacing: 4) {
+				HStack {
 					Image(systemName: icon)
 						.foregroundStyle(iconColor)
-						.font(.callout)
-						.frame(width: 16)
-
-					(Text(actorName).fontWeight(.medium) + description)
-						.font(.callout)
-						.lineLimit(2)
+					Text(description)
 				}
-
-				Text(activity.repo.fullName)
-					.font(.caption)
-					.foregroundStyle(.accent)
-
-				if activity.content.isNotEmpty {
-					Text(activity.content.emojized())
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.lineLimit(2)
+				
+				switch activity.opType {
+				case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
+					.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
+					.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
+					.pullRequestReadyForReview, .autoMergePullRequest:
+					let parts = activity.content.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+					if parts.count == 2 {
+						let content = String(parts[1])
+						
+						if content.isNotEmpty {
+							Text(content.emojized())
+								.font(.footnote)
+								.lineLimit(5)
+						}
+					}
+				default:
+					if activity.content.isNotEmpty {
+						Text(activity.content.emojized())
+							.font(.footnote)
+							.lineLimit(5)
+					}
 				}
-
-				Text(activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
-					.font(.caption2)
-					.foregroundStyle(.tertiary)
 			}
 		}
 		.buttonStyle(.plain)
@@ -61,7 +73,7 @@ struct ActivityView: View {
 
 		switch activity.opType {
 		case .createIssue, .commentIssue, .closeIssue, .reopenIssue:
-			if let index = Int64(ref) {
+			if let index = Int64(activity.content.split(separator: "|").first ?? "") {
 				IssueLoader(owner: owner, repo: repo, index: index)
 			} else {
 				FullRepoView(activity.repo)
@@ -69,7 +81,7 @@ struct ActivityView: View {
 		case .createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
 			.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
 			.pullRequestReadyForReview, .autoMergePullRequest:
-			if let index = Int64(ref) {
+			if let index = Int64(activity.content.split(separator: "|").first ?? "") {
 				PullRequestLoader(owner: owner, repo: repo, index: index)
 			} else {
 				FullRepoView(activity.repo)
@@ -116,7 +128,6 @@ struct ActivityView: View {
 		case .pullReviewDismissed: return "xmark.seal"
 		case .pullRequestReadyForReview: return "arrow.triangle.pull"
 		case .autoMergePullRequest: return "arrow.triangle.merge"
-		default: return "ellipsis"
 		}
 	}
 
@@ -135,150 +146,49 @@ struct ActivityView: View {
 		}
 	}
 
-	private var description: Text {
-		let ref = activity.refName
-
-		switch activity.opType {
-		case .createRepo:
-			return Text(" created repository")
-
-		case .renameRepo:
-			return Text(" renamed repository")
-
-		case .starRepo:
-			return Text(" starred ")
-
-		case .watchRepo:
-			return Text(" started watching ")
-
-		case .commitRepo:
-			if ref.isNotEmpty {
-				return Text(" pushed to \(ref)")
+	private var description: LocalizedStringResource {
+		let ref = switch activity.opType {
+		case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
+			.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
+			.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
+			.pullRequestReadyForReview, .autoMergePullRequest:
+			if let iid = activity.content.split(separator: "|").first {
+				String(iid)
+			} else {
+				""
 			}
-			return Text(" pushed to ")
-
-		case .createIssue:
-			if ref.isNotEmpty {
-				return Text(" opened issue \(ref) in ")
-			}
-			return Text(" opened issue in ")
-
-		case .createPullRequest:
-			if ref.isNotEmpty {
-				return Text(" opened pull request \(ref) in ")
-			}
-			return Text(" opened pull request in ")
-
-		case .transferRepo:
-			return Text(" transferred repository")
-
-		case .pushTag:
-			if ref.isNotEmpty {
-				return Text(" pushed tag \(ref) to ")
-			}
-			return Text(" pushed tag to ")
-
-		case .commentIssue:
-			if ref.isNotEmpty {
-				return Text(" commented on issue \(ref) in ")
-			}
-			return Text(" commented on issue in ")
-
-		case .mergePullRequest:
-			if ref.isNotEmpty {
-				return Text(" merged pull request \(ref) in ")
-			}
-			return Text(" merged pull request in ")
-
-		case .closeIssue:
-			if ref.isNotEmpty {
-				return Text(" closed issue \(ref) in ")
-			}
-			return Text(" closed issue in ")
-
-		case .reopenIssue:
-			if ref.isNotEmpty {
-				return Text(" reopened issue \(ref) in ")
-			}
-			return Text(" reopened issue in ")
-
-		case .closePullRequest:
-			if ref.isNotEmpty {
-				return Text(" closed pull request \(ref) in ")
-			}
-			return Text(" closed pull request in ")
-
-		case .reopenPullRequest:
-			if ref.isNotEmpty {
-				return Text(" reopened pull request \(ref) in ")
-			}
-			return Text(" reopened pull request in ")
-
-		case .deleteTag:
-			if ref.isNotEmpty {
-				return Text(" deleted tag \(ref) from ")
-			}
-			return Text(" deleted tag from ")
-
-		case .deleteBranch:
-			if ref.isNotEmpty {
-				return Text(" deleted branch \(ref) from ")
-			}
-			return Text(" deleted branch from ")
-
-		case .mirrorSyncPush:
-			return Text(" mirror-pushed to ")
-
-		case .mirrorSyncCreate:
-			return Text(" mirror-created in ")
-
-		case .mirrorSyncDelete:
-			return Text(" mirror-deleted from ")
-
-		case .approvePullRequest:
-			if ref.isNotEmpty {
-				return Text(" approved pull request \(ref) in ")
-			}
-			return Text(" approved pull request in ")
-
-		case .rejectPullRequest:
-			if ref.isNotEmpty {
-				return Text(" rejected pull request \(ref) in ")
-			}
-			return Text(" rejected pull request in ")
-
-		case .commentPull:
-			if ref.isNotEmpty {
-				return Text(" commented on pull request \(ref) in ")
-			}
-			return Text(" commented on pull request in ")
-
-		case .publishRelease:
-			if ref.isNotEmpty {
-				return Text(" published release \(ref) in ")
-			}
-			return Text(" published release in ")
-
-		case .pullReviewDismissed:
-			if ref.isNotEmpty {
-				return Text(" dismissed review on pull request \(ref) in ")
-			}
-			return Text(" dismissed review on pull request in ")
-
-		case .pullRequestReadyForReview:
-			if ref.isNotEmpty {
-				return Text(" marked pull request \(ref) ready for review in ")
-			}
-			return Text(" marked pull request ready for review in ")
-
-		case .autoMergePullRequest:
-			if ref.isNotEmpty {
-				return Text(" auto-merged pull request \(ref) in ")
-			}
-			return Text(" auto-merged pull request in ")
-
 		default:
-			return Text(" acted")
+			activity.refName
+		}
+
+		return switch activity.opType {
+		case .createRepo: "Created repository"
+		case .renameRepo: "Renamed repository"
+		case .starRepo: "Starred"
+		case .watchRepo: "Started watching"
+		case .commitRepo: "Pushed to \(ref)"
+		case .createIssue: "Opened issue"
+		case .createPullRequest: "Opened pull request #\(ref)"
+		case .transferRepo: "Transferred repository"
+		case .pushTag: "Pushed tag to \(ref)"
+		case .commentIssue: "Commented on issue #\(ref)"
+		case .mergePullRequest: "Merged pull request #\(ref)"
+		case .closeIssue: "Closed issue #\(ref)"
+		case .reopenIssue: "Reopened issue #\(ref)"
+		case .closePullRequest: "Closed pull request #\(ref)"
+		case .reopenPullRequest: "Reopened pull request #\(ref)"
+		case .deleteTag: "Deleted tag \(ref)"
+		case .deleteBranch: "Deleted branch \(ref)"
+		case .mirrorSyncPush: "Mirror-pushed"
+		case .mirrorSyncCreate: "Mirror-created"
+		case .mirrorSyncDelete: "Mirror-deleted"
+		case .approvePullRequest: "Approved pull request #\(ref)"
+		case .rejectPullRequest: "Rejected pull request #\(ref)"
+		case .commentPull: "Commented on pull request #\(ref)"
+		case .publishRelease: "Published release"
+		case .pullReviewDismissed: "Dismissed review on pull request"
+		case .pullRequestReadyForReview: "Marked pull request ready for review"
+		case .autoMergePullRequest: "Auto-merged pull request"
 		}
 	}
 }
