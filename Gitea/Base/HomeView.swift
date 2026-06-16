@@ -10,9 +10,20 @@ import SwiftUI
 struct HomeView: View {
 	@State var showNotifications = false
 	@State var showNotificationsBadge = false
+	@State private var versionWarning: String?
 	@State private var starredState = LoadState<[Components.Schemas.Repository]>.loading
 
 	private func load() async {
+		if let version = try? await Network.shared.client.getVersion().ok.body.json.version {
+			let host = InstanceManager.selected?.host ?? ""
+			if InstanceManager.compareVersions(version, InstanceManager.minimumRequiredVersion) == .orderedAscending,
+			   InstanceManager.shouldShowVersionWarning(for: host, serverVersion: version) {
+				versionWarning = version
+			} else {
+				versionWarning = nil
+			}
+		}
+
 		if let count = try? await Network.shared.client.notifyNewAvailable().ok.body.json.new, count > 0 {
 			showNotificationsBadge = true
 		}
@@ -24,6 +35,19 @@ struct HomeView: View {
 
 	var body: some View {
 		List {
+			if let versionWarning {
+				Section {
+					Label("This instance runs Gitea \(versionWarning). Cup requires v\(InstanceManager.minimumRequiredVersion) or later — some features may not work.", systemImage: "exclamationmark.triangle.fill")
+						.swipeActions {
+							Button("Acknowledge", systemImage: "xmark") {
+								let host = InstanceManager.selected?.host ?? ""
+								InstanceManager.acknowledgeVersionWarning(for: host, serverVersion: versionWarning)
+								self.versionWarning = nil
+							}
+						}
+				}
+			}
+
 			Section("Your work") {
 				NavigationLink(destination: IssueSearchLoader(type: .issues)) {
 					Label("Issues", systemImage: Icons.issues.rawValue)

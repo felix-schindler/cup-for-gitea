@@ -4886,6 +4886,28 @@
           }
         }
       }
+    },
+    "Acknowledge" : {
+      "comment" : "A button that dismisses the version warning on the home screen.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen"
+          }
+        }
+      }
+    },
+    "This instance runs Gitea %@. Cup requires v%@ or later — some features may not work." : {
+      "comment" : "Warning shown on the home screen when the Gitea server version is below the minimum required version.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Instanz läuft mit Gitea %1$@. Cup benötigt v%2$@ oder neuer – einige Funktionen könnten nicht funktionieren."
+          }
+        }
+      }
     }
   },
   "version" : "1.2"

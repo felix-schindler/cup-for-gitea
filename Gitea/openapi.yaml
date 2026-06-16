@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: http://opensource.org/licenses/MIT
-  version: 1.26.1
+  version: 1.26.0
 servers:
   - url: /api/v1
 security:
