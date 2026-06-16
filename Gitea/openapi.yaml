@@ -21610,7 +21610,6 @@ components:
         - id
         - name
         - owner
-        - repository
         - type
         - version
     PackageFile:

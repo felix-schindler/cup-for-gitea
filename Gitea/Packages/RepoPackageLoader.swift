@@ -18,7 +18,7 @@ struct RepoPackageLoader: View {
 				path: .init(owner: owner),
 				query: .init(page: 1, limit: 50)
 			).ok.body.json
-			return packages.filter { $0.repository.name == repo }
+			return packages.filter { $0.repository?.name == repo }
 		}
 	}
 

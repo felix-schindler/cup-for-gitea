@@ -20,7 +20,11 @@ struct SmallPackageView: View {
 				title: {
 					Text(pkg.name)
 					ScrollView(.horizontal) {
-						Text("\(pkg._type) · \(pkg.version) · \(pkg.repository.fullName)")
+						if let name = pkg.repository?.fullName, name.isNotEmpty {
+							Text("\(pkg._type) · \(pkg.version) · \(name)")
+						} else {
+							Text("\(pkg._type) · \(pkg.version)")
+						}
 					}.font(.footnote)
 				},
 				icon: {
