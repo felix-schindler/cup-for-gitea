@@ -26,7 +26,7 @@ name: swiftui-cached-async-image, nameSpecified: swiftui-cached-async-image, own
 
 name: swiftui-math, nameSpecified: swiftui-math, owner: gonzalezreal, version: 0.1.0, source: https://github.com/gonzalezreal/swiftui-math
 
-name: textual, nameSpecified: textual, owner: gonzalezreal, version: 0.3.1, source: https://github.com/gonzalezreal/textual
+name: textual, nameSpecified: textual, owner: gonzalezreal, version: 0.5.0, source: https://github.com/gonzalezreal/textual
 
 name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.2, source: https://github.com/jpsim/Yams
 
