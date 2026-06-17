@@ -14,14 +14,21 @@ struct ActivityView: View {
 	var body: some View {
 		NavigationLink(destination: destinationView) {
 			VStack(alignment: .leading) {
-				if showActor {
+				HStack {
 					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
-							SmallUserView(activity.actUser)
-							PillView(verbatim: activity.repo.fullName)
-							PillView(verbatim: activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+							if showActor {
+								SmallUserView(activity.actUser)
+							}
+							NavigationLink(activity.repo.fullName, destination: FullRepoView(activity.repo))
+								.controlSize(.mini)
+								.buttonBorderShape(.capsule)
+								.adaptiveButtonStyleProminent()
 						}.font(.footnote)
 					}
+					Spacer()
+					Text(activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+						.font(.footnote)
 				}
 
 				HStack {
