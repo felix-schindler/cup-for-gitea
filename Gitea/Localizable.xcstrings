@@ -33,6 +33,16 @@
         }
       }
     },
+    "…and %lld more commits" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "…und %lld weitere Commits"
+          }
+        }
+      }
+    },
     ".gitignore" : {
       "localizations" : {
         "de" : {
