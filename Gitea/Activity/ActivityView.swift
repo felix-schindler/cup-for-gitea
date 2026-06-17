@@ -45,44 +45,44 @@ struct ActivityView: View {
 								.lineLimit(5)
 						}
 					}
-			case .commitRepo, .pushTag:
-				if let data = activity.content.data(using: .utf8),
-				   let pushContent = try? JSONDecoder().decode(PushActivityContent.self, from: data)
-				{
-					if let commits = pushContent.commits, commits.isNotEmpty {
-						VStack(alignment: .leading, spacing: 2) {
-							let displayLimit = commits.count == 4 ? 4 : 3
-							ForEach(commits.prefix(displayLimit), id: \.sha1) { commit in
-								HStack(spacing: 4) {
-									Text(commit.shaAbbreviated)
-										.monospaced()
-										.foregroundStyle(.secondary)
-									Text(commit.messageFirstLine)
+				case .commitRepo, .pushTag:
+					if let data = activity.content.data(using: .utf8),
+						let pushContent = try? JSONDecoder().decode(PushActivityContent.self, from: data)
+					{
+						if let commits = pushContent.commits, commits.isNotEmpty {
+							VStack(alignment: .leading, spacing: 2) {
+								let displayLimit = commits.count == 4 ? 4 : 3
+								ForEach(commits.prefix(displayLimit), id: \.sha1) { commit in
+									HStack(spacing: 4) {
+										Text(commit.shaAbbreviated)
+											.monospaced()
+											.foregroundStyle(.secondary)
+										Text(commit.messageFirstLine)
+									}
+									.font(.footnote)
+									.lineLimit(1)
 								}
-								.font(.footnote)
-								.lineLimit(1)
+								if commits.count > displayLimit {
+									Text("…and \(pushContent.len - 3) more commits")
+										.font(.caption)
+										.foregroundStyle(.secondary)
+								}
 							}
-							if commits.count > displayLimit {
-								Text("…and \(pushContent.len - 3) more commits")
-									.font(.caption)
-									.foregroundStyle(.secondary)
-							}
+						} else {
+							HeadCommitView(commit: pushContent.headCommit)
 						}
-					} else {
-						HeadCommitView(commit: pushContent.headCommit)
+					} else if activity.content.isNotEmpty {
+						Text(activity.content.emojized())
+							.font(.footnote)
+							.lineLimit(5)
 					}
-				} else if activity.content.isNotEmpty {
-					Text(activity.content.emojized())
-						.font(.footnote)
-						.lineLimit(5)
+				default:
+					if activity.content.isNotEmpty {
+						Text(activity.content.emojized())
+							.font(.footnote)
+							.lineLimit(5)
+					}
 				}
-			default:
-				if activity.content.isNotEmpty {
-					Text(activity.content.emojized())
-						.font(.footnote)
-						.lineLimit(5)
-				}
-			}
 			}
 		}
 		.buttonStyle(.plain)
