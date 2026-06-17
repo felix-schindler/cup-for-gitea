@@ -14,7 +14,7 @@ class InstanceManager {
 	private static let selectedKey = "selectedInstance"
 
 	// This is a fallback which should hopefully never be used
-	static let defaultInstance = GiteaInstance(host: "gitea.com", token: "")
+	static let defaultInstance = GiteaInstance(baseURL: URL(string: "https://gitea.com")!, token: "")
 
 	static let minimumRequiredVersion = "1.26.0"
 
@@ -66,6 +66,14 @@ class InstanceManager {
 			else {
 				return []
 			}
+			// Migration: if selectedId uses old bare-host format, remap to URL format
+			if let selectedId,
+				!instances.contains(where: { $0.id == selectedId }),
+				let migratedId = GiteaInstance.normalizedBaseURL(from: selectedId)?.absoluteString,
+				instances.contains(where: { $0.id == migratedId })
+			{
+				self.selectedId = migratedId
+			}
 			return instances
 		}
 		set {
@@ -85,8 +93,10 @@ class InstanceManager {
 	}
 
 	static var selected: GiteaInstance? {
+		// Access instances first to trigger migration (which may update selectedId)
+		let allInstances = instances
 		guard let id = selectedId else { return nil }
-		return instances.first { $0.id == id }
+		return allInstances.first { $0.id == id }
 	}
 
 	static func add(_ instance: GiteaInstance) {

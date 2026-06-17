@@ -36,7 +36,7 @@ struct SmallPackageView: View {
 					Text(pkg.createdAt.toString(timeStyle: .short))
 				}
 			}.font(.footnote)
-			
+
 			ScrollView(.horizontal) {
 				Text(pkg.version)
 					.font(.footnote)

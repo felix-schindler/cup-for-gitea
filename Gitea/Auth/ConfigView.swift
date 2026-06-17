@@ -12,19 +12,9 @@ struct ConfigView: View {
 
 	public private(set) var showSetup: Binding<Bool>? = nil
 
-	@State private var newHost = "gitea.com"
+	@State private var newURL = "https://gitea.com"
 	@State private var newToken = ""
 	@State private var errorMessage: LocalizedStringKey?
-
-	private func sanitizeHost(_ input: String) -> String {
-		let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
-		if trimmed.contains("/") {
-			if let tempUrl = URL(string: trimmed), let host = tempUrl.host {
-				return host
-			}
-		}
-		return trimmed
-	}
 
 	var body: some View {
 		Form {
@@ -39,7 +29,7 @@ struct ConfigView: View {
 
 			Section(
 				content: {
-					TextField("gitea.example.com", text: $newHost)
+					TextField("https://gitea.example.com", text: $newURL)
 						.keyboardType(.URL)
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
@@ -77,9 +67,8 @@ struct ConfigView: View {
 		}.toolbar {
 			AsyncButton("Save") {
 				errorMessage = nil
-				let host = sanitizeHost(newHost)
-				guard host.isNotEmpty else {
-					errorMessage = "Please provide a valid host"
+				guard let instance = GiteaInstance(serverURLString: newURL, token: newToken) else {
+					errorMessage = "Please provide a valid URL"
 					return
 				}
 				guard newToken.isNotEmpty else {
@@ -88,7 +77,6 @@ struct ConfigView: View {
 				}
 
 				do {
-					let instance = GiteaInstance(host: host, token: newToken)
 					try await Auth.login(
 						instance: instance,
 						showSetup: showSetup,
