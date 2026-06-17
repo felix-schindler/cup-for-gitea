@@ -245,5 +245,17 @@ struct FullRepoView: View {
 		}
 		.navigationTitle(repo.fullName)
 		.navigationBarTitleDisplayMode(.inline)
+		.userActivity("viewRepo") { activity in
+			activity.title = repo.fullName
+			activity.isEligibleForSearch = true
+			activity.isEligibleForPublicIndexing = true
+			activity.keywords = Set([repo.owner.login, repo.name] + (repo.topics ?? []))
+			activity.userInfo = [
+				"type": "repo",
+				"instanceURL": Network.baseURL.absoluteString,
+				"owner": repo.owner.login,
+				"repo": repo.name
+			]
+		}
 	}
 }

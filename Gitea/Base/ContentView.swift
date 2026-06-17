@@ -20,6 +20,7 @@ struct ContentView: View {
 	@AppStorage("padTab") var padTab: PadTab?
 	@AppStorage("appearance") var appearance = ""
 	@StateObject private var sessionStore = SessionStore.shared
+	@EnvironmentObject private var router: NavigationRouter
 	@State private var showSettings = false
 
 	var body: some View {
@@ -31,6 +32,11 @@ struct ContentView: View {
 			}
 		}.task {
 			sessionStore.refresh()
+		}.onChange(of: router.pendingTab) { _, newTab in
+			if let newTab {
+				tab = newTab
+				router.pendingTab = nil
+			}
 		}.preferredColorScheme(appearance == "dark" ? .dark : appearance == "light" ? .light : nil)
 	}
 
@@ -40,8 +46,11 @@ struct ContentView: View {
 			sidebar
 		} detail: {
 			if let padTab {
-				NavigationStack {
+				NavigationStack(path: $router.homePath) {
 					content(for: padTab)
+						.navigationDestination(for: SpotlightDestination.self) { dest in
+							destinationView(for: dest)
+						}
 				}
 			} else {
 				VStack {
@@ -71,7 +80,12 @@ struct ContentView: View {
 	private var iphoneBody: some View {
 		TabView(selection: $tab) {
 			Tab("Home", systemImage: Icons.home.rawValue, value: ContentTab.home) {
-				NavigationStack { HomeView() }
+				NavigationStack(path: $router.homePath) {
+					HomeView()
+						.navigationDestination(for: SpotlightDestination.self) { dest in
+							destinationView(for: dest)
+						}
+				}
 			}
 
 			Tab("Activity", systemImage: Icons.activity.rawValue, value: ContentTab.activity) {
@@ -117,6 +131,18 @@ struct ContentView: View {
 			SearchView()
 		case .settings:
 			SettingsView()
+		}
+	}
+
+	@ViewBuilder
+	private func destinationView(for dest: SpotlightDestination) -> some View {
+		switch dest {
+		case .repo(_, let owner, let repo):
+			RepoLoader(owner: owner, repo: repo)
+		case .issue(_, let owner, let repo, let number):
+			IssueLoader(owner: owner, repo: repo, index: number)
+		case .pullRequest(_, let owner, let repo, let number):
+			PullRequestLoader(owner: owner, repo: repo, index: number)
 		}
 	}
 }

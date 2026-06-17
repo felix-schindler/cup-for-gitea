@@ -16,6 +16,11 @@ class Network {
 		(InstanceManager.selected ?? InstanceManager.defaultInstance).baseURL
 	}
 
+	public static func invalidate() {
+		_client = nil
+		_instanceKey = nil
+	}
+
 	public static var shared: GiteaClient {
 		let instance = InstanceManager.selected ?? InstanceManager.defaultInstance
 		let key = "\(instance.baseURL.absoluteString):\(instance.token)"

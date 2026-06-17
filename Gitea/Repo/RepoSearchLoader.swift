@@ -204,6 +204,11 @@ struct RepoSearchLoader: View {
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: context.isSearchable)
 		}
+		.onChange(of: state) { oldState, newState in
+			if case .loading = oldState, case .loaded(let items) = newState, search.isEmpty {
+				Task { try? await SpotlightIndexer.index(repos: items) }
+			}
+		}
 		.navigationTitle(Text(navigationTitle))
 	}
 }

@@ -158,6 +158,33 @@ struct IssueView: View {
 		} message: { error in
 			Text(error.localizedDescription)
 		}
+		.userActivity(activityType) { activity in
+			activity.title = "\(item.data.displayRepositoryFullName)#\(item.data.displayNumber) \(item.data.displayTitle)"
+			activity.isEligibleForSearch = true
+			activity.isEligibleForPublicIndexing = true
+			activity.keywords = [item.data.displayRepositoryFullName, item.data.displayTitle]
+			activity.userInfo = [
+				"type": spotlightType,
+				"instanceURL": Network.baseURL.absoluteString,
+				"owner": item.data.displayOwner,
+				"repo": item.data.displayRepo,
+				"number": item.data.displayNumber
+			]
+		}
+	}
+
+	private var activityType: String {
+		switch item {
+		case .issue: "viewIssue"
+		case .pullRequest: "viewPullRequest"
+		}
+	}
+
+	private var spotlightType: String {
+		switch item {
+		case .issue: "issue"
+		case .pullRequest: "pullRequest"
+		}
 	}
 
 	@ToolbarContentBuilder

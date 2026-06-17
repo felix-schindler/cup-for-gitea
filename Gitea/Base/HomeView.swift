@@ -29,9 +29,13 @@ struct HomeView: View {
 			showNotificationsBadge = true
 		}
 
-		starredState = await LoadState {
+		let repos = await LoadState {
 			try await Network.shared.client.userCurrentListStarred().ok.body.json
 		}
+		if case .loaded(let loadedRepos) = repos, loadedRepos.isNotEmpty {
+			try? await SpotlightIndexer.index(repos: loadedRepos)
+		}
+		starredState = repos
 	}
 
 	var body: some View {

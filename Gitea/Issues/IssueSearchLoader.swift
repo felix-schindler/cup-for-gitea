@@ -192,6 +192,11 @@ struct IssueSearchLoader: View {
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: true)
 		}
+		.onChange(of: state) { oldState, newState in
+			if case .loading = oldState, case .loaded(let items) = newState, search.isEmpty, type == .issues {
+				Task { try? await SpotlightIndexer.index(issues: items) }
+			}
+		}
 		.navigationTitle(Text(navigationTitle))
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
