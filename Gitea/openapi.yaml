@@ -16135,7 +16135,6 @@ components:
       x-go-package: code.gitea.io/gitea/modules/structs
       required:
         - completed_at
-        - conclusion
         - created_at
         - head_sha
         - html_url
