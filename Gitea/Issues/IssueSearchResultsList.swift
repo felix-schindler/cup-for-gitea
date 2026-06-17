@@ -19,45 +19,44 @@ struct IssueSearchResultsList: View {
 	let emptyText: LocalizedStringResource
 	let onLoadMore: () async -> Void
 
-	var body: some View {
-		List {
-			if results.isEmpty {
-				if let error {
-					FailedView(error)
-				} else if isLoading {
-					LoadingView(loadingText, systemImage: icon)
-				} else {
-					NoContentView(emptyText, systemImage: icon)
-				}
+	private var state: LoadState<[Components.Schemas.Issue]> {
+		if results.isEmpty {
+			if let error {
+				.failed(error)
+			} else if isLoading {
+				.loading
 			} else {
-				ForEach(results, id: \.id) { issue in
-					rowView(for: issue)
-						.onAppear {
-							if issue.id == results.last?.id, hasMorePages {
-								Task { await onLoadMore() }
-							}
-						}
-				}
-				if isLoading {
-					Section {
-						LoadingView(loadingMoreText, systemImage: icon)
-					}
-				} else if let error {
-					Section {
-						FailedView(error)
-					}
-				}
+				.loaded([])
+			}
+		} else {
+			if isLoading {
+				.loadingMore(results)
+			} else if let error {
+				.failedMore(results, error)
+			} else {
+				.loaded(results)
 			}
 		}
 	}
 
-	@ViewBuilder
-	private func rowView(for issue: Components.Schemas.Issue) -> some View {
-		switch type {
-		case .issues:
-			SmallIssueView(issue)
-		case .pulls:
-			SmallIssueView(issue, isPullRequest: issue.pullRequest != nil)
+	var body: some View {
+		LoadableList(
+			state: state,
+			id: \.id,
+			loadingText: loadingText,
+			emptyText: emptyText,
+			icon: icon,
+			load: {},
+			loadMore: onLoadMore,
+			hasMorePages: hasMorePages,
+			loadingMoreText: loadingMoreText
+		) { issue in
+			switch type {
+			case .issues:
+				SmallIssueView(issue)
+			case .pulls:
+				SmallIssueView(issue, isPullRequest: issue.pullRequest != nil)
+			}
 		}
 	}
 }

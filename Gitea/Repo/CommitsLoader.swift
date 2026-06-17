@@ -57,7 +57,7 @@ struct CommitsLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Commits", systemImage: Icons.commits.rawValue)
-			case .loaded(let commits):
+			case .loaded(let commits), .loadingMore(let commits), .failedMore(let commits, _):
 				if commits.isEmpty {
 					NoContentView(
 						"No commits on \(ref)",
@@ -240,7 +240,7 @@ private struct CommitDiffView: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Diff", systemImage: "doc.text")
-			case .loaded(let diffText):
+			case .loaded(let diffText), .loadingMore(let diffText), .failedMore(let diffText, _):
 				DiffView(diffText: diffText)
 			case .failed(let failure):
 				FailedView(failure)

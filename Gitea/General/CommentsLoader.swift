@@ -29,7 +29,7 @@ struct CommentsLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading comments", systemImage: Icons.comments.rawValue)
-			case .loaded(let comments):
+			case .loaded(let comments), .loadingMore(let comments), .failedMore(let comments, _):
 				if comments.isEmpty {
 					NoContentView("There are no comments", systemImage: Icons.comments.rawValue)
 				} else {

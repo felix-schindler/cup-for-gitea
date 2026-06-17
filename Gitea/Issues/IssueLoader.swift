@@ -20,7 +20,7 @@ struct IssueLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Issue", systemImage: Icons.issues.rawValue)
-			case .loaded(let issue):
+			case .loaded(let issue), .loadingMore(let issue), .failedMore(let issue, _):
 				IssueView(issue)
 			case .failed(let failure):
 				FailedView(failure)

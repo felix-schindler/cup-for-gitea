@@ -16,7 +16,7 @@ struct RepoPackageLoader: View {
 		state = await LoadState {
 			let packages = try await Network.shared.client.listPackages(
 				path: .init(owner: owner),
-				query: .init(page: 1, limit: 50)
+				query: .init(page: 1, limit: 7)
 			).ok.body.json
 			return packages.filter { $0.repository?.name == repo }
 		}

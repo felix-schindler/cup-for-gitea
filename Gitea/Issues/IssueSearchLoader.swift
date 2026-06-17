@@ -13,11 +13,10 @@ struct IssueSearchLoader: View {
 	let repo: String?
 
 	@State private var search: String = ""
-	@State private var results: [Components.Schemas.Issue] = []
-	@State private var error: Error?
-	@State private var isLoadingPage = false
+	@State private var state = LoadState<[Components.Schemas.Issue]>.loading
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var isLoadingMore = false
 	@State private var currentUsername: String?
 	@State private var filters: IssueSearchFilters
 	@State private var showFilters = false
@@ -110,21 +109,27 @@ struct IssueSearchLoader: View {
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		results = []
-		error = nil
+		guard !isLoadingMore else { return }
+		state = .loading
 		currentPage = 1
 		hasMorePages = true
-		isLoadingPage = false
 		await loadNextPage(debounced: debounced)
 	}
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingPage, hasMorePages else { return }
-		isLoadingPage = true
-		defer { isLoadingPage = false }
+		guard !isLoadingMore, hasMorePages else { return }
+		isLoadingMore = true
+		defer { isLoadingMore = false }
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
+		}
+		let currentItems: [Components.Schemas.Issue]
+		if case .loaded(let items) = state {
+			currentItems = items
+			state = .loadingMore(items)
+		} else {
+			currentItems = []
 		}
 		do {
 			if needsCurrentUser, currentUsername == nil {
@@ -134,8 +139,9 @@ struct IssueSearchLoader: View {
 			if Task.isCancelled { return }
 			if results.isEmpty {
 				hasMorePages = false
+				state = .loaded(currentItems)
 			} else {
-				self.results.append(contentsOf: results)
+				state = .loaded(currentItems + results)
 				let limit = filters.limitValue ?? defaultLimit
 				if results.count < limit {
 					hasMorePages = false
@@ -143,11 +149,13 @@ struct IssueSearchLoader: View {
 					currentPage += 1
 				}
 			}
-			isLoadingPage = false
 		} catch {
 			if Task.isCancelled { return }
-			self.error = error
-			isLoadingPage = false
+			if currentItems.isEmpty {
+				state = .failed(error)
+			} else {
+				state = .failedMore(currentItems, error)
+			}
 		}
 	}
 
@@ -162,25 +170,27 @@ struct IssueSearchLoader: View {
 	}
 
 	var body: some View {
-		IssueSearchResultsList(
-			type: type,
-			results: results,
-			error: error,
-			icon: icon,
-			isLoading: isLoadingPage,
-			hasMorePages: hasMorePages,
+		LoadableList(
+			state: state,
+			id: \.id,
 			loadingText: loadingText,
-			loadingMoreText: loadingMoreText,
-			emptyText: emptyText
-		) {
-			await loadNextPage()
+			emptyText: emptyText,
+			icon: icon,
+			load: { await resetAndLoad() },
+			loadMore: { await loadNextPage() },
+			hasMorePages: hasMorePages,
+			loadingMoreText: loadingMoreText
+		) { issue in
+			switch type {
+			case .issues:
+				SmallIssueView(issue)
+			case .pulls:
+				SmallIssueView(issue, isPullRequest: issue.pullRequest != nil)
+			}
 		}
 		.searchable(text: $search, prompt: Text(searchPrompt))
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: true)
-		}
-		.refreshable {
-			await resetAndLoad()
 		}
 		.navigationTitle(Text(navigationTitle))
 		.toolbar {

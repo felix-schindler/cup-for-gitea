@@ -28,7 +28,7 @@ struct PullRequestLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Pull Request", systemImage: Icons.pull_requests.rawValue)
-			case .loaded(let pr):
+			case .loaded(let pr), .loadingMore(let pr), .failedMore(let pr, _):
 				IssueView(pr)
 			case .failed(let failure):
 				FailedView(failure)

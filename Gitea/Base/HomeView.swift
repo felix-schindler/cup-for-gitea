@@ -74,7 +74,7 @@ struct HomeView: View {
 				switch starredState {
 				case .loading:
 					LoadingView("Loading starred repositories", systemImage: Icons.starred.rawValue)
-				case .loaded(let repos):
+				case .loaded(let repos), .loadingMore(let repos), .failedMore(let repos, _):
 					if repos.isEmpty {
 						NoContentView("You don't have starred repositories", systemImage: Icons.starred.rawValue)
 					} else {

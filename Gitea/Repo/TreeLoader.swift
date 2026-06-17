@@ -70,7 +70,7 @@ struct TreeLoader: View {
 				switch state {
 				case .loading:
 					LoadingView("Loading files", systemImage: "folder")
-				case .loaded(let entries):
+				case .loaded(let entries), .loadingMore(let entries), .failedMore(let entries, _):
 					if entries.isEmpty {
 						NoContentView("No files", systemImage: "folder")
 					} else {

@@ -26,7 +26,7 @@ struct NamespaceLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading namespace", systemImage: "person.3")
-			case .loaded(let org):
+			case .loaded(let org), .loadingMore(let org), .failedMore(let org, _):
 				OrgView(org: org)
 			case .failed:
 				UserLoader(username: owner)

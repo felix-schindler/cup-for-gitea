@@ -56,14 +56,13 @@ struct UserSearchLoader: View {
 	let context: UserSearchContext
 
 	@State private var search: String = ""
-	@State private var results: [Components.Schemas.User] = []
-	@State private var error: Error?
-	@State private var isLoadingPage = false
+	@State private var state = LoadState<[Components.Schemas.User]>.loading
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var isLoadingMore = false
 
 	private let debounceNanoseconds: UInt64 = 350_000_000
-	private let defaultLimit = 20
+	private let defaultLimit = 7
 
 	private var queryKey: String {
 		switch context {
@@ -110,82 +109,59 @@ struct UserSearchLoader: View {
 	}
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingPage, hasMorePages else { return }
-		isLoadingPage = true
+		guard !isLoadingMore, hasMorePages else { return }
+		isLoadingMore = true
+		defer { isLoadingMore = false }
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
 		}
+		let currentItems: [Components.Schemas.User]
+		if case .loaded(let items) = state {
+			currentItems = items
+			state = .loadingMore(items)
+		} else {
+			currentItems = []
+		}
 		do {
 			let page = try await loadUsers()
 			if Task.isCancelled { return }
-			if page.isEmpty {
+			state = .loaded(currentItems + page)
+			if page.count < defaultLimit {
 				hasMorePages = false
 			} else {
-				results.append(contentsOf: page)
-				if page.count < defaultLimit {
-					hasMorePages = false
-				} else {
-					currentPage += 1
-				}
+				currentPage += 1
 			}
 		} catch {
 			if Task.isCancelled { return }
-			self.error = error
+			if currentItems.isEmpty {
+				state = .failed(error)
+			} else {
+				state = .failedMore(currentItems, error)
+			}
 		}
-		isLoadingPage = false
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		results = []
-		error = nil
+		guard !isLoadingMore else { return }
+		state = .loading
 		currentPage = 1
 		hasMorePages = true
-		isLoadingPage = false
 		await loadNextPage(debounced: debounced)
 	}
 
 	var body: some View {
-		listContent
-			.task(id: queryKey) {
-				await resetAndLoad(debounced: context.isSearchable)
-			}
-			.refreshable {
-				await resetAndLoad()
-			}
-			.navigationTitle(Text(context.navigationTitle))
-	}
-
-	@ViewBuilder
-	private var listContent: some View {
-		List {
-			if results.isEmpty {
-				if let error {
-					FailedView(error)
-				} else if isLoadingPage {
-					LoadingView(context.loadingText, systemImage: context.icon)
-				} else {
-					NoContentView(context.emptyText, systemImage: context.icon)
-				}
-			} else {
-				ForEach(results, id: \.id) { user in
-					SmallUserView(user, avatarSize: .medium)
-						.onAppear {
-							if user.id == results.last?.id, hasMorePages {
-								Task { await loadNextPage() }
-							}
-						}
-				}
-				if isLoadingPage {
-					Section {
-						LoadingView("Loading more", systemImage: context.icon)
-					}
-				} else if let error {
-					Section {
-						FailedView(error)
-					}
-				}
-			}
+		LoadableList(
+			state: state,
+			id: \.id,
+			loadingText: context.loadingText,
+			emptyText: context.emptyText,
+			icon: context.icon,
+			load: { await resetAndLoad() },
+			loadMore: { await loadNextPage() },
+			hasMorePages: hasMorePages
+		) { user in
+			SmallUserView(user, avatarSize: .medium)
 		}
 		.modifier { view in
 			if context.isSearchable {
@@ -194,5 +170,9 @@ struct UserSearchLoader: View {
 				view
 			}
 		}
+		.task(id: queryKey) {
+			await resetAndLoad(debounced: context.isSearchable)
+		}
+		.navigationTitle(Text(context.navigationTitle))
 	}
 }

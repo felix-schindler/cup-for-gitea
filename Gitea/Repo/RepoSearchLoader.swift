@@ -26,17 +26,16 @@ struct RepoSearchLoader: View {
 	let starredBy: Int64?
 
 	@State private var search: String
-	@State private var results: [Components.Schemas.Repository] = []
-	@State private var error: Error?
-	@State private var isLoadingPage = false
+	@State private var state = LoadState<[Components.Schemas.Repository]>.loading
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var isLoadingMore = false
 	@State private var filters = RepoSearchFilters()
 	@State private var showFilters = false
 	@State private var resolvedUserID: Int64?
 
 	private let debounceNanoseconds: UInt64 = 350_000_000
-	private let defaultLimit = 20
+	private let defaultLimit = 7
 
 	init(context: RepoContext = .search, search: String = "", starredBy: Int64? = nil, limitToTopic: Bool = false) {
 		self.context = context
@@ -74,39 +73,45 @@ struct RepoSearchLoader: View {
 	private var icon: String { Icons.repositories.rawValue }
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingPage, hasMorePages else { return }
-		isLoadingPage = true
+		guard !isLoadingMore, hasMorePages else { return }
+		isLoadingMore = true
+		defer { isLoadingMore = false }
 		if debounced {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
 		}
+		let currentItems: [Components.Schemas.Repository]
+		if case .loaded(let items) = state {
+			currentItems = items
+			state = .loadingMore(items)
+		} else {
+			currentItems = []
+		}
 		do {
 			let page = try await loadRepos()
 			if Task.isCancelled { return }
-			if page.isEmpty {
+			state = .loaded(currentItems + page)
+			let limit = filters.limitValue ?? defaultLimit
+			if page.count < limit {
 				hasMorePages = false
 			} else {
-				results.append(contentsOf: page)
-				let limit = filters.limitValue ?? defaultLimit
-				if page.count < limit {
-					hasMorePages = false
-				} else {
-					currentPage += 1
-				}
+				currentPage += 1
 			}
 		} catch {
 			if Task.isCancelled { return }
-			self.error = error
+			if currentItems.isEmpty {
+				state = .failed(error)
+			} else {
+				state = .failedMore(currentItems, error)
+			}
 		}
-		isLoadingPage = false
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		results = []
-		error = nil
+		guard !isLoadingMore else { return }
+		state = .loading
 		currentPage = 1
 		hasMorePages = true
-		isLoadingPage = false
 		await loadNextPage(debounced: debounced)
 	}
 
@@ -161,17 +166,18 @@ struct RepoSearchLoader: View {
 	}
 
 	var body: some View {
-		RepoSearchResultsList(
-			results: results,
-			error: error,
-			icon: icon,
-			isLoading: isLoadingPage,
-			hasMorePages: hasMorePages,
+		LoadableList(
+			state: state,
+			id: \.id,
 			loadingText: "Loading repositories",
-			loadingMoreText: "Loading more repositories",
-			emptyText: "There are no repositories"
-		) {
-			await loadNextPage()
+			emptyText: "There are no repositories",
+			icon: icon,
+			load: { await resetAndLoad() },
+			loadMore: { await loadNextPage() },
+			hasMorePages: hasMorePages,
+			loadingMoreText: "Loading more repositories"
+		) { repo in
+			SmallRepoView(repo)
 		}
 		.modifier { view in
 			if context.isSearchable {
@@ -197,9 +203,6 @@ struct RepoSearchLoader: View {
 		}
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: context.isSearchable)
-		}
-		.refreshable {
-			await resetAndLoad()
 		}
 		.navigationTitle(Text(navigationTitle))
 	}

@@ -29,7 +29,7 @@ struct TopicsSearchLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Topics", systemImage: icon)
-			case .loaded(let topics):
+			case .loaded(let topics), .loadingMore(let topics), .failedMore(let topics, _):
 				if topics.isEmpty {
 					NoContentView("There are no Topics", systemImage: icon)
 				} else {

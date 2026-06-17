@@ -26,7 +26,7 @@ struct RepoWorktimeLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading work times", systemImage: "clock")
-			case .loaded(let entries):
+			case .loaded(let entries), .loadingMore(let entries), .failedMore(let entries, _):
 				if entries.isEmpty {
 					NoContentView("There are no tracked times", systemImage: "clock")
 				} else {

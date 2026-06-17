@@ -16,16 +16,15 @@ struct ActivityLoader: View {
 
 	let context: Context
 
-	@State private var results: [Components.Schemas.Activity] = []
-	@State private var error: Error?
-	@State private var isLoadingPage = false
+	@State private var state = LoadState<[Components.Schemas.Activity]>.loading
 	@State private var hasMorePages = true
 	@State private var currentPage = 1
+	@State private var isLoadingMore = false
 	@State private var heatmap: [Components.Schemas.UserHeatmapData]?
 	@State private var heatmapError: Error?
 	@State private var userLogin: String?
 
-	private let defaultLimit = 20
+	private let defaultLimit = 7
 
 	private var showHeatmap: Bool {
 		if case .org = context { return false }
@@ -39,36 +38,39 @@ struct ActivityLoader: View {
 
 	var body: some View {
 		List {
-			if results.isEmpty && isLoadingPage {
+			switch state {
+			case .loading:
 				LoadingView("Loading activity", systemImage: Icons.activity.rawValue)
-			} else if results.isEmpty {
-				if let error {
-					FailedView(error)
-				} else {
-					Section {
+			case .failed(let error):
+				FailedView(error)
+			case .loaded(let data), .loadingMore(let data), .failedMore(let data, _):
+				if data.isEmpty {
+					if case .failedMore(_, let error) = state {
+						FailedView(error)
+					} else {
 						NoContentView("No recent activity", systemImage: Icons.activity.rawValue)
 					}
-				}
-			} else {
-				if showHeatmap, let heatmap, heatmap.isNotEmpty {
-					ContributionGraphView(data: heatmap)
-						.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
-						.listRowBackground(Color.clear)
-				}
-
-				Section {
-					ForEach(results, id: \.id) { activity in
-						ActivityView(activity: activity, showActor: showActor)
-							.onAppear {
-								if activity.id == results.last?.id, hasMorePages {
-									Task { await loadNextPage() }
-								}
-							}
+				} else {
+					if showHeatmap, let heatmap, heatmap.isNotEmpty {
+						ContributionGraphView(data: heatmap)
+							.listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
+							.listRowBackground(Color.clear)
 					}
-					if isLoadingPage {
-						LoadingView("Loading more", systemImage: Icons.activity.rawValue)
-					} else if let error {
-						FailedView(error)
+
+					Section {
+						ForEach(data, id: \.id) { activity in
+							ActivityView(activity: activity, showActor: showActor)
+								.onAppear {
+									if activity.id == data.last?.id, hasMorePages {
+										Task { await loadNextPage() }
+									}
+								}
+						}
+						if case .loadingMore = state {
+							LoadingView("Loading more", systemImage: Icons.activity.rawValue)
+						} else if case .failedMore(_, let error) = state {
+							FailedView(error)
+						}
 					}
 				}
 			}
@@ -83,11 +85,11 @@ struct ActivityLoader: View {
 	}
 
 	private func resetAndLoad() async {
-		results = []
-		error = nil
+		guard !isLoadingMore else { return }
+		state = .loading
 		currentPage = 1
 		hasMorePages = true
-		isLoadingPage = false
+		isLoadingMore = false
 		userLogin = nil
 		if showHeatmap {
 			heatmap = nil
@@ -97,9 +99,16 @@ struct ActivityLoader: View {
 	}
 
 	private func loadNextPage() async {
-		guard !isLoadingPage, hasMorePages else { return }
-		isLoadingPage = true
-		defer { isLoadingPage = false }
+		guard !isLoadingMore, hasMorePages else { return }
+		isLoadingMore = true
+		defer { isLoadingMore = false }
+		let currentItems: [Components.Schemas.Activity]
+		if case .loaded(let items) = state {
+			currentItems = items
+			state = .loadingMore(items)
+		} else {
+			currentItems = []
+		}
 		do {
 			let activities: [Components.Schemas.Activity]
 			switch context {
@@ -135,7 +144,7 @@ struct ActivityLoader: View {
 				).ok.body.json
 			}
 			if Task.isCancelled { return }
-			results.append(contentsOf: activities)
+			state = .loaded(currentItems + activities)
 			if activities.count < defaultLimit {
 				hasMorePages = false
 			} else {
@@ -143,7 +152,11 @@ struct ActivityLoader: View {
 			}
 		} catch {
 			if Task.isCancelled { return }
-			self.error = error
+			if currentItems.isEmpty {
+				state = .failed(error)
+			} else {
+				state = .failedMore(currentItems, error)
+			}
 		}
 	}
 

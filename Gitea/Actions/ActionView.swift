@@ -43,7 +43,7 @@ struct ActionView: View {
 		jobsState = await LoadState {
 			try await Network.shared.client.listWorkflowRunJobs(
 				path: .init(owner: owner, repo: repo, run: Int(run.id)),
-				query: .init(page: 1, limit: 50)
+				query: .init(page: 1, limit: 7)
 			).ok.body.json.jobs
 		}
 	}
@@ -124,7 +124,7 @@ struct ActionView: View {
 				switch jobsState {
 				case .loading:
 					LoadingView("Loading jobs", systemImage: Icons.actions.rawValue)
-				case .loaded(let jobs):
+				case .loaded(let jobs), .loadingMore(let jobs), .failedMore(let jobs, _):
 					if jobs.isEmpty {
 						NoContentView("No jobs", systemImage: Icons.actions.rawValue)
 					} else {

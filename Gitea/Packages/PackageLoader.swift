@@ -15,7 +15,7 @@ struct PackageLoader: View {
 		state = await LoadState {
 			try await Network.shared.client.listPackages(
 				path: .init(owner: owner),
-				query: .init(page: 1, limit: 50)
+				query: .init(page: 1, limit: 7)
 			).ok.body.json
 		}
 	}

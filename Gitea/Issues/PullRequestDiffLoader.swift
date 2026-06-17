@@ -26,7 +26,7 @@ struct PullRequestDiffLoader: View {
 			switch state {
 			case .loading:
 				LoadingView("Loading Diff", systemImage: "doc.text")
-			case .loaded(let diffText):
+			case .loaded(let diffText), .loadingMore(let diffText), .failedMore(let diffText, _):
 				DiffView(diffText: diffText)
 			case .failed(let failure):
 				FailedView(failure)
