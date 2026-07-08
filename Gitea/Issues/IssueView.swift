@@ -652,10 +652,7 @@ struct IssueView: View {
 				}
 			}
 		case .pullRequest(let pullRequest):
-			if pullRequest.draft {
-				PillView("Draft", systemImage: "pencil")
-					.font(.footnote)
-			}
+			EmptyView()
 		}
 	}
 
