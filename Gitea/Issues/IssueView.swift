@@ -790,12 +790,14 @@ struct IssueView: View {
 						HStack {
 							Text("\(changedFiles) files changed")
 							Spacer()
-							HStack {
+							VStack {
 								Text("+\(additions)")
 									.foregroundStyle(.green)
 								Text("-\(deletions)")
 									.foregroundStyle(.red)
-							}.monospaced()
+							}
+							.monospaced()
+							.font(.footnote)
 						}
 					},
 					icon: {
