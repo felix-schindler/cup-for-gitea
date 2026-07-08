@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Textual
+import MarkdownView
 
 protocol IssueDisplayable {
 	var displayNavigationTitle: LocalizedStringResource { get }
@@ -96,9 +97,15 @@ struct IssueView: View {
 
 			if item.data.displayBody.isNotEmpty {
 				Section("Description") {
-					StructuredText(markdown: item.data.displayBody.emojized())
-						.textual.structuredTextStyle(.gitHub)
-						.textual.textSelection(.enabled)
+					MarkdownUI(
+						body: item.data.displayBody.emojized(),
+						css: "body { margin: 0 } :first-child { margin-top: 0 } :last-child { margin-bottom: 0 }",
+						stylesheets: [URL(string: "https://raw.githubusercontent.com/sindresorhus/github-markdown-css/refs/heads/main/github-markdown.css")!],
+						styled: false
+					)
+					// StructuredText(markdown: item.data.displayBody.emojized())
+					// 	.textual.structuredTextStyle(.gitHub)
+					// 	.textual.textSelection(.enabled)
 				}
 			}
 

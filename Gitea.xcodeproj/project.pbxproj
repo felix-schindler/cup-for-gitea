@@ -14,6 +14,7 @@
 		DC5C68BD2FAFF7250012D957 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */; };
 		DC5C68C12FAFF7410012D957 /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C68C02FAFF7410012D957 /* Highlightr */; };
 		DC5C6A622FB04B200012D957 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DC5C6A072FB047350012D957 /* Settings.bundle */; };
+		DCB7D4D82FF808A7001C8574 /* MarkdownView in Frameworks */ = {isa = PBXBuildFile; productRef = DCB7D4D72FF808A7001C8574 /* MarkdownView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 				DC39503C2FAFE94400D5984A /* OpenAPIRuntime in Frameworks */,
 				DC5C68BD2FAFF7250012D957 /* CachedAsyncImage in Frameworks */,
 				DC39503F2FAFE95500D5984A /* OpenAPIURLSession in Frameworks */,
+				DCB7D4D82FF808A7001C8574 /* MarkdownView in Frameworks */,
 				DC3382D92FB4CD4900EBB6D4 /* HighlightedTextEditor in Frameworks */,
 				DC3950342FAFE7D900D5984A /* Textual in Frameworks */,
 			);
@@ -92,6 +94,7 @@
 				DC5C68BC2FAFF7250012D957 /* CachedAsyncImage */,
 				DC5C68C02FAFF7410012D957 /* Highlightr */,
 				DC3382D82FB4CD4900EBB6D4 /* HighlightedTextEditor */,
+				DCB7D4D72FF808A7001C8574 /* MarkdownView */,
 			);
 			productName = Gitea;
 			productReference = DC394FFC2FAFE4BC00D5984A /* Gitea.app */;
@@ -130,6 +133,7 @@
 				DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 				DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */,
 				DC3382D72FB4CD4900EBB6D4 /* XCRemoteSwiftPackageReference "HighlightedTextEditor" */,
+				DCB7D4D62FF808A7001C8574 /* XCRemoteSwiftPackageReference "MarkdownView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DC394FFD2FAFE4BC00D5984A /* Products */;
@@ -455,6 +459,14 @@
 				minimumVersion = 2.3.0;
 			};
 		};
+		DCB7D4D62FF808A7001C8574 /* XCRemoteSwiftPackageReference "MarkdownView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/keitaoouchi/MarkdownView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -492,6 +504,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */;
 			productName = Highlightr;
+		};
+		DCB7D4D72FF808A7001C8574 /* MarkdownView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DCB7D4D62FF808A7001C8574 /* XCRemoteSwiftPackageReference "MarkdownView" */;
+			productName = MarkdownView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
