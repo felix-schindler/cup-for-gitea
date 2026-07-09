@@ -9,7 +9,7 @@ struct PullRequestDiffLoader: View {
 	@State private var state = LoadState<String>.loading
 
 	private func load() async {
-		state = await LoadState {
+		do {
 			let raw = try await Network.shared.client.repoDownloadPullDiffOrPatch(
 				.init(
 					path: .init(owner: owner, repo: repo, index: index, diffType: .diff),
@@ -17,7 +17,9 @@ struct PullRequestDiffLoader: View {
 				)
 			).ok.body.plainText
 
-			return try await String(collecting: raw, upTo: 2 * 1024 * 1024)
+			state = .loaded(try await String(collecting: raw, upTo: 2 * 1024 * 1024))
+		} catch {
+			state = .failed(error)
 		}
 	}
 

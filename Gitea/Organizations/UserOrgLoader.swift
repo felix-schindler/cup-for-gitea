@@ -16,12 +16,14 @@ struct UserOrgLoader: View {
 	}
 
 	func load() async {
-		state = await LoadState {
+		do {
 			if let username {
-				try await Network.shared.client.orgListUserOrgs(.init(path: .init(username: username))).ok.body.json
+				state = .loaded(try await Network.shared.client.orgListUserOrgs(.init(path: .init(username: username))).ok.body.json)
 			} else {
-				try await Network.shared.client.orgListCurrentUserOrgs().ok.body.json
+				state = .loaded(try await Network.shared.client.orgListCurrentUserOrgs().ok.body.json)
 			}
+		} catch {
+			state = .failed(error)
 		}
 	}
 

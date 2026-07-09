@@ -13,12 +13,14 @@ struct RepoPackageLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Package]>.loading
 
 	func load() async {
-		state = await LoadState {
+		do {
 			let packages = try await Network.shared.client.listPackages(
 				path: .init(owner: owner),
 				query: .init(page: 1, limit: 7)
 			).ok.body.json
-			return packages.filter { $0.repository?.name == repo }
+			state = .loaded(packages.filter { $0.repository?.name == repo })
+		} catch {
+			state = .failed(error)
 		}
 	}
 

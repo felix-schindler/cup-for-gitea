@@ -12,11 +12,14 @@ struct PackageLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Package]>.loading
 
 	func load() async {
-		state = await LoadState {
-			try await Network.shared.client.listPackages(
-				path: .init(owner: owner),
-				query: .init(page: 1, limit: 7)
-			).ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client.listPackages(
+					path: .init(owner: owner),
+					query: .init(page: 1, limit: 7)
+				).ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

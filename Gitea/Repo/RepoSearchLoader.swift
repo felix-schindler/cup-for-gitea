@@ -27,14 +27,11 @@ struct RepoSearchLoader: View {
 
 	@State private var search: String
 	@State private var state = LoadState<[Components.Schemas.Repository]>.loading
-	@State private var hasMorePages = true
-	@State private var currentPage = 1
-	@State private var isLoadingMore = false
+	@State private var paging = Paging()
 	@State private var filters = RepoSearchFilters()
 	@State private var showFilters = false
 	@State private var resolvedUserID: Int64?
 
-	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
 
 	init(context: RepoContext = .search, search: String = "", starredBy: Int64? = nil, limitToTopic: Bool = false) {
@@ -73,54 +70,28 @@ struct RepoSearchLoader: View {
 	private var icon: String { Icons.repositories.rawValue }
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingMore, hasMorePages else { return }
-		isLoadingMore = true
-		defer { isLoadingMore = false }
 		if debounced {
-			try? await Task.sleep(nanoseconds: debounceNanoseconds)
-			if Task.isCancelled { return }
+			try? await Task.sleep(nanoseconds: 350_000_000)
+			guard !Task.isCancelled else { return }
 		}
-		let currentItems: [Components.Schemas.Repository]
-		if case .loaded(let items) = state {
-			currentItems = items
-			state = .loadingMore(items)
-		} else {
-			currentItems = []
-		}
-		do {
-			let page = try await loadRepos()
-			if Task.isCancelled { return }
-			state = .loaded(currentItems + page)
-			let limit = filters.limitValue ?? defaultLimit
-			if page.count < limit {
-				hasMorePages = false
-			} else {
-				currentPage += 1
-			}
-		} catch {
-			if Task.isCancelled { return }
-			if currentItems.isEmpty {
-				state = .failed(error)
-			} else {
-				state = .failedMore(currentItems, error)
-			}
+		(state, paging) = await paging.nextPage(state: state, limit: filters.limitValue ?? defaultLimit) { page in
+			try await loadRepos(page: page)
 		}
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		guard !isLoadingMore else { return }
+		guard !paging.isLoading else { return }
 		state = .loading
-		currentPage = 1
-		hasMorePages = true
+		paging.reset()
 		await loadNextPage(debounced: debounced)
 	}
 
-	private func loadRepos() async throws -> [Components.Schemas.Repository] {
+	private func loadRepos(page: Int) async throws -> [Components.Schemas.Repository] {
 		switch context {
 		case .teamRepos(let teamId, _):
 			return try await Network.shared.client.orgListTeamRepos(
 				path: .init(id: teamId),
-				query: .init(page: currentPage, limit: defaultLimit)
+				query: .init(page: page, limit: defaultLimit)
 			).ok.body.json
 		default:
 			break
@@ -159,7 +130,7 @@ struct RepoSearchLoader: View {
 					exclusive: resolvedUserID != nil ? true : nil,
 					sort: filters.sortValue,
 					order: filters.order == .desc ? "desc" : nil,
-					page: currentPage,
+					page: page,
 					limit: limit
 				))
 		).ok.body.json.data
@@ -174,7 +145,7 @@ struct RepoSearchLoader: View {
 			icon: icon,
 			load: { await resetAndLoad() },
 			loadMore: { await loadNextPage() },
-			hasMorePages: hasMorePages,
+			hasMorePages: paging.hasMore,
 			loadingMoreText: "Loading more repositories"
 		) { repo in
 			SmallRepoView(repo)
@@ -197,9 +168,7 @@ struct RepoSearchLoader: View {
 			}
 		}
 		.sheet(isPresented: $showFilters) {
-			NavigationStack {
-				RepoSearchFiltersSheet(filters: $filters)
-			}
+			RepoSearchFiltersSheet(filters: $filters)
 		}
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: context.isSearchable)

@@ -14,8 +14,10 @@ struct ReleaseLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Release]>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client.repoListReleases(path: .init(owner: owner, repo: repo)).ok.body.json
+		do {
+			state = .loaded(try await Network.shared.client.repoListReleases(path: .init(owner: owner, repo: repo)).ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

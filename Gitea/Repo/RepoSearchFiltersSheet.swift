@@ -2,10 +2,9 @@ import SwiftUI
 
 struct RepoSearchFiltersSheet: View {
 	@Binding var filters: RepoSearchFilters
-	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
-		Form {
+		FilterSheet(filters: $filters, initialValue: RepoSearchFilters()) {
 			Section("Sort & Order") {
 				Picker("Sort by", selection: $filters.sort) {
 					ForEach(RepoSearchFilters.SortOption.allCases, id: \.self) { option in
@@ -70,20 +69,6 @@ struct RepoSearchFiltersSheet: View {
 			Section("Pagination") {
 				TextField("Page limit", text: $filters.limitText)
 					.keyboardType(.numberPad)
-			}
-		}
-		.scrollDismissesKeyboard(.immediately)
-		.navigationTitle("Filters")
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button("Reset") {
-					filters = RepoSearchFilters()
-				}
-			}
-			ToolbarItem(placement: .confirmationAction) {
-				Button("Done", systemImage: "checkmark") {
-					dismiss()
-				}
 			}
 		}
 	}

@@ -14,10 +14,13 @@ struct MilestonesLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Milestone]>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client
-				.issueGetMilestonesList(.init(path: .init(owner: owner, repo: repo)))
-				.ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client
+					.issueGetMilestonesList(.init(path: .init(owner: owner, repo: repo)))
+					.ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

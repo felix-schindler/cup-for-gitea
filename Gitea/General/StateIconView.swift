@@ -11,13 +11,9 @@ struct StateIconView: View {
 	let icon: String
 	let color: Color
 
-	init(
-		_ _type: Components.Schemas.NotificationSubject._TypePayload,
-		_ state: Components.Schemas.NotificationSubject.StatePayload,
-		isDraft: Bool = false
-	) {
+	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.NotificationSubject.StatePayload, isDraft: Bool = false) {
 		self.icon =
-			switch _type {
+			switch type {
 			case .issue:
 				Icons.issues.rawValue
 			case .pull:
@@ -25,12 +21,9 @@ struct StateIconView: View {
 					Icons.pull_requests.rawValue
 				} else {
 					switch state {
-					case .open:
-						Icons.pull_requests.rawValue
-					case .closed:
-						Icons.pull_request_closed.rawValue
-					case .merged:
-						Icons.pull_request_merged.rawValue
+					case .open: Icons.pull_requests.rawValue
+					case .closed: Icons.pull_request_closed.rawValue
+					case .merged: Icons.pull_request_merged.rawValue
 					}
 				}
 			case .commit:
@@ -40,52 +33,17 @@ struct StateIconView: View {
 			}
 
 		self.color =
-			if isDraft {
-				.secondary
-			} else {
+			if isDraft { .secondary } else {
 				switch state {
-				case .open:
-					.green
-				case .closed:
-					.red
-				case .merged:
-					.purple
+				case .open: .green
+				case .closed: .red
+				case .merged: .purple
 				}
 			}
 	}
 
-	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.Issue.StatePayload) {
-		if type != .issue {
-			fatalError("Wrong initializer")
-		}
-
-		self.icon = Icons.issues.rawValue
-		self.color =
-			switch state {
-			case .open:
-				.green
-			case .closed:
-				.red
-			}
-	}
-
-	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.PullRequest.StatePayload) {
-		if type != .pull {
-			fatalError("Wrong initializer")
-		}
-
-		self.icon = Icons.pull_requests.rawValue
-		self.color =
-			switch state {
-			case .open:
-				.green
-			case .closed:
-				.red
-			}
-	}
-
 	var body: some View {
-		Image(systemName: self.icon)
-			.foregroundStyle(self.color)
+		Image(systemName: icon)
+			.foregroundStyle(color)
 	}
 }

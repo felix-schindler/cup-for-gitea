@@ -17,10 +17,9 @@ private func stateDisplayName(_ state: Operations.IssueSearchIssues.Input.Query.
 
 struct IssueSearchFiltersSheet: View {
 	@Binding var filters: IssueSearchFilters
-	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
-		Form {
+		FilterSheet(filters: $filters, initialValue: IssueSearchFilters()) {
 			Section("State") {
 				Picker("State", selection: $filters.state) {
 					ForEach(Operations.IssueSearchIssues.Input.Query.StatePayload.allCases, id: \.self) { option in
@@ -99,20 +98,6 @@ struct IssueSearchFiltersSheet: View {
 			Section("Pagination") {
 				TextField("Limit", text: $filters.limitText)
 					.keyboardType(.numberPad)
-			}
-		}
-		.scrollDismissesKeyboard(.immediately)
-		.navigationTitle("Filters")
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button("Reset") {
-					filters = IssueSearchFilters()
-				}
-			}
-			ToolbarItem(placement: .confirmationAction) {
-				Button("Done", systemImage: "checkmark") {
-					dismiss()
-				}
 			}
 		}
 	}

@@ -57,11 +57,8 @@ struct UserSearchLoader: View {
 
 	@State private var search: String = ""
 	@State private var state = LoadState<[Components.Schemas.User]>.loading
-	@State private var hasMorePages = true
-	@State private var currentPage = 1
-	@State private var isLoadingMore = false
+	@State private var paging = Paging()
 
-	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
 
 	private var queryKey: String {
@@ -79,74 +76,49 @@ struct UserSearchLoader: View {
 
 	private var searchPrompt: LocalizedStringResource { "Search users" }
 
-	private func loadUsers() async throws -> [Components.Schemas.User] {
+	private func loadUsers(page: Int) async throws -> [Components.Schemas.User] {
 		switch context {
 		case .search:
 			try await Network.shared.client.userSearch(
 				.init(
 					query: .init(
 						q: search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : search,
-						page: currentPage,
+						page: page,
 						limit: defaultLimit
 					))
 			).ok.body.json.data
 		case .orgMembers(let org):
 			try await Network.shared.client.orgListMembers(
 				path: .init(org: org),
-				query: .init(page: currentPage, limit: defaultLimit)
+				query: .init(page: page, limit: defaultLimit)
 			).ok.body.json
 		case .repoCollaborators(let owner, let repo):
 			try await Network.shared.client.repoListCollaborators(
 				path: .init(owner: owner, repo: repo),
-				query: .init(page: currentPage, limit: defaultLimit)
+				query: .init(page: page, limit: defaultLimit)
 			).ok.body.json
 		case .teamMembers(let teamId):
 			try await Network.shared.client.orgListTeamMembers(
 				path: .init(id: teamId),
-				query: .init(page: currentPage, limit: defaultLimit)
+				query: .init(page: page, limit: defaultLimit)
 			).ok.body.json
 		}
 	}
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingMore, hasMorePages else { return }
-		isLoadingMore = true
-		defer { isLoadingMore = false }
 		if debounced {
-			try? await Task.sleep(nanoseconds: debounceNanoseconds)
-			if Task.isCancelled { return }
+			try? await Task.sleep(nanoseconds: 350_000_000)
+			guard !Task.isCancelled else { return }
 		}
-		let currentItems: [Components.Schemas.User]
-		if case .loaded(let items) = state {
-			currentItems = items
-			state = .loadingMore(items)
-		} else {
-			currentItems = []
-		}
-		do {
-			let page = try await loadUsers()
-			if Task.isCancelled { return }
-			state = .loaded(currentItems + page)
-			if page.count < defaultLimit {
-				hasMorePages = false
-			} else {
-				currentPage += 1
-			}
-		} catch {
-			if Task.isCancelled { return }
-			if currentItems.isEmpty {
-				state = .failed(error)
-			} else {
-				state = .failedMore(currentItems, error)
-			}
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit) { page in
+			try await loadUsers(page: page)
 		}
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		guard !isLoadingMore else { return }
+		guard !paging.isLoading else { return }
 		state = .loading
-		currentPage = 1
-		hasMorePages = true
+		paging.reset()
 		await loadNextPage(debounced: debounced)
 	}
 
@@ -159,7 +131,7 @@ struct UserSearchLoader: View {
 			icon: context.icon,
 			load: { await resetAndLoad() },
 			loadMore: { await loadNextPage() },
-			hasMorePages: hasMorePages
+			hasMorePages: paging.hasMore
 		) { user in
 			SmallUserView(user, avatarSize: .medium)
 		}

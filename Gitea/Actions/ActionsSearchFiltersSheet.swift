@@ -9,10 +9,9 @@ import SwiftUI
 
 struct ActionsSearchFiltersSheet: View {
 	@Binding var filters: ActionsSearchFilters
-	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
-		Form {
+		FilterSheet(filters: $filters, initialValue: ActionsSearchFilters()) {
 			Section("Status") {
 				Picker("Status", selection: $filters.status) {
 					ForEach(ActionsSearchFilters.StatusFilter.allCases, id: \.self) { option in
@@ -32,20 +31,6 @@ struct ActionsSearchFiltersSheet: View {
 				TextField("Actor", text: $filters.actor)
 					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()
-			}
-		}
-		.scrollDismissesKeyboard(.immediately)
-		.navigationTitle("Filters")
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button("Reset") {
-					filters = ActionsSearchFilters()
-				}
-			}
-			ToolbarItem(placement: .confirmationAction) {
-				Button("Done", systemImage: "checkmark") {
-					dismiss()
-				}
 			}
 		}
 	}

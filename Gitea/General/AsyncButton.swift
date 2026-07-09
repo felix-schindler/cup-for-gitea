@@ -19,23 +19,16 @@ struct AsyncButton<Label: View>: View {
 			role: role,
 			action: {
 				isPerformingTask = true
-
 				Task {
 					await action()
 					isPerformingTask = false
 				}
 			},
 			label: {
-				ZStack {
-					// We hide the label by setting its opacity
-					// to zero, since we don't want the button's
-					// size to change while its task is performed:
-					label().opacity(isPerformingTask ? 0 : 1)
-
-					if isPerformingTask {
-						ProgressView()
+				label().opacity(isPerformingTask ? 0 : 1)
+					.overlay {
+						if isPerformingTask { ProgressView() }
 					}
-				}
 			}
 		).disabled(isPerformingTask)
 	}
@@ -71,7 +64,7 @@ extension AsyncButton where Label == SwiftUI.Label<Text, Image> {
 		systemImage: String,
 		role: ButtonRole? = nil,
 		action: @escaping () async -> Void
-	) where Label == Label {
+	) {
 		self.init(action: action, role: role) {
 			Label(title, systemImage: systemImage)
 		}

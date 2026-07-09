@@ -19,8 +19,10 @@ struct TopicsSearchLoader: View {
 			try? await Task.sleep(nanoseconds: debounceNanoseconds)
 			if Task.isCancelled { return }
 		}
-		state = await LoadState {
-			try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json.topics
+		do {
+			state = .loaded(try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json.topics)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

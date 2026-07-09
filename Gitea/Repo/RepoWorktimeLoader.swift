@@ -14,10 +14,13 @@ struct RepoWorktimeLoader: View {
 	@State private var state = LoadState<[Components.Schemas.TrackedTime]>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client
-				.repoTrackedTimes(path: .init(owner: owner, repo: repo))
-				.ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client
+					.repoTrackedTimes(path: .init(owner: owner, repo: repo))
+					.ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

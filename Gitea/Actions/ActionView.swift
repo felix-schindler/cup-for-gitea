@@ -40,19 +40,25 @@ struct ActionView: View {
 	}
 
 	private func loadJobs() async {
-		jobsState = await LoadState {
-			try await Network.shared.client.listWorkflowRunJobs(
-				path: .init(owner: owner, repo: repo, run: Int(run.id)),
-				query: .init(page: 1, limit: 7)
-			).ok.body.json.jobs
+		do {
+			jobsState = .loaded(
+				try await Network.shared.client.listWorkflowRunJobs(
+					path: .init(owner: owner, repo: repo, run: Int(run.id)),
+					query: .init(page: 1, limit: 7)
+				).ok.body.json.jobs)
+		} catch {
+			jobsState = .failed(error)
 		}
 	}
 
 	private func loadArtifacts() async {
-		artifactsState = await LoadState {
-			try await Network.shared.client.getArtifactsOfRun(
-				path: .init(owner: owner, repo: repo, run: Int(run.id))
-			).ok.body.json.artifacts
+		do {
+			artifactsState = .loaded(
+				try await Network.shared.client.getArtifactsOfRun(
+					path: .init(owner: owner, repo: repo, run: Int(run.id))
+				).ok.body.json.artifacts)
+		} catch {
+			artifactsState = .failed(error)
 		}
 	}
 

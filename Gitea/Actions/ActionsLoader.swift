@@ -12,9 +12,7 @@ struct ActionsLoader: View {
 	let repo: String
 
 	@State private var state = LoadState<[Components.Schemas.ActionWorkflowRun]>.loading
-	@State private var hasMorePages = true
-	@State private var currentPage = 1
-	@State private var isLoadingMore = false
+	@State private var paging = Paging()
 	@State private var showFilters = false
 	@State private var filters = ActionsSearchFilters()
 
@@ -25,25 +23,14 @@ struct ActionsLoader: View {
 	}
 
 	private func resetAndLoad() async {
-		guard !isLoadingMore else { return }
+		guard !paging.isLoading else { return }
 		state = .loading
-		currentPage = 1
-		hasMorePages = true
+		paging.reset()
 		await loadNextPage()
 	}
 
 	private func loadNextPage() async {
-		guard !isLoadingMore, hasMorePages else { return }
-		isLoadingMore = true
-		defer { isLoadingMore = false }
-		let currentItems: [Components.Schemas.ActionWorkflowRun]
-		if case .loaded(let items) = state {
-			currentItems = items
-			state = .loadingMore(items)
-		} else {
-			currentItems = []
-		}
-		do {
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit) { page in
 			let response = try await Network.shared.client.getWorkflowRuns(
 				path: .init(owner: owner, repo: repo),
 				query: .init(
@@ -51,24 +38,11 @@ struct ActionsLoader: View {
 					branch: filters.branchFilter,
 					status: filters.status == .all ? nil : filters.status.rawValue,
 					actor: filters.actorFilter,
-					page: currentPage,
+					page: page,
 					limit: defaultLimit
 				)
 			).ok.body.json
-			if Task.isCancelled { return }
-			state = .loaded(currentItems + response.workflowRuns)
-			if response.workflowRuns.count < defaultLimit {
-				hasMorePages = false
-			} else {
-				currentPage += 1
-			}
-		} catch {
-			if Task.isCancelled { return }
-			if currentItems.isEmpty {
-				state = .failed(error)
-			} else {
-				state = .failedMore(currentItems, error)
-			}
+			return response.workflowRuns
 		}
 	}
 
@@ -81,7 +55,7 @@ struct ActionsLoader: View {
 			icon: Icons.actions.rawValue,
 			load: { await resetAndLoad() },
 			loadMore: { await loadNextPage() },
-			hasMorePages: hasMorePages
+			hasMorePages: paging.hasMore
 		) { run in
 			NavigationLink(destination: ActionView(run: run, owner: owner, repo: repo)) {
 				SmallActionView(run)
@@ -98,9 +72,7 @@ struct ActionsLoader: View {
 			}
 		}
 		.sheet(isPresented: $showFilters) {
-			NavigationStack {
-				ActionsSearchFiltersSheet(filters: $filters)
-			}
+			ActionsSearchFiltersSheet(filters: $filters)
 		}
 		.navigationTitle("Actions")
 	}

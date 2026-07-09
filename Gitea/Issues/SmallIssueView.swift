@@ -88,7 +88,7 @@ struct SmallIssueView: View {
 			if isPullRequest {
 				StateIconView(.pull, issue.pullRequestState, isDraft: issue.pullRequest?.draft == true)
 			} else {
-				StateIconView(.issue, issue.state)
+				StateIconView(.issue, issue.state.notificationState)
 			}
 		case .pullRequest(let pullRequest):
 			StateIconView(.pull, pullRequest.notificationState)
@@ -102,6 +102,15 @@ struct SmallIssueView: View {
 			SmallUserView(issue.user)
 		case .pullRequest(let pullRequest):
 			SmallUserView(pullRequest.user)
+		}
+	}
+}
+
+extension Components.Schemas.Issue.StatePayload {
+	var notificationState: Components.Schemas.NotificationSubject.StatePayload {
+		switch self {
+		case .open: return .open
+		case .closed: return .closed
 		}
 	}
 }

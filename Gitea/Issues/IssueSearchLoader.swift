@@ -14,14 +14,11 @@ struct IssueSearchLoader: View {
 
 	@State private var search: String = ""
 	@State private var state = LoadState<[Components.Schemas.Issue]>.loading
-	@State private var hasMorePages = true
-	@State private var currentPage = 1
-	@State private var isLoadingMore = false
+	@State private var paging = Paging()
 	@State private var currentUsername: String?
 	@State private var filters: IssueSearchFilters
 	@State private var showFilters = false
 
-	private let debounceNanoseconds: UInt64 = 350_000_000
 	private let defaultLimit = 7
 	private var navigationTitle: LocalizedStringResource {
 		switch type {
@@ -81,7 +78,7 @@ struct IssueSearchLoader: View {
 			owner: filters.myRepos ? currentUsername : filters.ownerValue,
 			createdBy: filters.createdByValue,
 			team: filters.teamValue,
-			page: currentPage,
+			page: paging.page,
 			limit: filters.limitValue ?? defaultLimit
 		)
 	}
@@ -98,7 +95,7 @@ struct IssueSearchLoader: View {
 			createdBy: filters.created ? currentUsername : filters.createdByValue,
 			assignedBy: filters.assigned ? currentUsername : nil,
 			mentionedBy: filters.mentioned ? currentUsername : nil,
-			page: currentPage,
+			page: paging.page,
 			limit: filters.limitValue ?? defaultLimit
 		)
 	}
@@ -109,64 +106,68 @@ struct IssueSearchLoader: View {
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
-		guard !isLoadingMore else { return }
+		guard !paging.isLoading else { return }
 		state = .loading
-		currentPage = 1
-		hasMorePages = true
+		paging.reset()
 		await loadNextPage(debounced: debounced)
 	}
 
 	private func loadNextPage(debounced: Bool = false) async {
-		guard !isLoadingMore, hasMorePages else { return }
-		isLoadingMore = true
-		defer { isLoadingMore = false }
+		if needsCurrentUser, currentUsername == nil {
+			currentUsername = try? await Network.shared.client.userGetCurrent().ok.body.json.login
+		}
 		if debounced {
-			try? await Task.sleep(nanoseconds: debounceNanoseconds)
-			if Task.isCancelled { return }
+			try? await Task.sleep(nanoseconds: 350_000_000)
+			guard !Task.isCancelled else { return }
 		}
-		let currentItems: [Components.Schemas.Issue]
-		if case .loaded(let items) = state {
-			currentItems = items
-			state = .loadingMore(items)
-		} else {
-			currentItems = []
-		}
-		do {
-			if needsCurrentUser, currentUsername == nil {
-				currentUsername = try await Network.shared.client.userGetCurrent().ok.body.json.login
-			}
-			let results = try await loadIssues()
-			if Task.isCancelled { return }
-			if results.isEmpty {
-				hasMorePages = false
-				state = .loaded(currentItems)
-			} else {
-				state = .loaded(currentItems + results)
-				let limit = filters.limitValue ?? defaultLimit
-				if results.count < limit {
-					hasMorePages = false
-				} else {
-					currentPage += 1
-				}
-			}
-		} catch {
-			if Task.isCancelled { return }
-			if currentItems.isEmpty {
-				state = .failed(error)
-			} else {
-				state = .failedMore(currentItems, error)
-			}
+		(state, paging) = await paging.nextPage(state: state, limit: filters.limitValue ?? defaultLimit) { page in
+			let results = try await loadIssues(page: page)
+			return results
 		}
 	}
 
-	private func loadIssues() async throws -> [Components.Schemas.Issue] {
+	private func loadIssues(page: Int) async throws -> [Components.Schemas.Issue] {
 		if let owner, let repo {
 			return try await Network.shared.client.issueListIssues(
 				path: .init(owner: owner, repo: repo),
-				query: repoQueryPayload
+				query: .init(
+					state: .init(rawValue: filters.state.rawValue),
+					labels: filters.labelsValue,
+					q: search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : search,
+					_type: .init(rawValue: type.rawValue),
+					milestones: filters.milestonesValue,
+					since: filters.since,
+					before: filters.before,
+					createdBy: filters.created ? currentUsername : filters.createdByValue,
+					assignedBy: filters.assigned ? currentUsername : nil,
+					mentionedBy: filters.mentioned ? currentUsername : nil,
+					page: page,
+					limit: filters.limitValue ?? defaultLimit
+				)
 			).ok.body.json
 		}
-		return try await Network.shared.client.issueSearchIssues(.init(query: queryPayload)).ok.body.json
+		return try await Network.shared.client.issueSearchIssues(
+			.init(
+				query: .init(
+					state: filters.state,
+					labels: filters.labelsValue,
+					milestones: filters.milestonesValue,
+					q: search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : search,
+					_type: type,
+					since: filters.since,
+					before: filters.before,
+					assigned: filters.assigned ? true : nil,
+					created: filters.created ? true : nil,
+					mentioned: filters.mentioned ? true : nil,
+					reviewRequested: filters.reviewRequested ? true : nil,
+					reviewed: filters.reviewed ? true : nil,
+					owner: filters.myRepos ? currentUsername : filters.ownerValue,
+					createdBy: filters.createdByValue,
+					team: filters.teamValue,
+					page: page,
+					limit: filters.limitValue ?? defaultLimit
+				))
+		).ok.body.json
 	}
 
 	var body: some View {
@@ -178,7 +179,7 @@ struct IssueSearchLoader: View {
 			icon: icon,
 			load: { await resetAndLoad() },
 			loadMore: { await loadNextPage() },
-			hasMorePages: hasMorePages,
+			hasMorePages: paging.hasMore,
 			loadingMoreText: loadingMoreText
 		) { issue in
 			switch type {
@@ -217,9 +218,7 @@ struct IssueSearchLoader: View {
 			}
 		}
 		.sheet(isPresented: $showFilters) {
-			NavigationStack {
-				IssueSearchFiltersSheet(filters: $filters)
-			}
+			IssueSearchFiltersSheet(filters: $filters)
 		}
 	}
 }

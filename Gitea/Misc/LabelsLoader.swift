@@ -14,10 +14,13 @@ struct LabelsLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Label]>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client
-				.issueListLabels(.init(path: .init(owner: owner, repo: repo)))
-				.ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client
+					.issueListLabels(.init(path: .init(owner: owner, repo: repo)))
+					.ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

@@ -8,10 +8,13 @@ struct IssueLoader: View {
 	@State private var state = LoadState<Components.Schemas.Issue>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client
-				.issueGetIssue(path: .init(owner: owner, repo: repo, index: index))
-				.ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client
+					.issueGetIssue(path: .init(owner: owner, repo: repo, index: index))
+					.ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

@@ -13,12 +13,4 @@ enum LoadState<Value> {
 		case .loading, .failed: nil
 		}
 	}
-
-	init(catching body: () async throws -> Value) async {
-		do {
-			self = .loaded(try await body())
-		} catch {
-			self = .failed(error)
-		}
-	}
 }

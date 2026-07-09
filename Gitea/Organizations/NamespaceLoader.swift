@@ -16,8 +16,10 @@ struct NamespaceLoader: View {
 	}
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client.orgGet(path: .init(org: owner)).ok.body.json
+		do {
+			state = .loaded(try await Network.shared.client.orgGet(path: .init(org: owner)).ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

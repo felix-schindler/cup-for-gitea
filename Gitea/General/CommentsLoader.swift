@@ -17,10 +17,13 @@ struct CommentsLoader: View {
 	@State private var state = LoadState<[Components.Schemas.Comment]>.loading
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client
-				.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid)))
-				.ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client
+					.issueGetComments(.init(path: .init(owner: owner, repo: repo, index: iid)))
+					.ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 

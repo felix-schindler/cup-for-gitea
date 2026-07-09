@@ -561,7 +561,7 @@ struct IssueView: View {
 	private var stateIcon: some View {
 		switch item {
 		case .issue(let issue):
-			StateIconView(.issue, issue.state)
+			StateIconView(.issue, issue.state.notificationState)
 		case .pullRequest(let pullRequest):
 			StateIconView(.pull, pullRequest.notificationState, isDraft: pullRequest.draft)
 		}

@@ -29,8 +29,13 @@ struct HomeView: View {
 			showNotificationsBadge = true
 		}
 
-		starredState = await LoadState {
-			try await Network.shared.client.userCurrentListStarred().ok.body.json
+		do {
+			starredState = .loaded(
+				try await Network.shared.client.userCurrentListStarred(
+					.init(query: .init(page: 1, limit: 10))
+				).ok.body.json)
+		} catch {
+			starredState = .failed(error)
 		}
 	}
 

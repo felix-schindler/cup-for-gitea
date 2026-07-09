@@ -25,17 +25,20 @@ struct TreeLoader: View {
 	}
 
 	private func load() async {
-		state = await LoadState {
+		do {
 			let response = try await Network.shared.client.repoGetContentsExt(
 				path: .init(owner: owner, repo: repo, filepath: folderPath ?? "."),
 				query: .init(ref: ref)
 			).ok.body.json
 			if let dirContents = response.dirContents {
-				return dirContents
+				state = .loaded(dirContents)
 			} else if let fileContents = response.fileContents {
-				return [fileContents]
+				state = .loaded([fileContents])
+			} else {
+				state = .loaded([])
 			}
-			return []
+		} catch {
+			state = .failed(error)
 		}
 	}
 

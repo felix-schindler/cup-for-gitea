@@ -23,11 +23,14 @@ struct CommitsLoader: View {
 	}
 
 	private func load() async {
-		state = await LoadState {
-			try await Network.shared.client.repoGetAllCommits(
-				path: .init(owner: owner, repo: repo),
-				query: .init(sha: ref)
-			).ok.body.json
+		do {
+			state = .loaded(
+				try await Network.shared.client.repoGetAllCommits(
+					path: .init(owner: owner, repo: repo),
+					query: .init(sha: ref)
+				).ok.body.json)
+		} catch {
+			state = .failed(error)
 		}
 	}
 
@@ -226,12 +229,14 @@ private struct CommitDiffView: View {
 	@State private var state = LoadState<String>.loading
 
 	private func load() async {
-		state = await LoadState {
+		do {
 			let raw = try await Network.shared.client.repoDownloadCommitDiffOrPatch(
 				.init(path: .init(owner: owner, repo: repo, sha: sha, diffType: .diff))
 			).ok.body.plainText
 
-			return try await String(collecting: raw, upTo: 2 * 1024 * 1024)
+			state = .loaded(try await String(collecting: raw, upTo: 2 * 1024 * 1024))
+		} catch {
+			state = .failed(error)
 		}
 	}
 
