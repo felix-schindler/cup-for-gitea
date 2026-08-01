@@ -15,7 +15,12 @@ curl -sS "$SPEC_URL" | jq '
   # Fix 2: plain-string responses (raw diffs/patches, markup rendering, gpg token)
   # are served as text/plain, not application/json.
   .components.responses.string.content =
-    {"text/plain": {"schema": {"type": "string"}}}
+    {"text/plain": {"schema": {"type": "string"}}} |
+  # Fix 3: asset-upload request bodies lack `required: true`, which makes the
+  # generator skip the multipart body (warning at build time).
+  (.paths["/repos/{owner}/{repo}/issues/{index}/assets"].post.requestBody.required = true) |
+  (.paths["/repos/{owner}/{repo}/issues/comments/{id}/assets"].post.requestBody.required = true) |
+  (.paths["/repos/{owner}/{repo}/releases/{id}/assets"].post.requestBody.required = true)
 ' > "$OUT"
 
 echo "updated $OUT (server version $(jq -r .info.version "$OUT"))"

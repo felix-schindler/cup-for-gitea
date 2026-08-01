@@ -624,8 +624,7 @@ struct IssueView: View {
 					}
 				}
 			}
-		case .pullRequest(let pullRequest):
-			EmptyView()
+		case .pullRequest: EmptyView()
 		}
 	}
 

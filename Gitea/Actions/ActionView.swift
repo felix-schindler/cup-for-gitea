@@ -92,7 +92,7 @@ struct ActionView: View {
 					HStack {
 						PillView(status.label, systemImage: status.icon, bgColor: status.color.opacity(0.2), fgColor: status.color)
 						Spacer()
-						Text("#\(run.runNumber)")
+						Text("#\(run.runNumber ?? 0)")
 							.font(.footnote)
 							.foregroundStyle(.secondary)
 							.monospacedDigit()
@@ -204,7 +204,7 @@ struct ActionView: View {
 				Text(downloadError?.localizedDescription ?? "")
 			}
 		)
-		.navigationTitle("Run #\(run.runNumber)")
+		.navigationTitle("Run #\(run.runNumber ?? 0)")
 		.navigationBarTitleDisplayMode(.inline)
 	}
 }
