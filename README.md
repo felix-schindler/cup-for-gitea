@@ -5,14 +5,12 @@
 
 # Useful commands
 
-## Swagger → OpenAPI
+## Regenerate API client
+
+The server serves an OpenAPI 3.0.3 spec as JSON; the swift-openapi-generator build plugin reads JSON natively, so no conversion is needed.
 
 ```
-cd openapi-schema
-curl https://git.schindlerfelix.de/swagger.v1.json > swagger.json
-npx swagger2openapi swagger.json --targetVersion 3.0.3 --yaml --resolve --patch --outfile openapi.yaml
-npx @redocly/cli@latest bundle openapi.yaml -o openapi.required.yaml
-mv openapi.required.yaml ../Gitea/openapi.yaml
+curl https://git.schindlerfelix.de/openapi3.v1.json > Gitea/openapi.json
 ```
 
 ## Bundle Licenses
