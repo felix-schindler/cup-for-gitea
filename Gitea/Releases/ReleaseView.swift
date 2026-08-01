@@ -49,20 +49,17 @@ struct ReleaseView: View {
 					if release.assets?.isNotEmpty == true {
 						ForEach(release.assets!, id: \.id) { asset in
 							if let urlString = asset.browserDownloadUrl, let url = URL(string: urlString) {
-								Link(
-									destination: url,
-									label: {
-										Label(
-											"\(asset.name ?? "") (\(ByteFormatter.shared.format(asset.size ?? 0)))",
-											systemImage: "square.and.arrow.down"
-										)
-										.modifier {
-											if #available(iOS 26.0, *) {
-												$0.labelIconToTitleSpacing(5)
-											}
+								DownloadArchiveButton(url: url) {
+									Label(
+										"\(asset.name ?? "") (\(ByteFormatter.shared.format(asset.size ?? 0)))",
+										systemImage: "square.and.arrow.down"
+									)
+									.modifier {
+										if #available(iOS 26.0, *) {
+											$0.labelIconToTitleSpacing(5)
 										}
 									}
-								)
+								}
 							} else {
 								Text(asset.name ?? "")
 							}
@@ -70,11 +67,15 @@ struct ReleaseView: View {
 					}
 
 					if let zipballUrl = release.zipballUrl, zipballUrl.isNotEmpty, let url = URL(string: zipballUrl) {
-						Link("Source code (zip)", destination: url)
+						DownloadArchiveButton(url: url) {
+							Label("Source code (zip)", systemImage: "doc.zipper")
+						}
 					}
 
 					if let tarballUrl = release.tarballUrl, tarballUrl.isNotEmpty, let url = URL(string: tarballUrl) {
-						Link("Source code (tar.gz)", destination: url)
+						DownloadArchiveButton(url: url) {
+							Label("Source code (tar.gz)", systemImage: "doc.zipper")
+						}
 					}
 				}
 			}

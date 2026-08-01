@@ -54,19 +54,15 @@ struct TagsLoader: View {
 					ScrollView(.horizontal) {
 						HStack {
 							if let zipballUrl = tag.zipballUrl, let url = URL(string: zipballUrl) {
-								Link(
-									destination: url,
-									label: {
-										Label("ZIP", systemImage: "doc.zipper")
-									})
+								DownloadArchiveButton(url: url) {
+									Label("ZIP", systemImage: "doc.zipper")
+								}
 							}
 
 							if let tarballUrl = tag.tarballUrl, let url = URL(string: tarballUrl) {
-								Link(
-									destination: url,
-									label: {
-										Label("TAR.GZ", systemImage: "doc.zipper")
-									})
+								DownloadArchiveButton(url: url) {
+									Label("TAR.GZ", systemImage: "doc.zipper")
+								}
 							}
 						}
 					}

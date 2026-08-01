@@ -66,23 +66,7 @@ struct ActionView: View {
 		guard let urlString = artifact.archiveDownloadUrl, let url = URL(string: urlString) else {
 			throw URLError(.badURL)
 		}
-		var request = URLRequest(url: url)
-		request.setValue("token \(Network.shared.token)", forHTTPHeaderField: "Authorization")
-		let (data, _) = try await URLSession.shared.data(for: request)
-		let tempURL = FileManager.default.temporaryDirectory
-			.appendingPathComponent(artifact.name ?? "artifact")
-			.appendingPathExtension("zip")
-		try data.write(to: tempURL)
-		return tempURL
-	}
-
-	@MainActor
-	private func presentShareSheet(for url: URL) {
-		guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-			let root = windowScene.windows.first?.rootViewController
-		else { return }
-		let vc = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-		root.present(vc, animated: true)
+		return try await Downloader.archive(from: url, fileName: "\(artifact.name ?? "artifact").zip")
 	}
 
 	var body: some View {
@@ -172,7 +156,7 @@ struct ActionView: View {
 									Task {
 										do {
 											let url = try await downloadArtifact(artifact)
-											presentShareSheet(for: url)
+											Downloader.presentShareSheet(for: url)
 										} catch {
 											downloadError = error
 											showDownloadError = true
