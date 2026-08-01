@@ -5,7 +5,6 @@
 //  Created by Felix Schindler on 11.05.26.
 //
 
-import HighlightedTextEditor
 import SwiftUI
 
 struct NewIssueView: View {
@@ -99,7 +98,8 @@ struct NewIssueView: View {
 				VStack(alignment: .leading) {
 					Text("Description (optional)")
 						.font(.footnote)
-					HighlightedTextEditor(text: $content, highlightRules: .markdown)
+					TextEditor(text: $content)
+						.font(.body.monospaced())
 						.frame(minHeight: 100)
 				}
 			}

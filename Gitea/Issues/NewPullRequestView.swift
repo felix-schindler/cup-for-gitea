@@ -5,7 +5,6 @@
 //  Created by Felix Schindler on 22.05.26.
 //
 
-import HighlightedTextEditor
 import SwiftUI
 
 struct NewPullRequestView: View {
@@ -107,7 +106,8 @@ struct NewPullRequestView: View {
 				VStack(alignment: .leading) {
 					Text("Description (optional)")
 						.font(.footnote)
-					HighlightedTextEditor(text: $bodyText, highlightRules: .markdown)
+					TextEditor(text: $bodyText)
+						.font(.body.monospaced())
 						.frame(minHeight: 100)
 				}
 			}

@@ -77,6 +77,8 @@ struct FeedbackView: View {
 						.foregroundStyle(.secondary)
 						.font(.footnote)
 					TextEditor(text: $desc)
+						.font(.body.monospaced())
+						.frame(maxHeight: 100)
 				}
 				Toggle(
 					"I have read and accept the privacy information",

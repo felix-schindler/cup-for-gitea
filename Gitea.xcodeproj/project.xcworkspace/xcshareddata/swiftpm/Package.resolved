@@ -1,15 +1,6 @@
 {
-  "originHash" : "b92a6308d0b528d408abc4709ff237237aec2b2edf831ab810153c37aea6593e",
+  "originHash" : "0f0800b2f69a4cd99a18bb16069f6f198440fe0f81e1807d200610307d01e43c",
   "pins" : [
-    {
-      "identity" : "highlightedtexteditor",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kyle-n/HighlightedTextEditor",
-      "state" : {
-        "revision" : "759d7b4bd2c10d0bbe93bc62d68572a3702049e3",
-        "version" : "2.1.2"
-      }
-    },
     {
       "identity" : "highlightr",
       "kind" : "remoteSourceControl",
