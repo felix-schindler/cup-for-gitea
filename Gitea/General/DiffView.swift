@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct DiffView: View {
+	@Environment(\.colorScheme) private var colorScheme
+
 	let diffText: String
 
 	var body: some View {
@@ -20,7 +22,7 @@ struct DiffView: View {
 				)
 			} else {
 				ScrollView {
-					Text(diffText)
+					CodeTextView(diffText, language: "diff", colorScheme: colorScheme)
 						.font(.system(.caption, design: .monospaced))
 						.textSelection(.enabled)
 						.frame(maxWidth: .infinity, alignment: .leading)
