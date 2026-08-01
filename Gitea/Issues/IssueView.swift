@@ -266,6 +266,7 @@ struct IssueView: View {
 			}
 			.navigationTitle("Merge")
 			.navigationBarTitleDisplayMode(.inline)
+			.task { await loadDefaultMergeMethod() }
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel") {
@@ -349,6 +350,16 @@ struct IssueView: View {
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
 		}
+	}
+
+	private func loadDefaultMergeMethod() async {
+		guard
+			let style = try? await Network.shared.client.repoGet(
+				.init(path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo))
+			).ok.body.json.defaultMergeStyle,
+			let method = Components.Schemas.MergePullRequestOption.DoPayload(rawValue: style)
+		else { return }
+		mergeConfig.method = method
 	}
 
 	private func mergePullRequest() async {
