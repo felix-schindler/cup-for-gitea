@@ -18,17 +18,12 @@ struct Paging {
 		isLoading = false
 	}
 
-	func nextPage<T>(state currentState: LoadState<[T]>, limit: Int, fetch: (Int) async throws -> [T]) async -> (LoadState<[T]>, Paging) {
-		guard !isLoading, hasMore else { return (currentState, self) }
+	// Callers set `isLoading = true` before awaiting this, so concurrent
+	// calls (refresh + loadMore) are blocked instead of writing back stale pages.
+	func nextPage<T>(state currentState: LoadState<[T]>, limit: Int, reset: Bool = false, fetch: (Int) async throws -> [T]) async -> (LoadState<[T]>, Paging) {
+		guard hasMore else { return (currentState, self) }
 		var p = self
-		p.isLoading = true
-		defer { p.isLoading = false }
-		let current: [T]
-		if case .loaded(let items) = currentState {
-			current = items
-		} else {
-			current = []
-		}
+		let current = (reset ? nil : currentState.value) ?? []
 		do {
 			let results = try await fetch(p.page)
 			guard !Task.isCancelled else { return (currentState, p) }

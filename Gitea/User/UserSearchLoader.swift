@@ -105,21 +105,23 @@ struct UserSearchLoader: View {
 		}
 	}
 
-	private func loadNextPage(debounced: Bool = false) async {
+	private func loadNextPage(debounced: Bool = false, reset: Bool = false) async {
 		if debounced {
 			try? await Task.sleep(nanoseconds: 350_000_000)
 			guard !Task.isCancelled else { return }
 		}
-		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit) { page in
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			try await loadUsers(page: page)
 		}
 	}
 
 	private func resetAndLoad(debounced: Bool = false) async {
 		guard !paging.isLoading else { return }
-		state = .loading
 		paging.reset()
-		await loadNextPage(debounced: debounced)
+		await loadNextPage(debounced: debounced, reset: true)
 	}
 
 	var body: some View {

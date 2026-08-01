@@ -24,13 +24,15 @@ struct ActionsLoader: View {
 
 	private func resetAndLoad() async {
 		guard !paging.isLoading else { return }
-		state = .loading
 		paging.reset()
-		await loadNextPage()
+		await loadNextPage(reset: true)
 	}
 
-	private func loadNextPage() async {
-		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit) { page in
+	private func loadNextPage(reset: Bool = false) async {
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			let response = try await Network.shared.client.getWorkflowRuns(
 				path: .init(owner: owner, repo: repo),
 				query: .init(

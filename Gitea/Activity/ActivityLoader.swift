@@ -84,18 +84,20 @@ struct ActivityLoader: View {
 
 	private func resetAndLoad() async {
 		guard !paging.isLoading else { return }
-		state = .loading
 		paging.reset()
 		userLogin = nil
 		if showHeatmap {
 			heatmap = nil
 			heatmapError = nil
 		}
-		await loadNextPage()
+		await loadNextPage(reset: true)
 	}
 
-	private func loadNextPage() async {
-		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit) { [self] page in
+	private func loadNextPage(reset: Bool = false) async {
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { [self] page in
 			switch context {
 			case .home:
 				if page == 1 {
