@@ -50,6 +50,19 @@ extension Components.Schemas.PullRequest: IssueDisplayable {
 	var displayHtmlUrl: String { htmlUrl ?? "" }
 }
 
+extension Components.Schemas.MergePullRequestOption.DoPayload {
+	fileprivate var displayName: String {
+		switch self {
+		case .merge: "Create a merge commit"
+		case .rebase: "Rebase and fast-forward"
+		case .rebaseMerge: "Rebase then create a merge commit"
+		case .squash: "Squash and merge"
+		case .fastForwardOnly: "Fast-forward only"
+		case .manuallyMerged: "Manually merged"
+		}
+	}
+}
+
 struct IssueView: View {
 	private enum Item {
 		case issue(Components.Schemas.Issue)
@@ -78,6 +91,7 @@ struct IssueView: View {
 		var method: Components.Schemas.MergePullRequestOption.DoPayload = .merge
 		var deleteBranch = false
 		var forceMerge = false
+		var headCommitId = ""
 	}
 
 	init(_ issue: Components.Schemas.Issue) {
@@ -223,23 +237,31 @@ struct IssueView: View {
 			Form {
 				Section("Merge Method") {
 					Picker("Method", selection: $mergeConfig.method) {
-						Text("Merge").tag(Components.Schemas.MergePullRequestOption.DoPayload.merge)
-						Text("Rebase").tag(Components.Schemas.MergePullRequestOption.DoPayload.rebase)
-						Text("Rebase Merge").tag(Components.Schemas.MergePullRequestOption.DoPayload.rebaseMerge)
-						Text("Squash").tag(Components.Schemas.MergePullRequestOption.DoPayload.squash)
-						Text("Fast-forward only").tag(Components.Schemas.MergePullRequestOption.DoPayload.fastForwardOnly)
+						ForEach(Components.Schemas.MergePullRequestOption.DoPayload.allCases, id: \.self) { method in
+							Text(method.displayName).tag(method)
+						}
 					}
 				}
 
-				Section("Options") {
-					Toggle("Delete branch after merge", isOn: $mergeConfig.deleteBranch)
-					Toggle("Force merge", isOn: $mergeConfig.forceMerge)
+				if mergeConfig.method == .manuallyMerged {
+					Section("Manually Merged") {
+						TextField("Head commit ID", text: $mergeConfig.headCommitId)
+							.textInputAutocapitalization(.never)
+							.autocorrectionDisabled()
+							.font(.body.monospaced())
+					}
+				} else {
+					Section("Options") {
+						Toggle("Delete branch after merge", isOn: $mergeConfig.deleteBranch)
+						Toggle("Force merge", isOn: $mergeConfig.forceMerge)
+					}
 				}
 
 				Section {
 					AsyncButton("Merge Pull Request", role: .destructive) {
 						await mergePullRequest()
 					}
+					.disabled(mergeConfig.method == .manuallyMerged && mergeConfig.headCommitId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 				}
 			}
 			.navigationTitle("Merge")
@@ -340,7 +362,7 @@ struct IssueView: View {
 							deleteBranchAfterMerge: mergeConfig.deleteBranch,
 							_do: mergeConfig.method,
 							forceMerge: mergeConfig.forceMerge,
-							headCommitId: "", mergeCommitId: "",
+							headCommitId: mergeConfig.headCommitId, mergeCommitId: "",
 							mergeMessageField: "", mergeTitleField: "",
 							mergeWhenChecksSucceed: false
 						))
