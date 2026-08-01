@@ -97,8 +97,8 @@ struct HeaderRepoView: View {
 						}
 					}
 
-					if (repo.size ?? 0) > 0 {
-						PillView(verbatim: ByteFormatter.shared.format(repo.size ?? 0))
+					if let size = repo.size, size > 0 {
+						PillView(verbatim: ByteFormatter.shared.format(size * 1024))
 					}
 
 					PillView(verbatim: repo.createdAt?.toString() ?? "")
