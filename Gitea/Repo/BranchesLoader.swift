@@ -32,9 +32,9 @@ struct BranchesLoader: View {
 		) { branch in
 			VStack(alignment: .leading) {
 				HStack {
-					Text(branch.name.emojized())
+					Text((branch.name ?? "").emojized())
 						.fontWeight(.medium)
-					if branch.protected {
+					if branch.protected == true {
 						Image(systemName: "lock")
 							.foregroundStyle(.secondary)
 					}
@@ -42,14 +42,16 @@ struct BranchesLoader: View {
 					Spacer()
 
 					VStack(alignment: .trailing) {
-						Text(branch.commit.timestamp.toString())
-						Text(branch.commit.id.prefix(10))
-							.monospaced()
+						if let commit = branch.commit {
+							Text(commit.timestamp?.toString() ?? "")
+							Text(String((commit.id ?? "").prefix(10)))
+								.monospaced()
+						}
 					}.font(.footnote)
 				}
 
-				if branch.commit.message.isNotEmpty {
-					Text(branch.commit.message.emojized())
+				if let message = branch.commit?.message, message.isNotEmpty {
+					Text(message.emojized())
 						.foregroundStyle(.secondary)
 				}
 			}

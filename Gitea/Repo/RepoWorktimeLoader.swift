@@ -51,7 +51,7 @@ struct RepoWorktimeLoader: View {
 
 	private var totalTime: Int64 {
 		if case .loaded(let entries) = state {
-			entries.reduce(0) { $0 + $1.time }
+			entries.reduce(0) { $0 + ($1.time ?? 0) }
 		} else {
 			0
 		}
@@ -67,11 +67,11 @@ struct RepoWorktimeLoader: View {
 
 	@ViewBuilder
 	private func contributorSections(_ entries: [Components.Schemas.TrackedTime]) -> some View {
-		let grouped = Dictionary(grouping: entries, by: \.userName)
+		let grouped = Dictionary(grouping: entries, by: { $0.userName ?? "" })
 		let sorted = grouped.sorted { $0.key < $1.key }
 
 		ForEach(sorted, id: \.key) { userName, userEntries in
-			let userTotal = userEntries.reduce(0) { $0 + $1.time }
+			let userTotal = userEntries.reduce(0) { $0 + ($1.time ?? 0) }
 			Section {
 				ForEach(userEntries, id: \.id) { entry in
 					WorktimeRow(entry: entry)
@@ -92,22 +92,23 @@ struct WorktimeRow: View {
 	let entry: Components.Schemas.TrackedTime
 
 	var body: some View {
-		NavigationLink(destination: IssueLoader(owner: entry.issue.repository.owner, repo: entry.issue.repository.name, index: entry.issue.number)) {
+		let issue = entry.issue
+		NavigationLink(destination: IssueLoader(owner: issue?.repository?.owner ?? "", repo: issue?.repository?.name ?? "", index: issue?.number ?? 0)) {
 			VStack(alignment: .leading) {
 				HStack {
-					if let inline = try? AttributedString(markdown: entry.issue.title.emojized()) {
+					if let inline = try? AttributedString(markdown: (issue?.title ?? "").emojized()) {
 						Text(inline)
 							.lineLimit(1)
 					} else {
-						Text(entry.issue.title.emojized())
+						Text((issue?.title ?? "").emojized())
 							.lineLimit(1)
 					}
 					Spacer()
-					Text(TimeFormatter.shared.format(entry.time))
+					Text(TimeFormatter.shared.format(entry.time ?? 0))
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
-				Text("\(entry.issue.repository.fullName)#\(entry.issue.number) · \(entry.created.toString())")
+				Text("\(issue?.repository?.fullName ?? "")#\(issue?.number ?? 0) · \(entry.created?.toString() ?? "")")
 					.font(.caption)
 					.foregroundStyle(.tertiary)
 			}

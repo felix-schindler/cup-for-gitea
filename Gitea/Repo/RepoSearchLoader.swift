@@ -133,7 +133,7 @@ struct RepoSearchLoader: View {
 					page: page,
 					limit: limit
 				))
-		).ok.body.json.data
+		).ok.body.json.data ?? []
 	}
 
 	var body: some View {

@@ -20,38 +20,40 @@ struct ReleaseView: View {
 			VStack(alignment: .leading) {
 				ScrollView(.horizontal, showsIndicators: false) {
 					HStack {
-						SmallUserView(release.author)
+						if let author = release.author {
+							SmallUserView(author)
+						}
 
-						PillView(verbatim: release.tagName, systemImage: Icons.topics.rawValue)
+						PillView(verbatim: release.tagName ?? "", systemImage: Icons.topics.rawValue)
 
-						if release.draft {
+						if release.draft == true {
 							PillView("Draft", systemImage: "pencil")
 						}
 
-						if release.prerelease {
+						if release.prerelease == true {
 							PillView("Pre-release", systemImage: "sparkles")
 						}
 					}
 					.font(.footnote)
 				}
 
-				if release.body.isNotEmpty {
-					StructuredText(markdown: release.body.emojized())
+				if release.body?.isNotEmpty == true {
+					StructuredText(markdown: (release.body ?? "").emojized())
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
 			}
 
-			if release.assets.isNotEmpty || release.zipballUrl.isNotEmpty || release.tarballUrl.isNotEmpty {
-				DisclosureGroup("Assets (\(release.assets.count))") {
-					if release.assets.isNotEmpty {
-						ForEach(release.assets, id: \.id) { asset in
-							if let url = URL(string: asset.browserDownloadUrl) {
+			if release.assets?.isNotEmpty == true || release.zipballUrl?.isNotEmpty == true || release.tarballUrl?.isNotEmpty == true {
+				DisclosureGroup("Assets (\(release.assets?.count ?? 0))") {
+					if release.assets?.isNotEmpty == true {
+						ForEach(release.assets!, id: \.id) { asset in
+							if let urlString = asset.browserDownloadUrl, let url = URL(string: urlString) {
 								Link(
 									destination: url,
 									label: {
 										Label(
-											"\(asset.name) (\(ByteFormatter.shared.format(asset.size)))",
+											"\(asset.name ?? "") (\(ByteFormatter.shared.format(asset.size ?? 0)))",
 											systemImage: "square.and.arrow.down"
 										)
 										.modifier {
@@ -62,32 +64,32 @@ struct ReleaseView: View {
 									}
 								)
 							} else {
-								Text(asset.name)
+								Text(asset.name ?? "")
 							}
 						}
 					}
 
-					if release.zipballUrl.isNotEmpty, let url = URL(string: release.zipballUrl) {
+					if let zipballUrl = release.zipballUrl, zipballUrl.isNotEmpty, let url = URL(string: zipballUrl) {
 						Link("Source code (zip)", destination: url)
 					}
 
-					if release.tarballUrl.isNotEmpty, let url = URL(string: release.tarballUrl) {
+					if let tarballUrl = release.tarballUrl, tarballUrl.isNotEmpty, let url = URL(string: tarballUrl) {
 						Link("Source code (tar.gz)", destination: url)
 					}
 				}
 			}
 		} header: {
 			HStack {
-				Text(release.name.isNotEmpty ? release.name.emojized() : release.tagName)
-				if release.draft {
+				Text((release.name?.isNotEmpty == true ? release.name ?? "" : release.tagName ?? "").emojized())
+				if release.draft == true {
 				}
 				Spacer()
-				Text(release.publishedAt.toString(timeStyle: .short))
+				Text(release.publishedAt?.toString(timeStyle: .short) ?? "")
 					.font(.footnote)
 			}
 		}
 		.swipeActions {
-			if let url = URL(string: release.htmlUrl) {
+			if let htmlUrl = release.htmlUrl, let url = URL(string: htmlUrl) {
 				ShareLink(item: url)
 			}
 		}

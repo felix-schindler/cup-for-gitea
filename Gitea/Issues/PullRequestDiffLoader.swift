@@ -15,9 +15,9 @@ struct PullRequestDiffLoader: View {
 					path: .init(owner: owner, repo: repo, index: index, diffType: .diff),
 					query: .init(binary: false)
 				)
-			).ok.body.plainText
+			).ok.body.json
 
-			state = .loaded(try await String(collecting: raw, upTo: 2 * 1024 * 1024))
+			state = .loaded(String(raw.prefix(2 * 1024 * 1024)))
 		} catch {
 			state = .failed(error)
 		}

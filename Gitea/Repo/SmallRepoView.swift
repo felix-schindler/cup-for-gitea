@@ -23,28 +23,28 @@ struct SmallRepoView: View {
 			},
 			label: {
 				HStack {
-					if let url = URL(string: repo.avatarUrl) {
+					if let avatarUrl = repo.avatarUrl, let url = URL(string: avatarUrl) {
 						AvatarImage(url, size: .small)
 					}
 					if showFullName {
-						Text(repo.fullName)
+						Text(repo.fullName ?? "")
 					} else {
-						Text(repo.name)
+						Text(repo.name ?? "")
 					}
 					Spacer()
-					if repo.fork {
+					if repo.fork == true {
 						Image(systemName: Icons.forks.rawValue)
 					}
-					if repo.template {
+					if repo.template == true {
 						Image(systemName: "document.on.document")
 					}
-					if repo.mirror {
+					if repo.mirror == true {
 						Image(systemName: "square.stack.3d.forward.dottedline")
 					}
-					if repo.archived {
+					if repo.archived == true {
 						Image(systemName: "archivebox")
 					}
-					VisibilityIcon(repo._private ? "private" : repo._internal ? "limited" : "")
+					VisibilityIcon(repo._private == true ? "private" : repo._internal == true ? "limited" : "")
 				}
 			})
 	}

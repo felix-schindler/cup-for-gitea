@@ -17,17 +17,19 @@ struct ActivityView: View {
 				HStack {
 					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
-							if showActor {
-								SmallUserView(activity.actUser)
+							if showActor, let actUser = activity.actUser {
+								SmallUserView(actUser)
 							}
-							NavigationLink(activity.repo.fullName, destination: FullRepoView(activity.repo))
-								.controlSize(.mini)
-								.buttonBorderShape(.capsule)
-								.adaptiveButtonStyleProminent()
+							if let repo = activity.repo {
+								NavigationLink(repo.fullName ?? "", destination: FullRepoView(repo))
+									.controlSize(.mini)
+									.buttonBorderShape(.capsule)
+									.adaptiveButtonStyleProminent()
+							}
 						}.font(.footnote)
 					}
 					Spacer()
-					Text(activity.created.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+					Text(activity.created?.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)) ?? "")
 						.font(.footnote)
 				}
 
@@ -38,11 +40,11 @@ struct ActivityView: View {
 				}
 
 				switch activity.opType {
-				case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
-					.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
-					.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
-					.pullRequestReadyForReview, .autoMergePullRequest:
-					let parts = activity.content.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+				case .createIssue?, .commentIssue?, .closeIssue?, .reopenIssue?,
+					.createPullRequest?, .mergePullRequest?, .closePullRequest?, .reopenPullRequest?,
+					.commentPull?, .approvePullRequest?, .rejectPullRequest?, .pullReviewDismissed?,
+					.pullRequestReadyForReview?, .autoMergePullRequest?:
+					let parts = (activity.content ?? "").split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
 					if parts.count == 2 {
 						let content = String(parts[1])
 
@@ -52,8 +54,8 @@ struct ActivityView: View {
 								.lineLimit(5)
 						}
 					}
-				case .commitRepo, .pushTag:
-					if let data = activity.content.data(using: .utf8),
+				case .commitRepo?, .pushTag?:
+					if let data = activity.content?.data(using: .utf8),
 						let pushContent = try? JSONDecoder().decode(PushActivityContent.self, from: data)
 					{
 						if let commits = pushContent.commits, commits.isNotEmpty {
@@ -78,14 +80,14 @@ struct ActivityView: View {
 						} else {
 							HeadCommitView(commit: pushContent.headCommit)
 						}
-					} else if activity.content.isNotEmpty {
-						Text(activity.content.emojized())
+					} else if activity.content?.isNotEmpty == true {
+						Text((activity.content ?? "").emojized())
 							.font(.footnote)
 							.lineLimit(5)
 					}
 				default:
-					if activity.content.isNotEmpty {
-						Text(activity.content.emojized())
+					if activity.content?.isNotEmpty == true {
+						Text((activity.content ?? "").emojized())
 							.font(.footnote)
 							.lineLimit(5)
 					}
@@ -97,43 +99,45 @@ struct ActivityView: View {
 
 	private var actorName: String {
 		let actor = activity.actUser
-		if actor.fullName.isNotEmpty {
-			return actor.fullName
+		if actor?.fullName?.isNotEmpty == true {
+			return actor?.fullName ?? ""
 		}
-		return actor.login
+		return actor?.login ?? ""
 	}
 
 	@ViewBuilder
 	private var destinationView: some View {
-		let owner = activity.repo.owner.login
-		let repo = activity.repo.name
-		let ref = activity.refName
+		let owner = activity.repo?.owner?.login ?? ""
+		let repo = activity.repo?.name ?? ""
+		let ref = activity.refName ?? ""
 
 		switch activity.opType {
-		case .createIssue, .commentIssue, .closeIssue, .reopenIssue:
-			if let index = Int64(activity.content.split(separator: "|").first ?? "") {
+		case .createIssue?, .commentIssue?, .closeIssue?, .reopenIssue?:
+			if let index = Int64((activity.content ?? "").split(separator: "|").first ?? "") {
 				IssueLoader(owner: owner, repo: repo, index: index)
-			} else {
-				FullRepoView(activity.repo)
+			} else if let repo = activity.repo {
+				FullRepoView(repo)
 			}
-		case .createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
-			.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
-			.pullRequestReadyForReview, .autoMergePullRequest:
-			if let index = Int64(activity.content.split(separator: "|").first ?? "") {
+		case .createPullRequest?, .mergePullRequest?, .closePullRequest?, .reopenPullRequest?,
+			.commentPull?, .approvePullRequest?, .rejectPullRequest?, .pullReviewDismissed?,
+			.pullRequestReadyForReview?, .autoMergePullRequest?:
+			if let index = Int64((activity.content ?? "").split(separator: "|").first ?? "") {
 				PullRequestLoader(owner: owner, repo: repo, index: index)
-			} else {
-				FullRepoView(activity.repo)
+			} else if let repo = activity.repo {
+				FullRepoView(repo)
 			}
-		case .commitRepo:
+		case .commitRepo?:
 			CommitsLoader(owner: owner, repo: repo, ref: ref)
-		case .pushTag, .deleteTag:
+		case .pushTag?, .deleteTag?:
 			TagsLoader(owner: owner, repo: repo)
-		case .publishRelease:
+		case .publishRelease?:
 			ReleaseLoader(owner: owner, repo: repo)
-		case .deleteBranch:
+		case .deleteBranch?:
 			BranchesLoader(owner: owner, repo: repo)
 		default:
-			FullRepoView(activity.repo)
+			if let repo = activity.repo {
+				FullRepoView(repo)
+			}
 		}
 	}
 
@@ -164,8 +168,9 @@ struct ActivityView: View {
 		case .commentPull: return "note.text"
 		case .publishRelease: return "music.note"
 		case .pullReviewDismissed: return "xmark.seal"
-		case .pullRequestReadyForReview: return "arrow.triangle.pull"
-		case .autoMergePullRequest: return "arrow.triangle.merge"
+		case .pullRequestReadyForReview?: return "arrow.triangle.pull"
+		case .autoMergePullRequest?: return "arrow.triangle.merge"
+		case .none: return "circle"
 		}
 	}
 
@@ -187,17 +192,17 @@ struct ActivityView: View {
 	private var description: LocalizedStringResource {
 		let ref =
 			switch activity.opType {
-			case .createIssue, .commentIssue, .closeIssue, .reopenIssue,
-				.createPullRequest, .mergePullRequest, .closePullRequest, .reopenPullRequest,
-				.commentPull, .approvePullRequest, .rejectPullRequest, .pullReviewDismissed,
-				.pullRequestReadyForReview, .autoMergePullRequest:
-				if let iid = activity.content.split(separator: "|").first {
+			case .createIssue?, .commentIssue?, .closeIssue?, .reopenIssue?,
+				.createPullRequest?, .mergePullRequest?, .closePullRequest?, .reopenPullRequest?,
+				.commentPull?, .approvePullRequest?, .rejectPullRequest?, .pullReviewDismissed?,
+				.pullRequestReadyForReview?, .autoMergePullRequest?:
+				if let iid = (activity.content ?? "").split(separator: "|").first {
 					String(iid)
 				} else {
 					""
 				}
 			default:
-				activity.refName
+				activity.refName ?? ""
 			}
 
 		return switch activity.opType {
@@ -228,6 +233,7 @@ struct ActivityView: View {
 		case .pullReviewDismissed: "Dismissed review on pull request"
 		case .pullRequestReadyForReview: "Marked pull request ready for review"
 		case .autoMergePullRequest: "Auto-merged pull request"
+		case .none: ""
 		}
 	}
 }

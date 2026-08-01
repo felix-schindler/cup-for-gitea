@@ -25,7 +25,7 @@ struct HeaderRepoView: View {
 	}
 
 	private func load() async {
-		if let langs = try? await Network.shared.client.repoGetLanguages(path: .init(owner: repo.owner.login, repo: repo.name)).ok.body.json {
+		if let langs = try? await Network.shared.client.repoGetLanguages(path: .init(owner: repo.owner?.login ?? "", repo: repo.name ?? "")).ok.body.json {
 			self.langs = langs.additionalProperties
 		}
 	}
@@ -42,34 +42,34 @@ struct HeaderRepoView: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 5) {
 			HStack {
-				if let avatarUrl = URL(string: repo.avatarUrl) {
-					AvatarImage(avatarUrl, size: .medium)
+				if let avatarUrl = repo.avatarUrl, let url = URL(string: avatarUrl) {
+					AvatarImage(url, size: .medium)
 				}
 
-				Text(repo.name)
+				Text(repo.name ?? "")
 					.font(.title)
 					.fontWeight(.bold)
 				Spacer()
 
-				if repo._private {
+				if repo._private == true {
 					Image(systemName: "lock")
-				} else if repo._internal {
+				} else if repo._internal == true {
 					Image(systemName: "network.badge.shield.half.filled")
 				} else {
 					Image(systemName: "network")
 				}
 			}
 
-			if repo.description.isNotEmpty {
-				Text(repo.description.emojized())
+			if repo.description?.isNotEmpty == true {
+				Text((repo.description ?? "").emojized())
 			}
 
 			HStack {
-				if repo.topics.isNotEmpty {
+				if repo.topics?.isNotEmpty == true {
 					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
-							ForEach(repo.topics, id: \.self) { topic in
+							ForEach(repo.topics!, id: \.self) { topic in
 								NavigationLink(destination: RepoSearchLoader(context: .search, search: topic, limitToTopic: true)) {
 									Text(topic)
 								}
@@ -84,33 +84,35 @@ struct HeaderRepoView: View {
 
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack {
-					if repo.website.isNotEmpty, let url = URL(string: repo.website) {
-						Link(repo.website, destination: url)
+					if repo.website?.isNotEmpty == true, let website = repo.website, let url = URL(string: website) {
+						Link(website, destination: url)
 							.tint(.accentColor)
 							.buttonStyle(.bordered)
 							.controlSize(.mini)
 					}
 
-					if repo.licenses.isNotEmpty {
-						ForEach(repo.licenses, id: \.self) { license in
+					if repo.licenses?.isNotEmpty == true {
+						ForEach(repo.licenses!, id: \.self) { license in
 							PillView(verbatim: license)
 						}
 					}
 
-					if repo.size > 0 {
-						PillView(verbatim: ByteFormatter.shared.format(repo.size))
+					if (repo.size ?? 0) > 0 {
+						PillView(verbatim: ByteFormatter.shared.format(repo.size ?? 0))
 					}
 
-					PillView(verbatim: repo.createdAt.toString())
+					PillView(verbatim: repo.createdAt?.toString() ?? "")
 				}.font(.footnote)
 			}
 
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack {
-					SmallUserView(repo.owner)
-					PillView(verbatim: "\(repo.starsCount)", systemImage: Icons.starred.rawValue)
-					PillView(verbatim: "\(repo.forksCount)", systemImage: Icons.forks.rawValue)
-					PillView(verbatim: "\(repo.watchersCount)", systemImage: Icons.watchers.rawValue)
+					if let owner = repo.owner {
+						SmallUserView(owner)
+					}
+					PillView(verbatim: "\(repo.starsCount ?? 0)", systemImage: Icons.starred.rawValue)
+					PillView(verbatim: "\(repo.forksCount ?? 0)", systemImage: Icons.forks.rawValue)
+					PillView(verbatim: "\(repo.watchersCount ?? 0)", systemImage: Icons.watchers.rawValue)
 				}
 			}
 

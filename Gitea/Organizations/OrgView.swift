@@ -16,49 +16,49 @@ struct OrgView: View {
 			Section {
 				VStack(alignment: .leading) {
 					HStack {
-						if let url = URL(string: org.avatarUrl) {
+						if let avatarUrl = org.avatarUrl, let url = URL(string: avatarUrl) {
 							AvatarImage(url, size: .medium)
 						}
-						if org.fullName.isNotEmpty {
+						if org.fullName?.isNotEmpty == true {
 							VStack(alignment: .leading) {
-								Text(org.fullName)
-								Text(org.name)
+								Text(org.fullName ?? "")
+								Text(org.name ?? "")
 									.font(.footnote)
 									.foregroundStyle(.secondary)
 							}
 						} else {
-							Text(org.name)
+							Text(org.name ?? "")
 						}
 						Spacer()
-						VisibilityIcon(org.visibility)
+						VisibilityIcon(org.visibility?.value1.rawValue ?? "")
 					}
 
-					if org.description.isNotEmpty {
-						InlineText(markdown: org.description)
+					if org.description?.isNotEmpty == true {
+						InlineText(markdown: org.description ?? "")
 							.textual.inlineStyle(.gitHub)
 							.textual.textSelection(.enabled)
 					}
 
-					if org.email.isNotEmpty {
+					if org.email?.isNotEmpty == true {
 						ScrollView(.horizontal, showsIndicators: false) {
-							Link(org.email, destination: URL(string: "mailto:\(org.email)")!)
+							Link(org.email ?? "", destination: URL(string: "mailto:\(org.email ?? "")")!)
 								.tint(.accentColor)
 								.buttonStyle(.bordered)
 								.controlSize(.mini)
 						}
 					}
 
-					if org.website.isNotEmpty || org.location.isNotEmpty {
+					if org.website?.isNotEmpty == true || org.location?.isNotEmpty == true {
 						ScrollView(.horizontal, showsIndicators: false) {
 							HStack {
-								if let url = URL(string: org.website) {
-									Link(org.website, destination: url)
+								if let website = org.website, let url = URL(string: website) {
+									Link(website, destination: url)
 										.tint(.accentColor)
 										.buttonStyle(.bordered)
 										.controlSize(.mini)
 								}
-								if org.location.isNotEmpty {
-									PillView(verbatim: org.location, systemImage: "mappin")
+								if org.location?.isNotEmpty == true {
+									PillView(verbatim: org.location ?? "", systemImage: "mappin")
 								}
 							}
 						}
@@ -67,25 +67,25 @@ struct OrgView: View {
 			}
 
 			Section {
-				NavigationLink(destination: RepoSearchLoader(context: .org(org.id))) {
+				NavigationLink(destination: RepoSearchLoader(context: .org(org.id ?? 0))) {
 					Label("Repositories", systemImage: Icons.repositories.rawValue)
 				}
 				// Label("Projects", systemImage: Icons.projects.rawValue)
-				NavigationLink(destination: PackageLoader(owner: org.name)) {
+				NavigationLink(destination: PackageLoader(owner: org.name ?? "")) {
 					Label("Packages", systemImage: Icons.packages.rawValue)
 				}
-				NavigationLink(destination: UserSearchLoader(context: .orgMembers(org: org.name))) {
+				NavigationLink(destination: UserSearchLoader(context: .orgMembers(org: org.name ?? ""))) {
 					Label("Members", systemImage: Icons.users.rawValue)
 				}
-				NavigationLink(destination: TeamLoader(orgName: org.name)) {
+				NavigationLink(destination: TeamLoader(orgName: org.name ?? "")) {
 					Label("Teams", systemImage: "person.3")
 				}
-				NavigationLink(destination: ActivityLoader(context: .org(org.name))) {
+				NavigationLink(destination: ActivityLoader(context: .org(org.name ?? ""))) {
 					Label("Public Activity", systemImage: Icons.activity.rawValue)
 				}
 			}
 		}
-		.navigationTitle(org.name)
+		.navigationTitle(org.name ?? "")
 		.navigationBarTitleDisplayMode(.inline)
 	}
 }
@@ -103,7 +103,7 @@ struct OrgView: View {
 				name: "Tanuki",
 				repoAdminChangeTeamAccess: true,
 				username: "Tanuki",
-				visibility: "private",
+				visibility: .some(.init(value1: ._private)),
 				website: "https://www.schindlerfelix.de/projects/tanuki"
 			))
 	}

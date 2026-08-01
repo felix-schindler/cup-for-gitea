@@ -86,7 +86,7 @@ struct UserSearchLoader: View {
 						page: page,
 						limit: defaultLimit
 					))
-			).ok.body.json.data
+			).ok.body.json.data ?? []
 		case .orgMembers(let org):
 			try await Network.shared.client.orgListMembers(
 				path: .init(org: org),

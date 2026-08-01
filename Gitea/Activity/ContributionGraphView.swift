@@ -17,9 +17,9 @@ struct ContributionGraphView: View {
 	private var contributionsByDate: [Date: Int] {
 		Dictionary(
 			data.map { entry in
-				let date = Date(timeIntervalSince1970: TimeInterval(entry.timestamp))
+				let date = Date(timeIntervalSince1970: TimeInterval(entry.timestamp ?? 0))
 				let day = calendar.startOfDay(for: date)
-				return (day, Int(entry.contributions))
+				return (day, Int(entry.contributions ?? 0))
 			}, uniquingKeysWith: +)
 	}
 
@@ -40,7 +40,7 @@ struct ContributionGraphView: View {
 	}
 
 	private var totalContributions: Int {
-		data.reduce(0) { $0 + Int($1.contributions) }
+		data.reduce(0) { $0 + Int($1.contributions ?? 0) }
 	}
 
 	private let cellColors: [Color] = [

@@ -42,7 +42,7 @@ struct ActionsLoader: View {
 					limit: defaultLimit
 				)
 			).ok.body.json
-			return response.workflowRuns
+			return response.workflowRuns ?? []
 		}
 	}
 

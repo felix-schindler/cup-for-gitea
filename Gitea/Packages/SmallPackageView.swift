@@ -18,9 +18,11 @@ struct SmallPackageView: View {
 		VStack(alignment: .leading) {
 			ScrollView(.horizontal) {
 				HStack {
-					SmallUserView(pkg.owner)
+					if let owner = pkg.owner {
+						SmallUserView(owner)
+					}
 					if let repo = pkg.repository {
-						NavigationLink(repo.name, destination: FullRepoView(repo))
+						NavigationLink(repo.name ?? "", destination: FullRepoView(repo))
 							.controlSize(.mini)
 							.buttonBorderShape(.capsule)
 							.adaptiveButtonStyleProminent()
@@ -28,23 +30,23 @@ struct SmallPackageView: View {
 				}
 			}.font(.footnote)
 
-			Text(pkg.name)
+			Text(pkg.name ?? "")
 
 			ScrollView(.horizontal) {
 				HStack {
-					Text(pkg._type.capitalized)
-					Text(pkg.createdAt.toString(timeStyle: .short))
+					Text((pkg._type ?? "").capitalized)
+					Text(pkg.createdAt?.toString(timeStyle: .short) ?? "")
 				}
 			}.font(.footnote)
 
 			ScrollView(.horizontal) {
-				Text(pkg.version)
+				Text(pkg.version ?? "")
 					.font(.footnote)
 					.foregroundStyle(.secondary)
 					.monospaced()
 			}
 		}.swipeActions {
-			if let url = URL(string: pkg.htmlUrl) {
+			if let htmlUrl = pkg.htmlUrl, let url = URL(string: htmlUrl) {
 				ShareLink(item: url)
 			}
 		}
@@ -55,7 +57,7 @@ struct SmallPackageView: View {
 	let user = Components.Schemas.User(
 		active: true, avatarUrl: "https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa", created: Date(), description: "", email: "",
 		followersCount: 0, followingCount: 0, fullName: "Felix", htmlUrl: "https://git.schindlerfelix.de/felix-schindler", id: 1, isAdmin: true, language: "", lastLogin: Date(), location: "",
-		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0, starredReposCount: 0, visibility: "", website: "")
+		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0, starredReposCount: 0, visibility: .some(.init(value1: ._private)), website: "")
 
 	let pkg = Components.Schemas.Package(createdAt: Date(), creator: user, htmlUrl: "https://schindlerfelix.de", id: 2, name: "package-name", owner: user, _type: "container", version: "main")
 

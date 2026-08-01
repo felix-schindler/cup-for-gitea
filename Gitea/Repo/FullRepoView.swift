@@ -18,15 +18,19 @@ struct FullRepoView: View {
 		self.repo = repo
 	}
 
+	private var owner: String { repo.owner?.login ?? "" }
+	private var repoName: String { repo.name ?? "" }
+	private var defaultBranch: String { repo.defaultBranch ?? "" }
+
 	private func load() async {
 		do {
 			let contents = try await Network.shared.client.repoGetRawFile(
 				.init(
 					path: .init(
-						owner: repo.owner.login,
-						repo: repo.name,
+						owner: owner,
+						repo: repoName,
 						filepath: "README.md"))
-			).ok.body.plainText
+			).ok.body.binary
 
 			// Collect the entire HTTP body into a single String, limiting to 2 MB
 			let stringContents = try await String(collecting: contents, upTo: 2 * 1024 * 1024)
@@ -42,25 +46,25 @@ struct FullRepoView: View {
 				HeaderRepoView(repo)
 			}
 
-			if repo.fork || repo.template || repo.mirror || repo.archived || repo.originalUrl.isNotEmpty {
+			if repo.fork == true || repo.template == true || repo.mirror == true || repo.archived == true || repo.originalUrl?.isNotEmpty == true {
 				Section {
 					VStack(alignment: .leading) {
-						if repo.fork {
+						if repo.fork == true {
 							Label("This repository is a fork of another repository.", systemImage: Icons.forks.rawValue)
 						}
-						if repo.template {
+						if repo.template == true {
 							Label("This repository is a template.", systemImage: "document.on.document")
 						}
-						if repo.mirror {
+						if repo.mirror == true {
 							Label("This repository is a mirror.", systemImage: "square.stack.3d.forward.dottedline")
-							Text("Last updated at \(repo.mirrorUpdated.toString()); Inverval: \(repo.mirrorInterval)")
+							Text("Last updated at \(repo.mirrorUpdated?.toString() ?? ""); Inverval: \(repo.mirrorInterval ?? "")")
 								.font(.footnote)
 						}
-						if repo.archived {
-							Label("This repository has been archived on \(repo.archivedAt.toString()).", systemImage: "archivebox")
+						if repo.archived == true {
+							Label("This repository has been archived on \(repo.archivedAt?.toString() ?? "").", systemImage: "archivebox")
 						}
-						if let url = URL(string: repo.originalUrl) {
-							Link(repo.originalUrl, destination: url)
+						if let originalUrl = repo.originalUrl, let url = URL(string: originalUrl) {
+							Link(originalUrl, destination: url)
 								.font(.caption)
 						}
 					}.labelStyle(TrailingIconLabelStyle())
@@ -68,7 +72,7 @@ struct FullRepoView: View {
 			}
 
 			Section {
-				if repo.hasIssues {
+				if repo.hasIssues == true {
 					if let externalTracker = repo.externalTracker?.externalTrackerUrl,
 						let url = URL(string: externalTracker)
 					{
@@ -78,13 +82,13 @@ struct FullRepoView: View {
 								Label("Issues", systemImage: Icons.issues.rawValue)
 							})
 					} else {
-						NavigationLink(destination: IssueSearchLoader(type: .issues, owner: repo.owner.login, repo: repo.name)) {
+						NavigationLink(destination: IssueSearchLoader(type: .issues, owner: owner, repo: repoName)) {
 							Label(
 								title: {
 									HStack {
 										Text("Issues")
 										Spacer()
-										Text("\(repo.openIssuesCount)")
+										Text("\(repo.openIssuesCount ?? 0)")
 									}
 								},
 								icon: {
@@ -94,14 +98,14 @@ struct FullRepoView: View {
 					}
 				}
 
-				if repo.hasPullRequests {
-					NavigationLink(destination: IssueSearchLoader(type: .pulls, owner: repo.owner.login, repo: repo.name)) {
+				if repo.hasPullRequests == true {
+					NavigationLink(destination: IssueSearchLoader(type: .pulls, owner: owner, repo: repoName)) {
 						Label(
 							title: {
 								HStack {
 									Text("Pull Requests")
 									Spacer()
-									Text("\(repo.openPrCounter)")
+									Text("\(repo.openPrCounter ?? 0)")
 								}
 							},
 							icon: {
@@ -113,21 +117,21 @@ struct FullRepoView: View {
 				DisclosureGroup(
 					content: {
 						NavigationLink("Collaborators") {
-							UserSearchLoader(context: .repoCollaborators(owner: repo.owner.login, repo: repo.name))
+							UserSearchLoader(context: .repoCollaborators(owner: owner, repo: repoName))
 						}
 						NavigationLink("Labels") {
-							LabelsLoader(owner: repo.owner.login, repo: repo.name)
+							LabelsLoader(owner: owner, repo: repoName)
 						}
 						NavigationLink("Milestones") {
-							MilestonesLoader(owner: repo.owner.login, repo: repo.name)
+							MilestonesLoader(owner: owner, repo: repoName)
 						}
 						NavigationLink("Worktime") {
-							RepoWorktimeLoader(owner: repo.owner.login, repo: repo.name)
+							RepoWorktimeLoader(owner: owner, repo: repoName)
 						}
 						// if repo.hasProjects {
 						// 	Text("Projects")
 						// }
-						if repo.hasWiki, let externalWiki = repo.externalWiki, let url = URL(string: externalWiki.externalWikiUrl) {
+						if repo.hasWiki == true, let externalWiki = repo.externalWiki, let externalWikiUrl = externalWiki.externalWikiUrl, let url = URL(string: externalWikiUrl) {
 							Link("Wiki", destination: url)
 						}
 					},
@@ -136,20 +140,20 @@ struct FullRepoView: View {
 					}
 				)
 
-				if repo.hasCode {
+				if repo.hasCode == true {
 					DisclosureGroup(
 						content: {
 							NavigationLink("Code") {
-								TreeLoader(owner: repo.owner.login, repo: repo.name, ref: repo.defaultBranch)
+								TreeLoader(owner: owner, repo: repoName, ref: defaultBranch)
 							}
 							NavigationLink("Commits") {
-								CommitsLoader(owner: repo.owner.login, repo: repo.name, ref: repo.defaultBranch)
+								CommitsLoader(owner: owner, repo: repoName, ref: defaultBranch)
 							}
 							NavigationLink("Branches") {
-								BranchesLoader(owner: repo.owner.login, repo: repo.name)
+								BranchesLoader(owner: owner, repo: repoName)
 							}
 							NavigationLink("Tags") {
-								TagsLoader(owner: repo.owner.login, repo: repo.name)
+								TagsLoader(owner: owner, repo: repoName)
 							}
 						},
 						label: {
@@ -158,22 +162,22 @@ struct FullRepoView: View {
 					)
 				}
 
-				if repo.hasReleases || repo.hasActions || repo.hasPackages {
+				if repo.hasReleases == true || repo.hasActions == true || repo.hasPackages == true {
 					DisclosureGroup(
 						content: {
-							if repo.hasActions {
+							if repo.hasActions == true {
 								NavigationLink("Actions") {
-									ActionsLoader(owner: repo.owner.login, repo: repo.name)
+									ActionsLoader(owner: owner, repo: repoName)
 								}
 							}
-							if repo.hasReleases {
+							if repo.hasReleases == true {
 								NavigationLink("Releases") {
-									ReleaseLoader(owner: repo.owner.login, repo: repo.name)
+									ReleaseLoader(owner: owner, repo: repoName)
 								}
 							}
-							if repo.hasPackages {
+							if repo.hasPackages == true {
 								NavigationLink("Packages") {
-									RepoPackageLoader(owner: repo.owner.login, repo: repo.name)
+									RepoPackageLoader(owner: owner, repo: repoName)
 								}
 							}
 						},
@@ -186,7 +190,7 @@ struct FullRepoView: View {
 
 			if let readmeContents, readmeContents.isNotEmpty {
 				Section {
-					let readmeBaseURL = Network.baseURL.appending(path: "\(repo.owner.login)/\(repo.name)/src/branch/\(repo.defaultBranch)")
+					let readmeBaseURL = Network.baseURL.appending(path: "\(owner)/\(repoName)/src/branch/\(defaultBranch)")
 					StructuredText(markdown: readmeContents.emojized(), baseURL: readmeBaseURL)
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
@@ -199,7 +203,7 @@ struct FullRepoView: View {
 		}.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Menu("More", systemImage: "ellipsis") {
-					if let url = URL(string: repo.htmlUrl) {
+					if let htmlUrl = repo.htmlUrl, let url = URL(string: htmlUrl) {
 						Section {
 							ShareLink(item: url)
 						}
@@ -207,11 +211,11 @@ struct FullRepoView: View {
 
 					Section("Clone code") {
 						Button("Copy SSH URL") {
-							UIPasteboard.general.string = repo.sshUrl
+							UIPasteboard.general.string = repo.sshUrl ?? ""
 							HapticFeedback.notify(.success)
 						}
 						Button("Copy HTTPS URL") {
-							UIPasteboard.general.string = repo.cloneUrl
+							UIPasteboard.general.string = repo.cloneUrl ?? ""
 							HapticFeedback.notify(.success)
 						}
 					}
@@ -219,31 +223,31 @@ struct FullRepoView: View {
 			}
 			ToolbarItem(placement: .topBarTrailing) {
 				Menu("Create", systemImage: "plus") {
-					if repo.hasIssues, repo.externalTracker == nil {
-						NavigationLink(destination: NewIssueView(owner: repo.owner.login, repo: repo.name)) {
+					if repo.hasIssues == true, repo.externalTracker == nil {
+						NavigationLink(destination: NewIssueView(owner: owner, repo: repoName)) {
 							Label("New Issue", systemImage: Icons.issues.rawValue)
 						}
 					}
-					if repo.hasPullRequests {
-						NavigationLink(destination: NewPullRequestView(owner: repo.owner.login, repo: repo.name)) {
+					if repo.hasPullRequests == true {
+						NavigationLink(destination: NewPullRequestView(owner: owner, repo: repoName)) {
 							Label("New Pull Request", systemImage: Icons.pull_requests.rawValue)
 						}
 					}
-					NavigationLink(destination: NewLabelView(owner: repo.owner.login, repo: repo.name)) {
+					NavigationLink(destination: NewLabelView(owner: owner, repo: repoName)) {
 						Label("New Label", systemImage: Icons.topics.rawValue)
 					}
-					NavigationLink(destination: NewMilestoneView(owner: repo.owner.login, repo: repo.name)) {
+					NavigationLink(destination: NewMilestoneView(owner: owner, repo: repoName)) {
 						Label("New Milestone", systemImage: Icons.milestones.rawValue)
 					}
-					if repo.hasReleases {
-						NavigationLink(destination: NewReleaseView(owner: repo.owner.login, repo: repo.name)) {
+					if repo.hasReleases == true {
+						NavigationLink(destination: NewReleaseView(owner: owner, repo: repoName)) {
 							Label("New Release", systemImage: "flag")
 						}
 					}
 				}
 			}
 		}
-		.navigationTitle(repo.fullName)
+		.navigationTitle(repo.fullName ?? "")
 		.navigationBarTitleDisplayMode(.inline)
 	}
 }

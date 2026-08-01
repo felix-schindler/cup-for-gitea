@@ -57,7 +57,7 @@ struct TreeLoader: View {
 							Text("Branch")
 							Picker("", selection: $ref) {
 								ForEach(branches, id: \.name) { branch in
-									Text(branch.name).tag(branch.name)
+									Text(branch.name ?? "").tag(branch.name ?? "")
 								}
 							}
 							.pickerStyle(.menu)
@@ -84,21 +84,21 @@ struct TreeLoader: View {
 										owner: owner,
 										repo: repo,
 										ref: ref,
-										folderPath: entry.path
+										folderPath: entry.path ?? ""
 									)
 								) {
-									Label(entry.name, systemImage: "folder")
+									Label(entry.name ?? "", systemImage: "folder")
 								}
 							} else {
 								NavigationLink(
 									destination: FileLoader(
 										owner: owner,
 										repo: repo,
-										filePath: entry.path,
+										filePath: entry.path ?? "",
 										ref: ref
 									)
 								) {
-									Label(entry.name, systemImage: "doc.text")
+									Label(entry.name ?? "", systemImage: "doc.text")
 								}
 							}
 						}

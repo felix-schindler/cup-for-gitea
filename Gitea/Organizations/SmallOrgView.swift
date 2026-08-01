@@ -17,21 +17,21 @@ struct SmallOrgView: View {
 	var body: some View {
 		NavigationLink(destination: OrgView(org: org)) {
 			HStack {
-				if let url = URL(string: org.avatarUrl) {
+				if let avatarUrl = org.avatarUrl, let url = URL(string: avatarUrl) {
 					AvatarImage(url, size: .medium)
 				}
-				if org.fullName.isNotEmpty {
+				if org.fullName?.isNotEmpty == true {
 					VStack(alignment: .leading) {
-						Text(org.fullName)
-						Text(org.name)
+						Text(org.fullName ?? "")
+						Text(org.name ?? "")
 							.font(.footnote)
 							.foregroundStyle(.secondary)
 					}
 				} else {
-					Text(org.name)
+					Text(org.name ?? "")
 				}
 				Spacer()
-				VisibilityIcon(org.visibility)
+				VisibilityIcon(org.visibility?.value1.rawValue ?? "")
 			}
 		}
 	}
@@ -50,7 +50,7 @@ struct SmallOrgView: View {
 				name: "Tanuki",
 				repoAdminChangeTeamAccess: true,
 				username: "Tanuki",
-				visibility: "private",
+				visibility: .some(.init(value1: ._private)),
 				website: "https://www.schindlerfelix.de/projects/tanuki"
 			))
 	}

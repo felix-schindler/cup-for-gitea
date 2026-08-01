@@ -47,7 +47,7 @@ struct CommitsLoader: View {
 					Text("On branch")
 					Picker("", selection: $ref) {
 						ForEach(branches!, id: \.name) { branch in
-							Text(branch.name).tag(branch.name)
+							Text(branch.name ?? "").tag(branch.name ?? "")
 						}
 					}
 					.pickerStyle(.menu)
@@ -76,7 +76,7 @@ struct CommitsLoader: View {
 								CommitRow(commit: commit)
 							}
 							.swipeActions {
-								if let url = URL(string: commit.htmlUrl) {
+								if let htmlUrl = commit.htmlUrl, let url = URL(string: htmlUrl) {
 									ShareLink(item: url)
 								}
 							}
@@ -104,25 +104,25 @@ private struct CommitRow: View {
 
 	var body: some View {
 		VStack(alignment: .leading) {
-			Text(commit.commit.message.emojized())
+			Text(commit.commit?.message?.emojized() ?? "")
 				.fontWeight(.medium)
 
 			HStack {
-				Text(commit.sha.prefix(10))
+				Text((commit.sha ?? "").prefix(10))
 					.monospaced()
-				Text(commit.created.toString())
+				Text(commit.created?.toString() ?? "")
 			}.font(.footnote)
 
 			HStack {
 				if let author = commit.author {
-					Text("Authored by \(author.login)")
-					if author.fullName.isNotEmpty {
-						Text("(\(author.fullName))")
+					Text("Authored by \(author.login ?? "")")
+					if author.fullName?.isNotEmpty == true {
+						Text("(\(author.fullName ?? ""))")
 					}
 				} else {
-					Text("Authored by \(commit.commit.author.email)")
-					if commit.commit.author.name.isNotEmpty {
-						Text("(\(commit.commit.author.name))")
+					Text("Authored by \(commit.commit?.author?.email ?? "")")
+					if commit.commit?.author?.name?.isNotEmpty == true {
+						Text("(\(commit.commit?.author?.name ?? ""))")
 					}
 				}
 			}
@@ -141,54 +141,56 @@ private struct CommitDetailView: View {
 		List {
 			Section {
 				VStack(alignment: .leading, spacing: 8) {
-					Text(commit.commit.message.emojized())
+					Text(commit.commit?.message?.emojized() ?? "")
 						.font(.title3)
 						.fontWeight(.medium)
 
-					HStack {
-						StatBadge("+\(commit.stats.additions)", color: .green)
-						StatBadge("-\(commit.stats.deletions)", color: .red)
-						if commit.stats.total > 0 {
-							StatBadge("\(commit.stats.total) total", color: .secondary)
+					if let stats = commit.stats {
+						HStack {
+							StatBadge("+\(stats.additions ?? 0)", color: .green)
+							StatBadge("-\(stats.deletions ?? 0)", color: .red)
+							if (stats.total ?? 0) > 0 {
+								StatBadge("\(stats.total ?? 0) total", color: .secondary)
+							}
 						}
 					}
 
 					HStack {
-						Text(commit.sha.prefix(10))
+						Text((commit.sha ?? "").prefix(10))
 							.monospaced()
 							.textSelection(.enabled)
-						Text(commit.created.toString(timeStyle: .short))
+						Text(commit.created?.toString(timeStyle: .short) ?? "")
 					}.font(.footnote)
 
 					if let author = commit.author {
-						Text("Authored by \(author.login)")
-						if author.fullName.isNotEmpty {
-							Text("(\(author.fullName))")
+						Text("Authored by \(author.login ?? "")")
+						if author.fullName?.isNotEmpty == true {
+							Text("(\(author.fullName ?? ""))")
 						}
 					} else {
-						Text("Authored by \(commit.commit.author.email)")
-						if commit.commit.author.name.isNotEmpty {
-							Text("(\(commit.commit.author.name))")
+						Text("Authored by \(commit.commit?.author?.email ?? "")")
+						if commit.commit?.author?.name?.isNotEmpty == true {
+							Text("(\(commit.commit?.author?.name ?? ""))")
 						}
 					}
 				}
 			}
 
-			if commit.files.isNotEmpty {
+			if commit.files?.isNotEmpty == true {
 				Section("Files") {
 					NavigationLink {
-						CommitDiffView(owner: owner, repo: repo, sha: commit.sha)
+						CommitDiffView(owner: owner, repo: repo, sha: commit.sha ?? "")
 					} label: {
 						Label("View Diff", systemImage: "doc.text")
 					}
-					ForEach(commit.files, id: \.filename) { file in
+					ForEach(commit.files!, id: \.filename) { file in
 						NavigationLink {
-							CommitDiffView(owner: owner, repo: repo, sha: commit.sha)
+							CommitDiffView(owner: owner, repo: repo, sha: commit.sha ?? "")
 						} label: {
 							HStack {
 								Image(systemName: fileSymbol(for: file.status))
 									.foregroundStyle(color(for: file.status))
-								Text(file.filename)
+								Text(file.filename ?? "")
 									.font(.system(.caption, design: .monospaced))
 							}
 						}
@@ -196,7 +198,7 @@ private struct CommitDetailView: View {
 				}
 			}
 		}
-		.navigationTitle("Commit \(commit.sha.prefix(10))")
+		.navigationTitle("Commit \((commit.sha ?? "").prefix(10))")
 		.navigationBarTitleDisplayMode(.inline)
 	}
 
@@ -232,9 +234,9 @@ private struct CommitDiffView: View {
 		do {
 			let raw = try await Network.shared.client.repoDownloadCommitDiffOrPatch(
 				.init(path: .init(owner: owner, repo: repo, sha: sha, diffType: .diff))
-			).ok.body.plainText
+			).ok.body.json
 
-			state = .loaded(try await String(collecting: raw, upTo: 2 * 1024 * 1024))
+			state = .loaded(String(raw.prefix(2 * 1024 * 1024)))
 		} catch {
 			state = .failed(error)
 		}

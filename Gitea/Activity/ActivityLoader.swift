@@ -100,8 +100,8 @@ struct ActivityLoader: View {
 			case .home:
 				if page == 1 {
 					let user = try await Network.shared.client.userGetCurrent().ok.body.json
-					userLogin = user.login
-					await loadHeatmap(username: user.login)
+					userLogin = user.login ?? ""
+					await loadHeatmap(username: user.login ?? "")
 				}
 				guard let login = userLogin else { return [] }
 				return try await Network.shared.client.userListActivityFeeds(

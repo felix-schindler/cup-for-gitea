@@ -30,17 +30,19 @@ struct NewIssueView: View {
 	@State private var error: Error?
 
 	private func toggleLabel(_ label: Components.Schemas.Label, labels: [Components.Schemas.Label]) {
-		if setLabels.contains(label.id) {
-			setLabels.removeAll { $0 == label.id }
+		if let id = label.id, setLabels.contains(id) {
+			setLabels.removeAll { $0 == id }
 			return
 		}
 
-		if label.exclusive {
-			let exclusiveIds = Set(labels.filter { $0.exclusive }.map { $0.id })
+		if label.exclusive == true {
+			let exclusiveIds = Set(labels.filter { $0.exclusive == true }.compactMap(\.id))
 			setLabels.removeAll { exclusiveIds.contains($0) }
 		}
 
-		setLabels.append(label.id)
+		if let id = label.id {
+			setLabels.append(id)
+		}
 	}
 
 	private func load() async {
@@ -106,16 +108,18 @@ struct NewIssueView: View {
 				Section {
 					ForEach(users, id: \.id) { user in
 						Button {
-							if assignees.contains(user.login) {
-								assignees.removeAll { $0 == user.login }
-							} else {
-								assignees.append(user.login)
+							if let login = user.login {
+								if assignees.contains(login) {
+									assignees.removeAll { $0 == login }
+								} else {
+									assignees.append(login)
+								}
 							}
 						} label: {
 							HStack {
-								Text(user.fullName.isEmpty ? user.login : user.fullName)
+								Text((user.fullName?.isEmpty == false ? user.fullName : user.login) ?? "")
 								Spacer()
-								if assignees.contains(user.login) {
+								if let login = user.login, assignees.contains(login) {
 									Image(systemName: "checkmark")
 								}
 							}
@@ -139,7 +143,7 @@ struct NewIssueView: View {
 							HStack {
 								SmallLabelView(label: label)
 								Spacer()
-								if setLabels.contains(label.id) {
+								if let id = label.id, setLabels.contains(id) {
 									Image(systemName: "checkmark")
 								}
 							}
@@ -159,7 +163,7 @@ struct NewIssueView: View {
 					Picker("Milestone", selection: $milestone) {
 						Text("None").tag(nil as Int64?)
 						ForEach(milestones, id: \.id) { milestone in
-							Text(milestone.title.emojized()).tag(milestone.id)
+							Text(milestone.title?.emojized() ?? "").tag(milestone.id)
 						}
 					}
 				}

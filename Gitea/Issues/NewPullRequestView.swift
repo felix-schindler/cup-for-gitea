@@ -56,7 +56,7 @@ struct NewPullRequestView: View {
 
 		// Set defaults
 		if self.baseBranch.isEmpty, let firstMainOrMaster = self.branches?.first(where: { $0.name == "main" || $0.name == "master" }) {
-			self.baseBranch = firstMainOrMaster.name
+			self.baseBranch = firstMainOrMaster.name ?? ""
 		}
 	}
 
@@ -116,12 +116,12 @@ struct NewPullRequestView: View {
 				if let branches {
 					Picker("Base Branch", selection: $baseBranch) {
 						ForEach(branches, id: \.name) { branch in
-							Text(branch.name).tag(branch.name)
+							Text(branch.name ?? "").tag(branch.name ?? "")
 						}
 					}
 					Picker("Head Branch", selection: $headBranch) {
 						ForEach(branches, id: \.name) { branch in
-							Text(branch.name).tag(branch.name)
+							Text(branch.name ?? "").tag(branch.name ?? "")
 						}
 					}
 				} else {
@@ -140,16 +140,18 @@ struct NewPullRequestView: View {
 				Section {
 					ForEach(users, id: \.id) { user in
 						Button {
-							if assignees.contains(user.login) {
-								assignees.removeAll { $0 == user.login }
-							} else {
-								assignees.append(user.login)
+							if let login = user.login {
+								if assignees.contains(login) {
+									assignees.removeAll { $0 == login }
+								} else {
+									assignees.append(login)
+								}
 							}
 						} label: {
 							HStack {
-								Text(user.fullName.isEmpty ? user.login : user.fullName)
+								Text((user.fullName?.isEmpty == false ? user.fullName : user.login) ?? "")
 								Spacer()
-								if assignees.contains(user.login) {
+								if let login = user.login, assignees.contains(login) {
 									Image(systemName: "checkmark")
 								}
 							}
@@ -166,16 +168,18 @@ struct NewPullRequestView: View {
 				Section {
 					ForEach(users, id: \.id) { user in
 						Button {
-							if reviewerUsernames.contains(user.login) {
-								reviewerUsernames.removeAll { $0 == user.login }
-							} else {
-								reviewerUsernames.append(user.login)
+							if let login = user.login {
+								if reviewerUsernames.contains(login) {
+									reviewerUsernames.removeAll { $0 == login }
+								} else {
+									reviewerUsernames.append(login)
+								}
 							}
 						} label: {
 							HStack {
-								Text(user.fullName.isEmpty ? user.login : user.fullName)
+								Text((user.fullName?.isEmpty == false ? user.fullName : user.login) ?? "")
 								Spacer()
-								if reviewerUsernames.contains(user.login) {
+								if let login = user.login, reviewerUsernames.contains(login) {
 									Image(systemName: "checkmark")
 								}
 							}
@@ -194,20 +198,21 @@ struct NewPullRequestView: View {
 				Section {
 					ForEach(labels, id: \.id) { label in
 						Button {
-							if setLabels.contains(label.id) {
-								setLabels.removeAll { $0 == label.id }
-							} else if label.exclusive {
-								let exclusiveIds = Set(labels.filter { $0.exclusive }.map { $0.id })
+							guard let id = label.id else { return }
+							if setLabels.contains(id) {
+								setLabels.removeAll { $0 == id }
+							} else if label.exclusive == true {
+								let exclusiveIds = Set(labels.filter { $0.exclusive == true }.compactMap(\.id))
 								setLabels.removeAll { exclusiveIds.contains($0) }
-								setLabels.append(label.id)
+								setLabels.append(id)
 							} else {
-								setLabels.append(label.id)
+								setLabels.append(id)
 							}
 						} label: {
 							HStack {
 								SmallLabelView(label: label)
 								Spacer()
-								if setLabels.contains(label.id) {
+								if let id = label.id, setLabels.contains(id) {
 									Image(systemName: "checkmark")
 								}
 							}
@@ -227,7 +232,7 @@ struct NewPullRequestView: View {
 					Picker("Milestone", selection: $milestone) {
 						Text("None").tag(nil as Int64?)
 						ForEach(milestones, id: \.id) { milestone in
-							Text(milestone.title.emojized()).tag(Optional(milestone.id))
+							Text(milestone.title?.emojized() ?? "").tag(Optional(milestone.id))
 						}
 					}
 				}

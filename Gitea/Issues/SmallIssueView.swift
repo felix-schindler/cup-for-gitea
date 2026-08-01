@@ -72,7 +72,7 @@ struct SmallIssueView: View {
 		switch item {
 		case .issue(let issue, let isPullRequest):
 			if isPullRequest {
-				PullRequestLoader(owner: issue.repository.owner, repo: issue.repository.name, index: issue.number)
+				PullRequestLoader(owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)
 			} else {
 				IssueView(issue)
 			}
@@ -88,7 +88,7 @@ struct SmallIssueView: View {
 			if isPullRequest {
 				StateIconView(.pull, issue.pullRequestState, isDraft: issue.pullRequest?.draft == true)
 			} else {
-				StateIconView(.issue, issue.state.notificationState)
+				StateIconView(.issue, issue.state?.notificationState ?? .closed)
 			}
 		case .pullRequest(let pullRequest):
 			StateIconView(.pull, pullRequest.notificationState)
@@ -99,14 +99,18 @@ struct SmallIssueView: View {
 	private var userView: some View {
 		switch item {
 		case .issue(let issue, _):
-			SmallUserView(issue.user)
+			if let user = issue.user {
+				SmallUserView(user)
+			}
 		case .pullRequest(let pullRequest):
-			SmallUserView(pullRequest.user)
+			if let user = pullRequest.user {
+				SmallUserView(user)
+			}
 		}
 	}
 }
 
-extension Components.Schemas.Issue.StatePayload {
+extension Components.Schemas.StateType {
 	var notificationState: Components.Schemas.NotificationSubject.StatePayload {
 		switch self {
 		case .open: return .open
@@ -120,12 +124,15 @@ extension Components.Schemas.Issue {
 		if pullRequest?.merged == true {
 			return .merged
 		}
-		return state == .open ? .open : .closed
+		return state?.notificationState ?? .closed
 	}
 }
 
 extension Components.Schemas.PullRequest {
 	var notificationState: Components.Schemas.NotificationSubject.StatePayload {
-		merged ? .merged : (state == .open ? .open : .closed)
+		if merged == true {
+			return .merged
+		}
+		return state?.value1.notificationState ?? .closed
 	}
 }

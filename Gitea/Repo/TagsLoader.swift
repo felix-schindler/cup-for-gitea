@@ -31,27 +31,29 @@ struct TagsLoader: View {
 			load: load
 		) { tag in
 			VStack(alignment: .leading) {
-				Text(tag.name.emojized())
+				Text((tag.name ?? "").emojized())
 					.font(.headline)
 
 				VStack(alignment: .leading) {
-					HStack {
-						Text(tag.commit.sha.prefix(10))
-							.monospaced()
-						Text(tag.commit.created.toString())
+					if let commit = tag.commit {
+						HStack {
+							Text(String((commit.sha ?? "").prefix(10)))
+								.monospaced()
+							Text(commit.created?.toString() ?? "")
+						}
 					}
 				}
 				.font(.footnote)
 				.foregroundStyle(.secondary)
 
-				if tag.message.isNotEmpty {
-					Text(tag.message.emojized())
+				if tag.message?.isNotEmpty == true {
+					Text((tag.message ?? "").emojized())
 				}
 
-				if tag.tarballUrl.isNotEmpty || tag.zipballUrl.isNotEmpty {
+				if tag.tarballUrl?.isNotEmpty == true || tag.zipballUrl?.isNotEmpty == true {
 					ScrollView(.horizontal) {
 						HStack {
-							if let url = URL(string: tag.zipballUrl) {
+							if let zipballUrl = tag.zipballUrl, let url = URL(string: zipballUrl) {
 								Link(
 									destination: url,
 									label: {
@@ -59,7 +61,7 @@ struct TagsLoader: View {
 									})
 							}
 
-							if let url = URL(string: tag.tarballUrl) {
+							if let tarballUrl = tag.tarballUrl, let url = URL(string: tarballUrl) {
 								Link(
 									destination: url,
 									label: {

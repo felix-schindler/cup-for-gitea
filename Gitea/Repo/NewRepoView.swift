@@ -16,7 +16,7 @@ struct NewRepoView: View {
 	@State private var initRepo = false
 	@State private var makeTemplate = false
 	@State private var defaultBranch = "main"
-	@State private var objectFormat = Components.Schemas.CreateRepoOption.ObjectFormatNamePayload.sha1
+	@State private var objectFormat = Components.Schemas.CreateRepoOption.ObjectFormatNamePayload(value1: .sha1)
 	@State private var gitignore = ""
 	@State private var issueLabels = ""
 	@State private var license = ""
@@ -129,8 +129,8 @@ struct NewRepoView: View {
 					if licenseTemplates.isNotEmpty {
 						Picker(".gitignore", selection: $license) {
 							Text("None").tag("")
-							ForEach(licenseTemplates, id: \.self) { l in
-								Text(l.name).tag(l.name)
+							ForEach(licenseTemplates, id: \.name) { l in
+								Text(l.name ?? "").tag(l.name ?? "")
 							}
 						}
 					}
@@ -149,8 +149,8 @@ struct NewRepoView: View {
 
 				VStack(alignment: .leading) {
 					Picker("Object Format", selection: $objectFormat) {
-						ForEach(Components.Schemas.CreateRepoOption.ObjectFormatNamePayload.allCases, id: \.self) { format in
-							Text(format.rawValue.uppercased()).tag(format)
+						ForEach(Components.Schemas.ObjectFormatName.allCases, id: \.self) { format in
+							Text(format.rawValue.uppercased()).tag(Components.Schemas.CreateRepoOption.ObjectFormatNamePayload(value1: format))
 						}
 					}
 					Text("Object format of the repository. Cannot be changed later. SHA1 is most compatible.")

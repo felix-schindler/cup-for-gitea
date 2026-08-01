@@ -16,15 +16,15 @@ struct ActionsJobView: View {
 
 	var body: some View {
 		DisclosureGroup {
-			ForEach(job.steps, id: \.number) { step in
+			ForEach(job.steps ?? [], id: \.number) { step in
 				Label(
 					title: {
 						HStack {
-							Text(step.name)
+							Text(step.name ?? "")
 								.font(.callout)
-							if step.completedAt > step.startedAt {
+							if let completedAt = step.completedAt, let startedAt = step.startedAt, completedAt > startedAt {
 								Spacer()
-								Text(duration(from: step.startedAt, to: step.completedAt))
+								Text(duration(from: startedAt, to: completedAt))
 									.font(.footnote)
 									.foregroundStyle(.secondary)
 									.monospacedDigit()
@@ -41,7 +41,7 @@ struct ActionsJobView: View {
 			}
 		} label: {
 			Label(title: {
-				Text(job.name)
+				Text(job.name ?? "")
 			}) {
 				Image(systemName: status.icon)
 					.foregroundStyle(status.color)

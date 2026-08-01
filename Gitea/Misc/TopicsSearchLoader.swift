@@ -20,7 +20,7 @@ struct TopicsSearchLoader: View {
 			if Task.isCancelled { return }
 		}
 		do {
-			state = .loaded(try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json.topics)
+			state = .loaded(try await Network.shared.client.topicSearch(.init(query: .init(q: search))).ok.body.json.topics ?? [])
 		} catch {
 			state = .failed(error)
 		}
@@ -36,11 +36,11 @@ struct TopicsSearchLoader: View {
 					NoContentView("There are no Topics", systemImage: icon)
 				} else {
 					ForEach(topics, id: \.id) { topic in
-						NavigationLink(destination: RepoSearchLoader(context: .search, search: topic.topicName, limitToTopic: true)) {
+						NavigationLink(destination: RepoSearchLoader(context: .search, search: topic.topicName ?? "", limitToTopic: true)) {
 							HStack {
-								Text(topic.topicName)
+								Text(topic.topicName ?? "")
 								Spacer()
-								Text("\(topic.repoCount)")
+								Text("\(topic.repoCount ?? 0)")
 							}
 						}
 					}

@@ -23,12 +23,12 @@ struct SmallActionView: View {
 			title: {
 				VStack(alignment: .leading) {
 					HStack {
-						Text(run.displayTitle)
+						Text(run.displayTitle ?? "")
 							.font(.subheadline)
 							.fontWeight(.medium)
 							.lineLimit(1)
 						Spacer()
-						Text("#\(run.runNumber)")
+						Text("#\(run.runNumber ?? 0)")
 							.font(.footnote)
 							.foregroundStyle(.secondary)
 							.monospacedDigit()
@@ -36,12 +36,12 @@ struct SmallActionView: View {
 
 					ScrollView(.horizontal) {
 						HStack {
-							PillView(verbatim: run.event)
+							PillView(verbatim: run.event ?? "")
 							if let headBranch = run.headBranch {
 								PillView(verbatim: headBranch)
 							}
 							Spacer()
-							Text(run.startedAt.toString(timeStyle: .short))
+							Text(run.startedAt?.toString(timeStyle: .short) ?? "")
 								.font(.caption2)
 								.foregroundStyle(.secondary)
 						}.font(.footnote)

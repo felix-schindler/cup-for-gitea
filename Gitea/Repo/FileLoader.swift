@@ -33,7 +33,7 @@ struct FileLoader: View {
 				.init(
 					path: .init(owner: owner, repo: repo, filepath: "\(ref)/\(filePath)")
 				)
-			).ok.body.plainText
+			).ok.body.binary
 			content = try await String(collecting: raw, upTo: 2 * 1024 * 1024)
 		} catch {
 			self.error = error

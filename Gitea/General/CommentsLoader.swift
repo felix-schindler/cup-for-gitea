@@ -46,22 +46,22 @@ struct CommentsLoader: View {
 								} else {
 									Spacer()
 								}
-								Text(c.createdAt.toString())
+								Text(c.createdAt?.toString() ?? "")
 									.font(.footnote)
 							}
-							StructuredText(markdown: c.body.emojized())
+							StructuredText(markdown: c.body?.emojized() ?? "")
 								.textual.structuredTextStyle(.gitHub)
 								.textual.textSelection(.enabled)
 
-							if c.assets.isNotEmpty {
+							if let assets = c.assets, assets.isNotEmpty {
 								ScrollView(.horizontal, showsIndicators: false) {
 									HStack {
-										ForEach(c.assets, id: \.id) { a in
-											if let url = URL(string: a.browserDownloadUrl) {
+										ForEach(assets, id: \.id) { a in
+											if let browserUrl = a.browserDownloadUrl, let url = URL(string: browserUrl) {
 												Link(
 													destination: url,
 													label: {
-														Label("\(a.name) (\(ByteFormatter.shared.format(a.size)))", systemImage: "square.and.arrow.down")
+														Label("\(a.name ?? "") (\(ByteFormatter.shared.format(a.size ?? 0)))", systemImage: "square.and.arrow.down")
 															.modifier {
 																if #available(iOS 26.0, *) {
 																	$0.labelIconToTitleSpacing(5)
@@ -78,7 +78,7 @@ struct CommentsLoader: View {
 								}
 							}
 						}.swipeActions {
-							if let url = URL(string: c.htmlUrl) {
+							if let htmlUrl = c.htmlUrl, let url = URL(string: htmlUrl) {
 								ShareLink(item: url)
 							}
 						}

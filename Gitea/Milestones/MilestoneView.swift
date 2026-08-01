@@ -23,39 +23,39 @@ struct MilestoneView: View {
 		Section {
 			VStack(alignment: .leading) {
 				HStack {
-					if milestone.state == .open {
+					if milestone.state?.value1 == .open {
 						PillView("Open", systemImage: Icons.milestones.rawValue, bgColor: .green, fgColor: .white)
 					} else {
 						PillView("Closed", systemImage: Icons.milestones.rawValue, bgColor: .red, fgColor: .white)
 					}
 				}.font(.footnote)
 
-				let total = milestone.openIssues + milestone.closedIssues
+				let total = (milestone.openIssues ?? 0) + (milestone.closedIssues ?? 0)
 				if total > 0 {
-					let progress = Double(milestone.closedIssues) / Double(total)
+					let progress = Double(milestone.closedIssues ?? 0) / Double(total)
 					ProgressView(value: progress) {
-						Text("\(milestone.closedIssues) / \(total) issues closed")
+						Text("\(milestone.closedIssues ?? 0) / \(total) issues closed")
 							.font(.footnote)
 					}
 				}
 
-				if milestone.description.isNotEmpty {
-					StructuredText(markdown: milestone.description.emojized())
+				if milestone.description?.isNotEmpty == true {
+					StructuredText(markdown: (milestone.description ?? "").emojized())
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
 			}
 
 			NavigationLink {
-				IssueSearchLoader(type: .issues, owner: owner, repo: repo, milestonesFilter: milestone.title)
+				IssueSearchLoader(type: .issues, owner: owner, repo: repo, milestonesFilter: milestone.title ?? "")
 			} label: {
 				Label("Open issues", systemImage: Icons.issues.rawValue)
 			}
 		} header: {
 			HStack {
-				Text(milestone.title.emojized())
+				Text((milestone.title ?? "").emojized())
 				Spacer()
-				Text(milestone.createdAt.toString(.short))
+				Text(milestone.createdAt?.toString(.short) ?? "")
 					.font(.footnote)
 			}
 		}

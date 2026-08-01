@@ -36,35 +36,35 @@ struct TeamRowView: View {
 	let orgName: String
 
 	var body: some View {
-		Section(team.name) {
-			if team.description.isNotEmpty {
-				Text(team.description)
+		Section(team.name ?? "") {
+			if team.description?.isNotEmpty == true {
+				Text(team.description ?? "")
 					.foregroundStyle(.secondary)
 			}
 
 			DisclosureGroup("Permissions") {
-				LabeledContent("Level", value: team.permission.rawValue.capitalized)
-				if team.canCreateOrgRepo {
+				LabeledContent("Level", value: team.permission?.rawValue.capitalized ?? "")
+				if team.canCreateOrgRepo == true {
 					Text("Can create organization repositories")
 				}
-				if team.includesAllRepositories {
+				if team.includesAllRepositories == true {
 					Text("Has access to all repositories")
 				}
-				if !team.unitsMap.additionalProperties.isEmpty {
-					ForEach(Array(team.unitsMap.additionalProperties.keys.sorted()), id: \.self) { unit in
-						LabeledContent(unit, value: team.unitsMap.additionalProperties[unit] ?? "")
+				if let unitsMap = team.unitsMap, !unitsMap.additionalProperties.isEmpty {
+					ForEach(Array(unitsMap.additionalProperties.keys.sorted()), id: \.self) { unit in
+						LabeledContent(unit, value: unitsMap.additionalProperties[unit] ?? "")
 					}
 				}
 			}
 
 			NavigationLink(
-				destination: UserSearchLoader(context: .teamMembers(teamId: team.id))
+				destination: UserSearchLoader(context: .teamMembers(teamId: team.id ?? 0))
 			) {
 				Label("Members", systemImage: Icons.users.rawValue)
 			}
 
 			NavigationLink(
-				destination: RepoSearchLoader(context: .teamRepos(teamId: team.id, org: orgName))
+				destination: RepoSearchLoader(context: .teamRepos(teamId: team.id ?? 0, org: orgName))
 			) {
 				Label("Repositories", systemImage: Icons.repositories.rawValue)
 			}

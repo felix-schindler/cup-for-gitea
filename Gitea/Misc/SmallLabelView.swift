@@ -13,9 +13,9 @@ struct SmallLabelView: View {
 	var body: some View {
 		HStack {
 			Circle()
-				.fill(Color(hex: label.color))
+				.fill(Color(hex: label.color ?? ""))
 				.frame(width: 12, height: 12)
-			Text(label.name.emojized())
+			Text((label.name ?? "").emojized())
 		}
 	}
 }

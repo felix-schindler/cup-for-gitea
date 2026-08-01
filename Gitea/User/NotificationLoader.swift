@@ -73,28 +73,31 @@ struct NotificationLoader: View {
 									VStack(alignment: .leading) {
 										ScrollView(.horizontal, showsIndicators: false) {
 											HStack {
-												StateIconView(notif.subject._type, notif.subject.state)
-												Text(notif.repository.fullName)
-												if let url = URL(string: notif.subject.htmlUrl) {
-													Text("#\(url.lastPathComponent)")
-														.font(.footnote)
-														.foregroundStyle(.secondary)
+												if let subject = notif.subject {
+													StateIconView(subject._type ?? .issue, subject.state ?? .open)
+													if let url = URL(string: subject.htmlUrl ?? "") {
+														Text("#\(url.lastPathComponent)")
+															.font(.footnote)
+															.foregroundStyle(.secondary)
+													}
 												}
+												Text(notif.repository?.fullName ?? "")
 											}
 										}
 
-										Text(notif.subject.title.emojized())
+										Text(notif.subject?.title?.emojized() ?? "")
 									}
 								}
 								.buttonStyle(.plain)
 								.swipeActions {
 									HStack {
-										if notif.unread || notif.pinned {
+										if notif.unread == true || notif.pinned == true {
 											Button("Mark read", systemImage: "envelope.open") {
 												Task {
+													guard let id = notif.id else { return }
 													do {
-														try await mark(notif.id, status: .read)
-														applyStatusChange(id: notif.id, status: .read)
+														try await mark(id, status: .read)
+														applyStatusChange(id: id, status: .read)
 														HapticFeedback.notify(.success)
 													} catch {
 														HapticFeedback.notify(.error)
@@ -104,9 +107,10 @@ struct NotificationLoader: View {
 										} else {
 											Button("Mark pinned", systemImage: "pin") {
 												Task {
+													guard let id = notif.id else { return }
 													do {
-														try await mark(notif.id, status: .pinned)
-														applyStatusChange(id: notif.id, status: .pinned)
+														try await mark(id, status: .pinned)
+														applyStatusChange(id: id, status: .pinned)
 														HapticFeedback.notify(.success)
 													} catch {
 														HapticFeedback.notify(.error)
@@ -115,9 +119,10 @@ struct NotificationLoader: View {
 											}.tint(.orange)
 											Button("Mark unread", systemImage: "envelope.badge") {
 												Task {
+													guard let id = notif.id else { return }
 													do {
-														try await mark(notif.id, status: .unread)
-														applyStatusChange(id: notif.id, status: .unread)
+														try await mark(id, status: .unread)
+														applyStatusChange(id: id, status: .unread)
 														HapticFeedback.notify(.success)
 													} catch {
 														HapticFeedback.notify(.error)
@@ -145,30 +150,34 @@ struct NotificationLoader: View {
 
 	@ViewBuilder
 	private func destinationView(for notif: Components.Schemas.NotificationThread) -> some View {
-		let owner = notif.repository.owner.login
-		let repo = notif.repository.name
+		let owner = notif.repository?.owner?.login ?? ""
+		let repo = notif.repository?.name ?? ""
 
-		switch notif.subject._type {
+		switch notif.subject?._type {
 		case .issue:
-			if let url = URL(string: notif.subject.htmlUrl), let index = Int64(url.lastPathComponent) {
+			if let url = URL(string: notif.subject?.htmlUrl ?? ""), let index = Int64(url.lastPathComponent) {
 				IssueLoader(owner: owner, repo: repo, index: index)
-			} else {
-				FullRepoView(notif.repository)
+			} else if let repository = notif.repository {
+				FullRepoView(repository)
 			}
 		case .pull:
-			if let url = URL(string: notif.subject.htmlUrl), let index = Int64(url.lastPathComponent) {
+			if let url = URL(string: notif.subject?.htmlUrl ?? ""), let index = Int64(url.lastPathComponent) {
 				PullRequestLoader(owner: owner, repo: repo, index: index)
-			} else {
-				FullRepoView(notif.repository)
+			} else if let repository = notif.repository {
+				FullRepoView(repository)
 			}
 		case .commit:
-			if let url = URL(string: notif.subject.htmlUrl) {
+			if let url = URL(string: notif.subject?.htmlUrl ?? "") {
 				CommitsLoader(owner: owner, repo: repo, ref: url.lastPathComponent)
-			} else {
-				FullRepoView(notif.repository)
+			} else if let repository = notif.repository {
+				FullRepoView(repository)
 			}
 		case .repository:
-			FullRepoView(notif.repository)
+			if let repository = notif.repository {
+				FullRepoView(repository)
+			}
+		case .none:
+			EmptyView()
 		}
 	}
 }

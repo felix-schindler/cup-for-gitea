@@ -41,27 +41,27 @@ struct UserLoader: View {
 					Section {
 						VStack(alignment: .leading) {
 							HStack {
-								if let url = URL(string: u.avatarUrl) {
+								if let avatarUrl = u.avatarUrl, let url = URL(string: avatarUrl) {
 									AvatarImage(url, size: .medium)
 								}
 
 								VStack(alignment: .leading) {
 									HStack {
-										if u.fullName.isNotEmpty {
-											Text(u.fullName)
+										if u.fullName?.isNotEmpty == true {
+											Text(u.fullName ?? "")
 										} else {
-											Text(u.login)
+											Text(u.login ?? "")
 										}
 
-										if u.isAdmin {
+										if u.isAdmin == true {
 											Image(systemName: "checkmark.seal")
 										}
 
-										VisibilityIcon(u.visibility)
+										VisibilityIcon(u.visibility?.value1.rawValue ?? "")
 									}
 
-									if u.fullName.isNotEmpty {
-										Text("@\(u.login)")
+									if u.fullName?.isNotEmpty == true {
+										Text("@\(u.login ?? "")")
 											.font(.footnote)
 											.foregroundStyle(.secondary)
 									}
@@ -70,37 +70,37 @@ struct UserLoader: View {
 								Spacer()
 
 								VStack(alignment: .trailing) {
-									Text(u.created.toString())
-									Text("#\(u.id)")
+									Text(u.created?.toString() ?? "")
+									Text("#\(u.id ?? 0)")
 								}.font(.footnote)
 							}
 
 							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
-									if u.email.isNotEmpty, let url = URL(string: "mailto:\(u.email)") {
-										Link(u.email, destination: url)
+									if let email = u.email, email.isNotEmpty, let url = URL(string: "mailto:\(email)") {
+										Link(email, destination: url)
 											.tint(.accentColor)
 											.buttonStyle(.bordered)
 											.controlSize(.mini)
 									}
 
-									if let url = URL(string: u.website) {
-										Link(u.website, destination: url)
+									if let website = u.website, let url = URL(string: website) {
+										Link(website, destination: url)
 											.tint(.accentColor)
 											.buttonStyle(.bordered)
 											.controlSize(.mini)
 									}
 
-									if u.location.isNotEmpty {
-										PillView(verbatim: u.location, systemImage: "mappin")
+									if u.location?.isNotEmpty == true {
+										PillView(verbatim: u.location ?? "", systemImage: "mappin")
 									}
 								}.font(.footnote)
 							}
 
 							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
-									NavigationLink("\(u.followersCount) Followers", destination: FollowLoader(u.login, type: .followers))
-									NavigationLink("\(u.followingCount) Following", destination: FollowLoader(u.login, type: .following))
+									NavigationLink("\(u.followersCount ?? 0) Followers", destination: FollowLoader(u.login ?? "", type: .followers))
+									NavigationLink("\(u.followingCount ?? 0) Following", destination: FollowLoader(u.login ?? "", type: .following))
 								}
 								.controlSize(.mini)
 								.buttonBorderShape(.capsule)
@@ -108,8 +108,8 @@ struct UserLoader: View {
 								.font(.footnote)
 							}
 
-							if u.description.isNotEmpty {
-								InlineText(markdown: u.description.emojized())
+							if u.description?.isNotEmpty == true {
+								InlineText(markdown: (u.description ?? "").emojized())
 									.textual.inlineStyle(.gitHub)
 									.textual.textSelection(.enabled)
 							}
@@ -120,7 +120,7 @@ struct UserLoader: View {
 
 					Section {
 						NavigationLink(
-							destination: RepoSearchLoader(context: .user(u.id)),
+							destination: RepoSearchLoader(context: .user(u.id ?? 0)),
 							label: {
 								Label("Repositories", systemImage: Icons.repositories.rawValue)
 							})
@@ -130,10 +130,10 @@ struct UserLoader: View {
 						}
 
 						// Label("Projects", systemImage: Icons.projects.rawValue)
-						NavigationLink(destination: PackageLoader(owner: u.login)) {
+						NavigationLink(destination: PackageLoader(owner: u.login ?? "")) {
 							Label("Packages", systemImage: Icons.packages.rawValue)
 						}
-						NavigationLink(destination: ActivityLoader(context: .user(u.login))) {
+						NavigationLink(destination: ActivityLoader(context: .user(u.login ?? ""))) {
 							Label("Public Activity", systemImage: Icons.activity.rawValue)
 						}
 
@@ -145,7 +145,7 @@ struct UserLoader: View {
 										HStack {
 											Text("Starred Repositories")
 											Spacer()
-											Text(String(u.starredReposCount))
+											Text(String(u.starredReposCount ?? 0))
 										}
 									},
 									icon: {
@@ -169,7 +169,7 @@ struct UserLoader: View {
 			await load()
 		}.toolbar {
 			HStack {
-				if let user, case .success(let u) = user, let url = URL(string: u.htmlUrl) {
+				if let user, case .success(let u) = user, let htmlUrl = u.htmlUrl, let url = URL(string: htmlUrl) {
 					ShareLink(item: url)
 				}
 				if username == nil {

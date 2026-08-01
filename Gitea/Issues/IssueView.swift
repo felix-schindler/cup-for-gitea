@@ -24,30 +24,30 @@ protocol IssueDisplayable {
 
 extension Components.Schemas.Issue: IssueDisplayable {
 	var displayNavigationTitle: LocalizedStringResource { "Issue" }
-	var displayRepositoryFullName: String { repository.fullName }
-	var displayOwner: String { repository.owner }
-	var displayRepo: String { repository.name }
-	var displayNumber: Int64 { number }
-	var displayIsLocked: Bool { isLocked }
-	var displayCreatedAt: Date { createdAt }
-	var displayTitle: String { title }
-	var displayBody: String { body }
-	var displayComments: Int64 { comments }
-	var displayHtmlUrl: String { htmlUrl }
+	var displayRepositoryFullName: String { repository?.fullName ?? "" }
+	var displayOwner: String { repository?.owner ?? "" }
+	var displayRepo: String { repository?.name ?? "" }
+	var displayNumber: Int64 { number ?? 0 }
+	var displayIsLocked: Bool { isLocked ?? false }
+	var displayCreatedAt: Date { createdAt ?? Date() }
+	var displayTitle: String { title ?? "" }
+	var displayBody: String { body ?? "" }
+	var displayComments: Int64 { comments ?? 0 }
+	var displayHtmlUrl: String { htmlUrl ?? "" }
 }
 
 extension Components.Schemas.PullRequest: IssueDisplayable {
 	var displayNavigationTitle: LocalizedStringResource { "Pull Request" }
-	var displayRepositoryFullName: String { base.repo.fullName }
-	var displayOwner: String { base.repo.owner.login }
-	var displayRepo: String { base.repo.name }
-	var displayNumber: Int64 { number }
-	var displayIsLocked: Bool { isLocked }
-	var displayCreatedAt: Date { createdAt }
-	var displayTitle: String { title }
-	var displayBody: String { body }
-	var displayComments: Int64 { comments }
-	var displayHtmlUrl: String { htmlUrl }
+	var displayRepositoryFullName: String { base?.repo?.fullName ?? "" }
+	var displayOwner: String { base?.repo?.owner?.login ?? "" }
+	var displayRepo: String { base?.repo?.name ?? "" }
+	var displayNumber: Int64 { number ?? 0 }
+	var displayIsLocked: Bool { isLocked ?? false }
+	var displayCreatedAt: Date { createdAt ?? Date() }
+	var displayTitle: String { title ?? "" }
+	var displayBody: String { body ?? "" }
+	var displayComments: Int64 { comments ?? 0 }
+	var displayHtmlUrl: String { htmlUrl ?? "" }
 }
 
 struct IssueView: View {
@@ -183,9 +183,9 @@ struct IssueView: View {
 				}
 			}
 		case .pullRequest(let pr):
-			if !pr.merged {
-				if pr.state == .open {
-					if pr.draft {
+			if pr.merged != true {
+				if pr.state?.value1 == .open {
+					if pr.draft == true {
 						AsyncButton("Mark Ready for Review", systemImage: "pencil.slash") {
 							await markReadyForReview()
 						}
@@ -194,7 +194,7 @@ struct IssueView: View {
 							await markAsWIP()
 						}
 
-						if pr.base.sha != pr.mergeBase {
+						if pr.base?.sha != pr.mergeBase {
 							AsyncButton("Update Branch", systemImage: "arrow.triangle.merge") {
 								await updatePullRequestBranch()
 							}
@@ -203,7 +203,7 @@ struct IssueView: View {
 					AsyncButton("Close", systemImage: "archivebox") {
 						await closePullRequest()
 					}
-					if pr.mergeable {
+					if pr.mergeable == true {
 						Button("Merge", systemImage: "checkmark.circle") {
 							showMergeSheet = true
 						}
@@ -308,21 +308,7 @@ struct IssueView: View {
 	private func closePullRequest() async {
 		guard case .pullRequest(let pr) = item else { return }
 		do {
-			let response = try await Network.shared.client.repoEditPullRequest(
-				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(
-						.init(
-							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-							body: pr.body, contentVersion: pr.contentVersion,
-							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-							milestone: pr.milestone?.id ?? 0, state: "closed",
-							title: pr.title, unsetDueDate: pr.dueDate == nil
-						))
-				)
-			).created.body.json
-			item = .pullRequest(response)
+			try await applyPullRequestEdit(title: pr.title ?? "", state: "closed")
 			HapticFeedback.notify(.success)
 		} catch {
 			self.error = error
@@ -334,21 +320,7 @@ struct IssueView: View {
 	private func reopenPullRequest() async {
 		guard case .pullRequest(let pr) = item else { return }
 		do {
-			let response = try await Network.shared.client.repoEditPullRequest(
-				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(
-						.init(
-							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-							body: pr.body, contentVersion: pr.contentVersion,
-							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-							milestone: pr.milestone?.id ?? 0, state: "open",
-							title: pr.title, unsetDueDate: false
-						))
-				)
-			).created.body.json
-			item = .pullRequest(response)
+			try await applyPullRequestEdit(title: pr.title ?? "", state: "open")
 			HapticFeedback.notify(.success)
 		} catch {
 			self.error = error
@@ -443,7 +415,7 @@ struct IssueView: View {
 	private func markReadyForReview() async {
 		guard case .pullRequest(let pr) = item else { return }
 
-		let cleanedTitle = pr.title
+		let cleanedTitle = (pr.title ?? "")
 			.replacingOccurrences(of: #"^\[WIP\]\s*"#, with: "", options: .regularExpression)
 			.replacingOccurrences(of: #"^WIP:\s*"#, with: "", options: .regularExpression)
 
@@ -455,21 +427,7 @@ struct IssueView: View {
 		}
 
 		do {
-			let response = try await Network.shared.client.repoEditPullRequest(
-				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(
-						.init(
-							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-							body: pr.body, contentVersion: pr.contentVersion,
-							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-							milestone: pr.milestone?.id ?? 0, state: "open",
-							title: cleanedTitle, unsetDueDate: pr.dueDate == nil
-						))
-				)
-			).created.body.json
-			item = .pullRequest(response)
+			try await applyPullRequestEdit(title: cleanedTitle, state: "open")
 			HapticFeedback.notify(.success)
 		} catch {
 			self.error = error
@@ -480,7 +438,7 @@ struct IssueView: View {
 
 	private func markAsWIP() async {
 		guard case .pullRequest(let pr) = item else { return }
-		guard !pr.title.hasPrefix("WIP:"), !pr.title.hasPrefix("[WIP]") else {
+		guard !(pr.title ?? "").hasPrefix("WIP:"), !(pr.title ?? "").hasPrefix("[WIP]") else {
 			self.error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Pull request is already marked as WIP."])
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
@@ -488,27 +446,38 @@ struct IssueView: View {
 		}
 
 		do {
-			let response = try await Network.shared.client.repoEditPullRequest(
-				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
-					body: .json(
-						.init(
-							allowMaintainerEdit: pr.allowMaintainerEdit, assignee: pr.assignee?.login ?? "",
-							assignees: pr.assignees?.map(\.login) ?? [], base: pr.base.ref,
-							body: pr.body, contentVersion: pr.contentVersion,
-							dueDate: pr.dueDate ?? Date(), labels: pr.labels.map(\.id),
-							milestone: pr.milestone?.id ?? 0, state: "open",
-							title: "WIP: " + pr.title, unsetDueDate: pr.dueDate == nil
-						))
-				)
-			).created.body.json
-			item = .pullRequest(response)
+			try await applyPullRequestEdit(title: "WIP: " + (pr.title ?? ""), state: "open")
 			HapticFeedback.notify(.success)
 		} catch {
 			self.error = error
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
 		}
+	}
+
+	private func applyPullRequestEdit(title: String, state: String) async throws {
+		guard case .pullRequest(let pr) = item else { return }
+		let body = Components.Schemas.EditPullRequestOption(
+			allowMaintainerEdit: pr.allowMaintainerEdit,
+			assignee: pr.assignee?.login ?? "",
+			assignees: pr.assignees?.compactMap(\.login) ?? [],
+			base: pr.base?.ref ?? "",
+			body: pr.body,
+			contentVersion: pr.contentVersion,
+			dueDate: pr.dueDate ?? Date(),
+			labels: pr.labels?.compactMap(\.id) ?? [],
+			milestone: pr.milestone?.id ?? 0,
+			state: state,
+			title: title,
+			unsetDueDate: pr.dueDate == nil
+		)
+		let response = try await Network.shared.client.repoEditPullRequest(
+			.init(
+				path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+				body: .json(body)
+			)
+		).created.body.json
+		item = .pullRequest(response)
 	}
 
 	private func postComment() async {
@@ -561,9 +530,9 @@ struct IssueView: View {
 	private var stateIcon: some View {
 		switch item {
 		case .issue(let issue):
-			StateIconView(.issue, issue.state.notificationState)
+			StateIconView(.issue, issue.state?.notificationState ?? .closed)
 		case .pullRequest(let pullRequest):
-			StateIconView(.pull, pullRequest.notificationState, isDraft: pullRequest.draft)
+			StateIconView(.pull, pullRequest.notificationState, isDraft: pullRequest.draft == true)
 		}
 	}
 
@@ -573,9 +542,11 @@ struct IssueView: View {
 			HStack {
 				switch item {
 				case .issue(let issue):
-					SmallUserView(issue.user)
+					if let user = issue.user {
+						SmallUserView(user)
+					}
 					if let pr = issue.pullRequest,
-						let url = URL(string: pr.htmlUrl)
+						let url = URL(string: pr.htmlUrl ?? "")
 					{
 						NavigationLink(
 							destination: PullRequestLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
@@ -585,7 +556,7 @@ struct IssueView: View {
 									Text("#\(url.lastPathComponent)")
 								},
 								icon: {
-									StateIconView(.pull, issue.pullRequestState, isDraft: pr.draft)
+									StateIconView(.pull, issue.pullRequestState, isDraft: pr.draft == true)
 								})
 						}
 						.controlSize(.mini)
@@ -595,16 +566,18 @@ struct IssueView: View {
 						NavigationLink {
 							MilestonesLoader(owner: item.data.displayOwner, repo: item.data.displayRepo)
 						} label: {
-							Label(milestone.title.emojized(), systemImage: Icons.milestones.rawValue)
+							Label(milestone.title?.emojized() ?? "", systemImage: Icons.milestones.rawValue)
 						}
 						.controlSize(.mini)
 						.buttonStyle(.bordered)
 					}
 				case .pullRequest(let pullRequest):
-					SmallUserView(pullRequest.user)
-					branchPill(pullRequest.head.ref)
+					if let user = pullRequest.user {
+						SmallUserView(user)
+					}
+					branchPill(pullRequest.head?.ref ?? "")
 					Image(systemName: "arrow.right")
-					branchPill(pullRequest.base.ref)
+					branchPill(pullRequest.base?.ref ?? "")
 				}
 			}
 		}.font(.footnote)
@@ -626,11 +599,11 @@ struct IssueView: View {
 	private var issueMetadata: some View {
 		switch item {
 		case .issue(let issue):
-			if issue.timeEstimate != 0 || issue.dueDate != nil {
+			if (issue.timeEstimate ?? 0) != 0 || issue.dueDate != nil {
 				ScrollView(.horizontal, showsIndicators: false) {
 					HStack {
-						if issue.timeEstimate != 0 {
-							PillView(verbatim: "\(issue.timeEstimate)", systemImage: "clock")
+						if (issue.timeEstimate ?? 0) != 0 {
+							PillView(verbatim: "\(issue.timeEstimate ?? 0)", systemImage: "clock")
 								.font(.footnote)
 						}
 						if let dueDate = issue.dueDate {
@@ -640,13 +613,13 @@ struct IssueView: View {
 				}
 			}
 
-			if issue.assets.isNotEmpty {
+			if let assets = issue.assets, assets.isNotEmpty {
 				ScrollView(.horizontal, showsIndicators: false) {
-					ForEach(issue.assets, id: \.id) { asset in
-						if let url = URL(string: asset.browserDownloadUrl) {
-							Link(asset.name, destination: url)
+					ForEach(assets, id: \.id) { asset in
+						if let browserDownloadUrl = asset.browserDownloadUrl, let url = URL(string: browserDownloadUrl) {
+							Link(asset.name ?? "", destination: url)
 						} else {
-							Text(asset.name)
+							Text(asset.name ?? "")
 						}
 					}
 				}
@@ -660,11 +633,11 @@ struct IssueView: View {
 	private var details: some View {
 		switch item {
 		case .issue(let issue):
-			commonDetails(assignees: issue.assignees, labels: issue.labels, milestoneTitle: issue.milestone?.title)
+			commonDetails(assignees: issue.assignees, labels: issue.labels ?? [], milestoneTitle: issue.milestone?.title)
 		case .pullRequest(let pullRequest):
 			commonDetails(
 				assignees: pullRequest.assignees,
-				labels: pullRequest.labels,
+				labels: pullRequest.labels ?? [],
 				milestoneTitle: pullRequest.milestone?.title
 			)
 			pullRequestDetails(pullRequest)
@@ -705,9 +678,9 @@ struct IssueView: View {
 					ScrollView(.horizontal) {
 						HStack {
 							ForEach(labels, id: \.id) { label in
-								let bgColor = Color(hex: label.color)
+								let bgColor = Color(hex: label.color ?? "")
 								PillView(
-									verbatim: label.name.emojized(),
+									verbatim: label.name?.emojized() ?? "",
 									bgColor: bgColor,
 									fgColor: bgColor.adaptiveText()
 								)
@@ -755,7 +728,7 @@ struct IssueView: View {
 			DisclosureGroup(
 				content: {
 					ForEach(requestedTeams, id: \.id) { team in
-						Label(team.name, systemImage: "person.3")
+						Label(team.name ?? "", systemImage: "person.3")
 					}
 				},
 				label: {
@@ -807,13 +780,13 @@ struct IssueView: View {
 			}
 		}
 
-		if pullRequest.reviewComments != 0 {
+		if (pullRequest.reviewComments ?? 0) != 0 {
 			Label(
 				title: {
 					HStack {
 						Text("Review comments")
 						Spacer()
-						Text("\(pullRequest.reviewComments)")
+						Text("\(pullRequest.reviewComments ?? 0)")
 					}
 				},
 				icon: {
@@ -825,17 +798,17 @@ struct IssueView: View {
 	private var hasDetails: Bool {
 		switch item {
 		case .issue(let issue):
-			(issue.assignees?.isNotEmpty == true) || issue.labels.isNotEmpty || issue.milestone != nil
+			(issue.assignees?.isNotEmpty == true) || issue.labels?.isNotEmpty == true || issue.milestone != nil
 		case .pullRequest(let pullRequest):
 			(pullRequest.assignees?.isNotEmpty == true)
-				|| pullRequest.labels.isNotEmpty
+				|| pullRequest.labels?.isNotEmpty == true
 				|| pullRequest.milestone != nil
 				|| (pullRequest.requestedReviewers?.isNotEmpty == true)
 				|| (pullRequest.requestedReviewersTeams?.isNotEmpty == true)
 				|| pullRequest.additions != nil
 				|| pullRequest.deletions != nil
 				|| pullRequest.changedFiles != nil
-				|| pullRequest.reviewComments != 0
+				|| (pullRequest.reviewComments ?? 0) != 0
 		}
 	}
 }

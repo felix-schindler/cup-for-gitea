@@ -30,8 +30,8 @@ struct ActionView: View {
 	}
 
 	private var duration: String {
-		guard run.completedAt > run.startedAt else { return "In progress" }
-		let interval = run.completedAt.timeIntervalSince(run.startedAt)
+		guard let completedAt = run.completedAt, let startedAt = run.startedAt, completedAt > startedAt else { return "In progress" }
+		let interval = completedAt.timeIntervalSince(startedAt)
 		guard interval >= 0 else { return "Invalid duration" }
 		let formatter = DateComponentsFormatter()
 		formatter.allowedUnits = [.hour, .minute, .second]
@@ -43,9 +43,9 @@ struct ActionView: View {
 		do {
 			jobsState = .loaded(
 				try await Network.shared.client.listWorkflowRunJobs(
-					path: .init(owner: owner, repo: repo, run: Int(run.id)),
+					path: .init(owner: owner, repo: repo, run: Int(run.id ?? 0)),
 					query: .init(page: 1, limit: 7)
-				).ok.body.json.jobs)
+				).ok.body.json.jobs ?? [])
 		} catch {
 			jobsState = .failed(error)
 		}
@@ -55,22 +55,22 @@ struct ActionView: View {
 		do {
 			artifactsState = .loaded(
 				try await Network.shared.client.getArtifactsOfRun(
-					path: .init(owner: owner, repo: repo, run: Int(run.id))
-				).ok.body.json.artifacts)
+					path: .init(owner: owner, repo: repo, run: Int(run.id ?? 0))
+				).ok.body.json.artifacts ?? [])
 		} catch {
 			artifactsState = .failed(error)
 		}
 	}
 
 	private func downloadArtifact(_ artifact: Components.Schemas.ActionArtifact) async throws -> URL {
-		guard let url = URL(string: artifact.archiveDownloadUrl) else {
+		guard let urlString = artifact.archiveDownloadUrl, let url = URL(string: urlString) else {
 			throw URLError(.badURL)
 		}
 		var request = URLRequest(url: url)
 		request.setValue("token \(Network.shared.token)", forHTTPHeaderField: "Authorization")
 		let (data, _) = try await URLSession.shared.data(for: request)
 		let tempURL = FileManager.default.temporaryDirectory
-			.appendingPathComponent(artifact.name)
+			.appendingPathComponent(artifact.name ?? "artifact")
 			.appendingPathExtension("zip")
 		try data.write(to: tempURL)
 		return tempURL
@@ -98,7 +98,7 @@ struct ActionView: View {
 							.monospacedDigit()
 					}
 
-					Text(run.displayTitle)
+					Text(run.displayTitle ?? "")
 						.font(.title3)
 						.fontWeight(.medium)
 
@@ -107,20 +107,22 @@ struct ActionView: View {
 							if let user = run.actor {
 								SmallUserView(user, showUsername: true)
 							}
-							PillView(verbatim: run.event)
+							PillView(verbatim: run.event ?? "")
 							if let headBranch = run.headBranch {
 								PillView(verbatim: headBranch)
 							}
-							PillView(verbatim: String(run.headSha.prefix(7)))
+							PillView(verbatim: String((run.headSha ?? "").prefix(7)))
 								.monospaced()
 						}
 					}.font(.footnote)
 
 					Divider()
 
-					LabeledContent("Started", value: run.startedAt.toString(timeStyle: .short))
-					if run.completedAt > run.startedAt {
-						LabeledContent("Completed", value: run.completedAt.toString(timeStyle: .short))
+					if let startedAt = run.startedAt {
+						LabeledContent("Started", value: startedAt.toString(timeStyle: .short))
+					}
+					if let completedAt = run.completedAt, let startedAt = run.startedAt, completedAt > startedAt {
+						LabeledContent("Completed", value: completedAt.toString(timeStyle: .short))
 					}
 					LabeledContent("Duration", value: duration)
 				}
@@ -157,7 +159,8 @@ struct ActionView: View {
 									} else {
 										Image(systemName: "square.and.arrow.down")
 									}
-									Text("\(artifact.name) (\(ByteFormatter.shared.format(artifact.sizeInBytes)))")
+									let size = ByteFormatter.shared.format(artifact.sizeInBytes ?? 0)
+									Text("\(artifact.name ?? "") (\(size))")
 									Spacer()
 								}
 								.contentShape(Rectangle())
