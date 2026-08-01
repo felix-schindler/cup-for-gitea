@@ -127,7 +127,7 @@ struct NewRepoView: View {
 						}
 					}
 					if licenseTemplates.isNotEmpty {
-						Picker(".gitignore", selection: $license) {
+						Picker("License", selection: $license) {
 							Text("None").tag("")
 							ForEach(licenseTemplates, id: \.self) { l in
 								Text(l.name).tag(l.name)
