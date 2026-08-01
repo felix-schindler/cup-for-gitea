@@ -1720,7 +1720,7 @@
       },
       "string": {
         "content": {
-          "application/json": {
+          "text/plain": {
             "schema": {
               "type": "string"
             }
@@ -2343,7 +2343,7 @@
             "x-go-name": "Path"
           },
           "previous_attempt_url": {
-            "description": "PreviousAttemptURL is the API URL of the previous attempt of this run, e.g. \".../actions/runs/{run_id}/attempts/{attempt-1}\".\nIt is set only when the current attempt is \u003e 1 (i.e. a rerun). For the first attempt, or for legacy runs that pre-date ActionRunAttempt, it is null.",
+            "description": "PreviousAttemptURL is the API URL of the previous attempt of this run, e.g. \".../actions/runs/{run_id}/attempts/{attempt-1}\".\nIt is set only when the current attempt is > 1 (i.e. a rerun). For the first attempt, or for legacy runs that pre-date ActionRunAttempt, it is null.",
             "format": "uri",
             "type": "string",
             "x-go-name": "PreviousAttemptURL"
@@ -4401,7 +4401,7 @@
             "x-go-name": "Deadline"
           },
           "head": {
-            "description": "The head branch for the pull request, it could be a branch name on the base repository or\na form like `\u003cusername\u003e:\u003cbranch\u003e` which refers to the user's fork repository's branch.",
+            "description": "The head branch for the pull request, it could be a branch name on the base repository or\na form like `<username>:<branch>` which refers to the user's fork repository's branch.",
             "type": "string",
             "x-go-name": "Head"
           },
@@ -12392,7 +12392,7 @@
             }
           },
           {
-            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread \u0026 pinned.",
+            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread & pinned.",
             "in": "query",
             "name": "status-types",
             "schema": {
@@ -20131,7 +20131,7 @@
         ]
       },
       "post": {
-        "description": "Uses automatic pagination based on default page size and max response size and returns the maximum allowed number of files. Files which could not be retrieved are null. Files which are too large are being returned with `encoding == null`, `content == null` and `size \u003e 0`, they can be requested separately by using the `download_url`.",
+        "description": "Uses automatic pagination based on default page size and max response size and returns the maximum allowed number of files. Files which could not be retrieved are null. Files which are too large are being returned with `encoding == null`, `content == null` and `size > 0`, they can be requested separately by using the `download_url`.",
         "operationId": "repoGetFileContentsPost",
         "parameters": [
           {
@@ -26102,7 +26102,7 @@
             }
           },
           {
-            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread \u0026 pinned",
+            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread & pinned",
             "in": "query",
             "name": "status-types",
             "schema": {
@@ -28199,9 +28199,8 @@
         "responses": {
           "200": {
             "content": {
-              "application/octet-stream": {
+              "text/plain": {
                 "schema": {
-                  "format": "binary",
                   "type": "string"
                 }
               }

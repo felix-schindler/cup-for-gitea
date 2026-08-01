@@ -234,9 +234,9 @@ private struct CommitDiffView: View {
 		do {
 			let raw = try await Network.shared.client.repoDownloadCommitDiffOrPatch(
 				.init(path: .init(owner: owner, repo: repo, sha: sha, diffType: .diff))
-			).ok.body.json
+			).ok.body.plainText
 
-			state = .loaded(String(raw.prefix(2 * 1024 * 1024)))
+			state = .loaded(try await String(collecting: raw, upTo: 2 * 1024 * 1024))
 		} catch {
 			state = .failed(error)
 		}

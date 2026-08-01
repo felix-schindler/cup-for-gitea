@@ -30,7 +30,7 @@ struct FullRepoView: View {
 						owner: owner,
 						repo: repoName,
 						filepath: "README.md"))
-			).ok.body.binary
+			).ok.body.plainText
 
 			// Collect the entire HTTP body into a single String, limiting to 2 MB
 			let stringContents = try await String(collecting: contents, upTo: 2 * 1024 * 1024)
