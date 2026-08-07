@@ -49,7 +49,7 @@ struct ReleaseView: View {
 					if release.assets?.isNotEmpty == true {
 						ForEach(release.assets!, id: \.id) { asset in
 							if let urlString = asset.browserDownloadUrl, let url = URL(string: urlString) {
-								DownloadArchiveButton(url: url) {
+								DownloadArchiveButton(url: url, fileName: asset.name) {
 									Label(
 										"\(asset.name ?? "") (\(ByteFormatter.shared.format(asset.size ?? 0)))",
 										systemImage: "square.and.arrow.down"
@@ -82,8 +82,6 @@ struct ReleaseView: View {
 		} header: {
 			HStack {
 				Text((release.name?.isNotEmpty == true ? release.name ?? "" : release.tagName ?? "").emojized())
-				if release.draft == true {
-				}
 				Spacer()
 				Text(release.publishedAt?.toString(timeStyle: .short) ?? "")
 					.font(.footnote)
