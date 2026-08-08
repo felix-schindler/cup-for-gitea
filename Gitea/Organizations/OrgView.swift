@@ -39,9 +39,9 @@ struct OrgView: View {
 							.textual.textSelection(.enabled)
 					}
 
-					if org.email?.isNotEmpty == true {
+					if let email = org.email, email.isNotEmpty, let url = URL(string: "mailto:\(email)") {
 						ScrollView(.horizontal, showsIndicators: false) {
-							Link(org.email ?? "", destination: URL(string: "mailto:\(org.email ?? "")")!)
+							Link(email, destination: url)
 								.tint(.accentColor)
 								.buttonStyle(.bordered)
 								.controlSize(.mini)

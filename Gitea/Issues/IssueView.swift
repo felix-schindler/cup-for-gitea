@@ -315,7 +315,7 @@ struct IssueView: View {
 							assignee: "", assignees: [], body: issue.body,
 							contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
 							milestone: issue.milestone?.id ?? 0, ref: "",
-							state: "open", title: issue.title, unsetDueDate: false
+							state: "open", title: issue.title, unsetDueDate: issue.dueDate == nil
 						))
 				)
 			).created.body.json
