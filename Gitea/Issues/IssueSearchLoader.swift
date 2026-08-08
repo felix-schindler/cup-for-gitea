@@ -18,6 +18,13 @@ struct IssueSearchLoader: View {
 	@State private var currentUsername: String?
 	@State private var filters: IssueSearchFilters
 	@State private var showFilters = false
+	@State private var pinnedIssues: [Components.Schemas.Issue] = []
+	@State private var pinnedPullRequests: [Components.Schemas.PullRequest] = []
+
+	private var pinnedIds: Set<Int64> {
+		Set(pinnedIssues.compactMap(\.id) + pinnedPullRequests.compactMap(\.id))
+	}
+	private var canPin: Bool { owner != nil && repo != nil }
 
 	private let defaultLimit = 7
 	private var navigationTitle: LocalizedStringResource {
@@ -108,6 +115,7 @@ struct IssueSearchLoader: View {
 	private func resetAndLoad(debounced: Bool = false) async {
 		guard !paging.isLoading else { return }
 		paging.reset()
+		await loadPinned()
 		await loadNextPage(debounced: debounced, reset: true)
 	}
 
@@ -172,6 +180,37 @@ struct IssueSearchLoader: View {
 		).ok.body.json
 	}
 
+	private func loadPinned() async {
+		guard let owner, let repo else { return }
+		do {
+			switch type {
+			case .issues:
+				pinnedIssues = try await Network.shared.client.repoListPinnedIssues(path: .init(owner: owner, repo: repo)).ok.body.json
+			case .pulls:
+				pinnedPullRequests = try await Network.shared.client.repoListPinnedPullRequests(path: .init(owner: owner, repo: repo)).ok.body.json
+			@unknown default:
+				break
+			}
+		} catch {
+			print("Failed to load pinned items: \(error)")
+		}
+	}
+
+	private func setPinned(index: Int64, pinned: Bool) async {
+		guard let owner, let repo else { return }
+		do {
+			if pinned {
+				_ = try await Network.shared.client.pinIssue(path: .init(owner: owner, repo: repo, index: index))
+			} else {
+				_ = try await Network.shared.client.unpinIssue(path: .init(owner: owner, repo: repo, index: index))
+			}
+			HapticFeedback.notify(.success)
+			await resetAndLoad()
+		} catch {
+			HapticFeedback.notify(.error)
+		}
+	}
+
 	var body: some View {
 		LoadableList(
 			state: state,
@@ -182,15 +221,23 @@ struct IssueSearchLoader: View {
 			load: { await resetAndLoad() },
 			loadMore: { await loadNextPage() },
 			hasMorePages: paging.hasMore,
-			loadingMoreText: loadingMoreText
-		) { issue in
-			switch type {
-			case .issues:
-				SmallIssueView(issue)
-			case .pulls:
-				SmallIssueView(issue, isPullRequest: issue.pullRequest != nil)
+			loadingMoreText: loadingMoreText,
+			header: AnyView(pinnedSection),
+			row: { issue in
+				if canPin, pinnedIds.contains(issue.id ?? -1) {
+					EmptyView()
+				} else {
+					rowView(for: issue)
+						.swipeActions(edge: .leading) {
+							if canPin {
+								Button("Pin", systemImage: "pin") {
+									Task { await setPinned(index: issue.number ?? 0, pinned: true) }
+								}.tint(.orange)
+							}
+						}
+				}
 			}
-		}
+		)
 		.searchable(text: $search, prompt: Text(searchPrompt))
 		.task(id: queryKey) {
 			await resetAndLoad(debounced: true)
@@ -221,6 +268,52 @@ struct IssueSearchLoader: View {
 		}
 		.sheet(isPresented: $showFilters) {
 			IssueSearchFiltersSheet(filters: $filters)
+		}
+	}
+
+	@ViewBuilder
+	private var pinnedSection: some View {
+		if canPin {
+			switch type {
+			case .issues:
+				if !pinnedIssues.isEmpty {
+					Section("Pinned") {
+						ForEach(pinnedIssues, id: \.id) { issue in
+							SmallIssueView(issue)
+								.swipeActions(edge: .leading) {
+									Button("Unpin", systemImage: "pin.slash") {
+										Task { await setPinned(index: issue.number ?? 0, pinned: false) }
+									}.tint(.orange)
+								}
+						}
+					}
+				}
+			case .pulls:
+				if !pinnedPullRequests.isEmpty {
+					Section("Pinned") {
+						ForEach(pinnedPullRequests, id: \.id) { pr in
+							SmallIssueView(pr)
+								.swipeActions(edge: .leading) {
+									Button("Unpin", systemImage: "pin.slash") {
+										Task { await setPinned(index: pr.number ?? 0, pinned: false) }
+									}.tint(.orange)
+								}
+						}
+					}
+				}
+			@unknown default:
+				EmptyView()
+			}
+		}
+	}
+
+	@ViewBuilder
+	private func rowView(for issue: Components.Schemas.Issue) -> some View {
+		switch type {
+		case .issues:
+			SmallIssueView(issue)
+		case .pulls:
+			SmallIssueView(issue, isPullRequest: issue.pullRequest != nil)
 		}
 	}
 }

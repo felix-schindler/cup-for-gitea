@@ -10,6 +10,7 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 	let loadMore: (() async -> Void)?
 	let hasMorePages: Bool
 	let loadingMoreText: LocalizedStringResource
+	let header: AnyView?
 	@ViewBuilder let row: (Data.Element) -> Row
 
 	init(
@@ -30,6 +31,7 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 		self.loadMore = nil
 		self.hasMorePages = false
 		self.loadingMoreText = "Loading more"
+		self.header = nil
 		self.row = row
 	}
 
@@ -43,6 +45,7 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 		loadMore: @escaping () async -> Void,
 		hasMorePages: Bool,
 		loadingMoreText: LocalizedStringResource = "Loading more",
+		header: AnyView? = nil,
 		@ViewBuilder row: @escaping (Data.Element) -> Row
 	) {
 		self.state = state
@@ -54,11 +57,15 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 		self.loadMore = loadMore
 		self.hasMorePages = hasMorePages
 		self.loadingMoreText = loadingMoreText
+		self.header = header
 		self.row = row
 	}
 
 	var body: some View {
 		List {
+			if let header {
+				header
+			}
 			switch state {
 			case .loading:
 				LoadingView(loadingText, systemImage: icon)
