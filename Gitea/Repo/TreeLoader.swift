@@ -37,6 +37,8 @@ struct TreeLoader: View {
 			} else {
 				state = .loaded([])
 			}
+		} catch is CancellationError {
+			// Overridden by a newer branch selection.
 		} catch {
 			state = .failed(error)
 		}
@@ -61,9 +63,6 @@ struct TreeLoader: View {
 								}
 							}
 							.pickerStyle(.menu)
-							.onChange(of: ref) { _, _ in
-								Task { await load() }
-							}
 						}
 					}
 				}
@@ -108,8 +107,10 @@ struct TreeLoader: View {
 				}
 			}
 		}
-		.task {
+		.task(id: ref) {
 			await load()
+		}
+		.task {
 			if folderPath == nil {
 				await loadBranches()
 			}

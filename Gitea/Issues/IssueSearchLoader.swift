@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import os
+
+private let issueLogger = Logger(subsystem: "app.gitea.ios", category: "issueSearchLoader")
 
 struct IssueSearchLoader: View {
 	let type: Operations.IssueSearchIssues.Input.Query._TypePayload
@@ -192,7 +195,9 @@ struct IssueSearchLoader: View {
 				break
 			}
 		} catch {
-			print("Failed to load pinned items: \(error)")
+			// Pinned items are a bonus on top of the issue list, not part of it —
+			// log, keep the previous data, and let a refresh retry.
+			issueLogger.error("Failed to load pinned items: \(error, privacy: .public)")
 		}
 	}
 

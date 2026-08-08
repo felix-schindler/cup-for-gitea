@@ -12,6 +12,7 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 	let loadingMoreText: LocalizedStringResource
 	let header: AnyView?
 	@ViewBuilder let row: (Data.Element) -> Row
+	@State private var isLoadingMore = false
 
 	init(
 		state: LoadState<Data>,
@@ -97,9 +98,12 @@ struct LoadableList<Data, ID, Row>: View where Data: RandomAccessCollection, ID:
 			ForEach(data, id: id) { element in
 				row(element)
 					.onAppear {
-						if let loadMore, hasMorePages, element[keyPath: id] == data.last?[keyPath: id] {
+						// isLoadingMore guards against rapid scroll firing multiple tasks
+						if !isLoadingMore, let loadMore, hasMorePages, element[keyPath: id] == data.last?[keyPath: id] {
+							isLoadingMore = true
 							Task {
 								await loadMore()
+								isLoadingMore = false
 							}
 						}
 					}

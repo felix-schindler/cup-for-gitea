@@ -11,6 +11,8 @@ import Textual
 
 struct FullRepoView: View {
 	@State private var readmeContents: String?
+	@State private var readmeError: Error?
+	@State private var readmeReload = 0
 	@State private var copied = false
 	private let repo: Components.Schemas.Repository
 
@@ -24,19 +26,38 @@ struct FullRepoView: View {
 
 	private func load() async {
 		do {
-			let contents = try await Network.shared.client.repoGetRawFile(
+			let response = try await Network.shared.client.repoGetRawFile(
 				.init(
 					path: .init(
 						owner: owner,
 						repo: repoName,
 						filepath: "README.md"))
-			).ok.body.plainText
-
-			// Collect the entire HTTP body into a single String, limiting to 2 MB
-			let stringContents = try await String(collecting: contents, upTo: 2 * 1024 * 1024)
-			readmeContents = stringContents
+			)
+			switch response {
+			case .ok(let ok):
+				// Collect the entire HTTP body into a single String, limiting to 2 MB
+				readmeContents = try await String(collecting: ok.body.plainText, upTo: 2 * 1024 * 1024)
+				readmeError = nil
+			case .notFound:
+				// No README in this repo — not an error.
+				readmeContents = nil
+				readmeError = nil
+			default:
+				readmeContents = nil
+				readmeError = ReadmeError.undocumented
+			}
+		} catch is CancellationError {
+			// .task(id:) retry restarted this; ignore.
 		} catch {
-			print(error)
+			readmeError = error
+		}
+	}
+
+	enum ReadmeError: LocalizedError {
+		case undocumented
+
+		var errorDescription: String? {
+			"Couldn't load the repository's README file."
 		}
 	}
 
@@ -195,8 +216,19 @@ struct FullRepoView: View {
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
+			} else if readmeError != nil {
+				Section {
+					HStack {
+						Label("Couldn't load README", systemImage: "exclamationmark.triangle")
+							.foregroundStyle(.red)
+						Spacer()
+						Button("Retry") {
+							readmeReload += 1
+						}
+					}
+				}
 			}
-		}.task {
+		}.task(id: readmeReload) {
 			await load()
 		}.refreshable {
 			await load()

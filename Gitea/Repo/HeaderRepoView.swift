@@ -69,7 +69,7 @@ struct HeaderRepoView: View {
 					ScrollView(.horizontal, showsIndicators: false) {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
-							ForEach(repo.topics!, id: \.self) { topic in
+							ForEach(repo.topics ?? [], id: \.self) { topic in
 								NavigationLink(destination: RepoSearchLoader(context: .search, search: topic, limitToTopic: true)) {
 									Text(topic)
 								}
@@ -92,7 +92,7 @@ struct HeaderRepoView: View {
 					}
 
 					if repo.licenses?.isNotEmpty == true {
-						ForEach(repo.licenses!, id: \.self) { license in
+						ForEach(repo.licenses ?? [], id: \.self) { license in
 							PillView(verbatim: license)
 						}
 					}

@@ -47,7 +47,7 @@ struct ReleaseView: View {
 			if release.assets?.isNotEmpty == true || release.zipballUrl?.isNotEmpty == true || release.tarballUrl?.isNotEmpty == true {
 				DisclosureGroup("Assets (\(release.assets?.count ?? 0))") {
 					if release.assets?.isNotEmpty == true {
-						ForEach(release.assets!, id: \.id) { asset in
+						ForEach(release.assets ?? [], id: \.id) { asset in
 							if let urlString = asset.browserDownloadUrl, let url = URL(string: urlString) {
 								DownloadArchiveButton(url: url, fileName: asset.name) {
 									Label(

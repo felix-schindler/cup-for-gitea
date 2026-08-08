@@ -19,53 +19,44 @@ class EmojiHelper {
 		return codes
 	}()
 
+	private static let emojiRegex = try? NSRegularExpression(
+		pattern: "(:[a-z0-9-+_]+:)", options: .caseInsensitive)
+
 	public static func emojizedStringWithString(text: String) -> String {
+		guard let regex = emojiRegex else { return text }
 		var resultText = text
-		do {
-			let regex = try NSRegularExpression(
-				pattern: "(:[a-z0-9-+_]+:)", options: .caseInsensitive)
-			let matchingRange = NSMakeRange(0, resultText.count)
-			regex.enumerateMatches(
-				in: resultText, options: .reportCompletion,
-				range: matchingRange,
-				using: {
-					(
-						result: NSTextCheckingResult!,
-						flags: NSRegularExpression.MatchingFlags,
-						stop: UnsafeMutablePointer<ObjCBool>
-					) -> Void in
-					if (result != nil)
-						&& (result.resultType == .regularExpression)
-					{
-						let range = result.range
-						if range.location != NSNotFound {
-							let code = (text as NSString).substring(with: range)
-							let unicode = EmojiHelper.emojiAliases(key: code)
-							if unicode.isNotEmpty {
-								resultText = resultText.replacingOccurrences(
-									of: code, with: unicode)
-							}
+		let matchingRange = NSMakeRange(0, resultText.utf16.count)
+		regex.enumerateMatches(
+			in: resultText, options: .reportCompletion,
+			range: matchingRange,
+			using: {
+				(
+					result: NSTextCheckingResult?,
+					flags: NSRegularExpression.MatchingFlags,
+					stop: UnsafeMutablePointer<ObjCBool>
+				) -> Void in
+				if let result, result.resultType == .regularExpression {
+					let range = result.range
+					if range.location != NSNotFound {
+						let code = (text as NSString).substring(with: range)
+						let unicode = EmojiHelper.emojiAliases(key: code)
+						if unicode.isNotEmpty {
+							resultText = resultText.replacingOccurrences(
+								of: code, with: unicode)
 						}
 					}
-				})
-		} catch {
-			print("RegExp error")
-		}
-
+				}
+			})
 		return resultText
 	}
 
 	public static func emojiAliases(key: String) -> String {
-		var value: String?
-		let regex = try! NSRegularExpression(
-			pattern: "(:[a-z0-9-+_]+:)", options: .caseInsensitive)
-
+		guard let regex = emojiRegex else { return key }
 		if regex.firstMatch(
-			in: key, options: [], range: NSMakeRange(0, key.utf8.count)) != nil
+			in: key, options: [], range: NSMakeRange(0, key.utf16.count)) != nil
 		{
-			value = emojiCodes[key]
+			return emojiCodes[key] ?? key
 		}
-
-		return value ?? key
+		return key
 	}
 }

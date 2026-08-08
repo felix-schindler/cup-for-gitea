@@ -29,6 +29,8 @@ struct CommitsLoader: View {
 					path: .init(owner: owner, repo: repo),
 					query: .init(sha: ref)
 				).ok.body.json)
+		} catch is CancellationError {
+			// Overridden by a newer branch selection.
 		} catch {
 			state = .failed(error)
 		}
@@ -42,18 +44,15 @@ struct CommitsLoader: View {
 
 	var body: some View {
 		List {
-			if branches != nil {
+			if let branches {
 				HStack {
 					Text("On branch")
 					Picker("", selection: $ref) {
-						ForEach(branches!, id: \.name) { branch in
+						ForEach(branches, id: \.name) { branch in
 							Text(branch.name ?? "").tag(branch.name ?? "")
 						}
 					}
 					.pickerStyle(.menu)
-					.onChange(of: ref) {
-						Task { await load() }
-					}
 				}
 			}
 
@@ -87,8 +86,10 @@ struct CommitsLoader: View {
 				FailedView(failure)
 			}
 		}
-		.task {
+		.task(id: ref) {
 			await load()
+		}
+		.task {
 			await loadBranches()
 		}
 		.refreshable {
@@ -183,7 +184,7 @@ private struct CommitDetailView: View {
 					} label: {
 						Label("View Diff", systemImage: "doc.text")
 					}
-					ForEach(commit.files!, id: \.filename) { file in
+					ForEach(commit.files ?? [], id: \.filename) { file in
 						NavigationLink {
 							CommitDiffView(owner: owner, repo: repo, sha: commit.sha ?? "")
 						} label: {

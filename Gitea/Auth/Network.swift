@@ -19,10 +19,12 @@ class Network {
 	public static var shared: GiteaClient {
 		let instance = InstanceManager.selected ?? InstanceManager.defaultInstance
 		let key = "\(instance.baseURL.absoluteString):\(instance.token)"
-		if _instanceKey != key {
-			_client = GiteaClient(serverURL: instance.serverURL, token: instance.token)
-			_instanceKey = key
+		if let client = _client, _instanceKey == key {
+			return client
 		}
-		return _client!
+		let client = GiteaClient(serverURL: instance.serverURL, token: instance.token)
+		_client = client
+		_instanceKey = key
+		return client
 	}
 }
