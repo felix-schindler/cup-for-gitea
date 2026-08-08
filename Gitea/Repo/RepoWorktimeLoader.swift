@@ -92,25 +92,26 @@ struct WorktimeRow: View {
 	let entry: Components.Schemas.TrackedTime
 
 	var body: some View {
-		let issue = entry.issue
-		NavigationLink(destination: IssueLoader(owner: issue?.repository?.owner ?? "", repo: issue?.repository?.name ?? "", index: issue?.number ?? 0)) {
-			VStack(alignment: .leading) {
-				HStack {
-					if let inline = try? AttributedString(markdown: (issue?.title ?? "").emojized()) {
-						Text(inline)
-							.lineLimit(1)
-					} else {
-						Text((issue?.title ?? "").emojized())
-							.lineLimit(1)
+		if let issue = entry.issue {
+			NavigationLink(destination: IssueLoader(owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)) {
+				VStack(alignment: .leading) {
+					HStack {
+						if let inline = try? AttributedString(markdown: (issue.title ?? "").emojized()) {
+							Text(inline)
+								.lineLimit(1)
+						} else {
+							Text((issue.title ?? "").emojized())
+								.lineLimit(1)
+						}
+						Spacer()
+						Text(TimeFormatter.shared.format(entry.time ?? 0))
+							.font(.footnote)
+							.foregroundStyle(.secondary)
 					}
-					Spacer()
-					Text(TimeFormatter.shared.format(entry.time ?? 0))
-						.font(.footnote)
-						.foregroundStyle(.secondary)
+					Text("\(issue.repository?.fullName ?? "")#\(issue.number ?? 0) · \(entry.created?.toString() ?? "")")
+						.font(.caption)
+						.foregroundStyle(.tertiary)
 				}
-				Text("\(issue?.repository?.fullName ?? "")#\(issue?.number ?? 0) · \(entry.created?.toString() ?? "")")
-					.font(.caption)
-					.foregroundStyle(.tertiary)
 			}
 		}
 	}

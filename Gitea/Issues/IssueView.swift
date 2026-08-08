@@ -15,7 +15,7 @@ protocol IssueDisplayable {
 	var displayRepo: String { get }
 	var displayNumber: Int64 { get }
 	var displayIsLocked: Bool { get }
-	var displayCreatedAt: Date { get }
+	var displayCreatedAt: Date? { get }
 	var displayTitle: String { get }
 	var displayBody: String { get }
 	var displayComments: Int64 { get }
@@ -29,7 +29,7 @@ extension Components.Schemas.Issue: IssueDisplayable {
 	var displayRepo: String { repository?.name ?? "" }
 	var displayNumber: Int64 { number ?? 0 }
 	var displayIsLocked: Bool { isLocked ?? false }
-	var displayCreatedAt: Date { createdAt ?? Date() }
+	var displayCreatedAt: Date? { createdAt }
 	var displayTitle: String { title ?? "" }
 	var displayBody: String { body ?? "" }
 	var displayComments: Int64 { comments ?? 0 }
@@ -43,7 +43,7 @@ extension Components.Schemas.PullRequest: IssueDisplayable {
 	var displayRepo: String { base?.repo?.name ?? "" }
 	var displayNumber: Int64 { number ?? 0 }
 	var displayIsLocked: Bool { isLocked ?? false }
-	var displayCreatedAt: Date { createdAt ?? Date() }
+	var displayCreatedAt: Date? { createdAt }
 	var displayTitle: String { title ?? "" }
 	var displayBody: String { body ?? "" }
 	var displayComments: Int64 { comments ?? 0 }
@@ -289,7 +289,7 @@ struct IssueView: View {
 					body: .json(
 						.init(
 							assignee: "", assignees: [], body: issue.body,
-							contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+							contentVersion: issue.contentVersion, dueDate: issue.dueDate,
 							milestone: issue.milestone?.id ?? 0, ref: issue.ref,
 							state: "closed", title: issue.title, unsetDueDate: issue.dueDate == nil
 						))
@@ -313,7 +313,7 @@ struct IssueView: View {
 					body: .json(
 						.init(
 							assignee: "", assignees: [], body: issue.body,
-							contentVersion: issue.contentVersion, dueDate: issue.dueDate ?? Date(),
+							contentVersion: issue.contentVersion, dueDate: issue.dueDate,
 							milestone: issue.milestone?.id ?? 0, ref: "",
 							state: "open", title: issue.title, unsetDueDate: issue.dueDate == nil
 						))
@@ -546,7 +546,9 @@ struct IssueView: View {
 					Image(systemName: "lock")
 				}
 				Spacer()
-				Text(item.data.displayCreatedAt.toString())
+				if let createdAt = item.data.displayCreatedAt {
+					Text(createdAt.toString())
+				}
 			}.font(.footnote)
 
 			InlineText(markdown: item.data.displayTitle.emojized())

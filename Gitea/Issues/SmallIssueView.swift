@@ -43,7 +43,9 @@ struct SmallIssueView: View {
 						Image(systemName: "lock")
 					}
 					Spacer()
-					Text(item.data.displayCreatedAt.toString())
+					if let createdAt = item.data.displayCreatedAt {
+						Text(createdAt.toString())
+					}
 				}.font(.footnote)
 
 				if let inline = try? AttributedString(markdown: item.data.displayTitle.emojized()) {
