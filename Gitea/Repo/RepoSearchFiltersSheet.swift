@@ -65,11 +65,6 @@ struct RepoSearchFiltersSheet: View {
 				Toggle("Limit to topic", isOn: $filters.topic)
 				Toggle("Include description", isOn: $filters.includeDesc)
 			}
-
-			Section("Pagination") {
-				TextField("Page limit", text: $filters.limitText)
-					.keyboardType(.numberPad)
-			}
 		}
 	}
 }

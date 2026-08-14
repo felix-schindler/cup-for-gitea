@@ -18,14 +18,23 @@ enum StatusChange: String {
 struct NotificationLoader: View {
 	private let icon = Icons.notifications.rawValue
 	@State var showAll = false
-	@State var notifications: Result<[Components.Schemas.NotificationThread], Error>?
+	@State private var state = LoadState<[Components.Schemas.NotificationThread]>.loading
+	@State private var paging = Paging()
 
-	private func load() async {
-		do {
-			let notifications = try await Network.shared.client.notifyGetList(.init(query: .init(all: showAll))).ok.body.json
-			self.notifications = .success(notifications)
-		} catch {
-			self.notifications = .failure(error)
+	private let defaultLimit = 7
+
+	private func resetAndLoad() async {
+		guard !paging.isLoading else { return }
+		paging.reset()
+		await loadNextPage(reset: true)
+	}
+
+	private func loadNextPage(reset: Bool = false) async {
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
+			try await Network.shared.client.notifyGetList(.init(query: .init(all: showAll, page: page, limit: defaultLimit))).ok.body.json
 		}
 	}
 
@@ -34,7 +43,7 @@ struct NotificationLoader: View {
 	}
 
 	private func applyStatusChange(id: Int64, status: StatusChange) {
-		guard case .success(let current) = notifications else { return }
+		guard let current = state.value else { return }
 		let shouldRemove: Bool
 		switch status {
 		case .read, .pinned:
@@ -45,7 +54,7 @@ struct NotificationLoader: View {
 
 		guard shouldRemove else { return }
 		let updated = current.filter { $0.id != id }
-		notifications = .success(updated)
+		state = .loaded(updated)
 	}
 
 	var body: some View {
@@ -56,95 +65,107 @@ struct NotificationLoader: View {
 					Text("Read").tag(true)
 				}.onChange(of: showAll) {
 					Task {
-						await load()
+						await resetAndLoad()
 					}
 				}.pickerStyle(.segmented)
 			}
 
 			Section {
-				if let notifications {
-					switch notifications {
-					case .success(let success):
-						if success.isEmpty {
-							NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
+				switch state {
+				case .loading:
+					LoadingView("Loading user notification thread", systemImage: icon)
+				case .loaded(let data), .loadingMore(let data), .failedMore(let data, _):
+					if data.isEmpty {
+						if case .failedMore(_, let error) = state {
+							FailedView(error)
 						} else {
-							ForEach(success, id: \.id) { notif in
-								NavigationLink(destination: destinationView(for: notif)) {
-									VStack(alignment: .leading) {
-										ScrollView(.horizontal, showsIndicators: false) {
-											HStack {
-												if let subject = notif.subject {
-													StateIconView(subject._type ?? .issue, subject.state ?? .open)
-													if let url = URL(string: subject.htmlUrl ?? "") {
-														Text("#\(url.lastPathComponent)")
-															.font(.footnote)
-															.foregroundStyle(.secondary)
-													}
+							NoContentView("All caught up!", systemImage: icon, description: "No unread notifications.")
+						}
+					} else {
+						ForEach(data, id: \.id) { notif in
+							NavigationLink(destination: destinationView(for: notif)) {
+								VStack(alignment: .leading) {
+									ScrollView(.horizontal, showsIndicators: false) {
+										HStack {
+											if let subject = notif.subject {
+												StateIconView(subject._type ?? .issue, subject.state ?? .open)
+												if let url = URL(string: subject.htmlUrl ?? "") {
+													Text("#\(url.lastPathComponent)")
+														.font(.footnote)
+														.foregroundStyle(.secondary)
 												}
-												Text(notif.repository?.fullName ?? "")
 											}
+											Text(notif.repository?.fullName ?? "")
 										}
-
-										Text(notif.subject?.title?.emojized() ?? "")
 									}
+
+									Text(notif.subject?.title?.emojized() ?? "")
 								}
-								.buttonStyle(.plain)
-								.swipeActions {
-									HStack {
-										if notif.unread == true || notif.pinned == true {
-											Button("Mark read", systemImage: "envelope.open") {
-												Task {
-													guard let id = notif.id else { return }
-													do {
-														try await mark(id, status: .read)
-														applyStatusChange(id: id, status: .read)
-														HapticFeedback.notify(.success)
-													} catch {
-														HapticFeedback.notify(.error)
-													}
+							}
+							.buttonStyle(.plain)
+							.swipeActions {
+								HStack {
+									if notif.unread == true || notif.pinned == true {
+										Button("Mark read", systemImage: "envelope.open") {
+											Task {
+												guard let id = notif.id else { return }
+												do {
+													try await mark(id, status: .read)
+													applyStatusChange(id: id, status: .read)
+													HapticFeedback.notify(.success)
+												} catch {
+													HapticFeedback.notify(.error)
 												}
-											}.tint(.accentColor)
-										} else {
-											Button("Mark pinned", systemImage: "pin") {
-												Task {
-													guard let id = notif.id else { return }
-													do {
-														try await mark(id, status: .pinned)
-														applyStatusChange(id: id, status: .pinned)
-														HapticFeedback.notify(.success)
-													} catch {
-														HapticFeedback.notify(.error)
-													}
+											}
+										}.tint(.accentColor)
+									} else {
+										Button("Mark pinned", systemImage: "pin") {
+											Task {
+												guard let id = notif.id else { return }
+												do {
+													try await mark(id, status: .pinned)
+													applyStatusChange(id: id, status: .pinned)
+													HapticFeedback.notify(.success)
+												} catch {
+													HapticFeedback.notify(.error)
 												}
-											}.tint(.orange)
-											Button("Mark unread", systemImage: "envelope.badge") {
-												Task {
-													guard let id = notif.id else { return }
-													do {
-														try await mark(id, status: .unread)
-														applyStatusChange(id: id, status: .unread)
-														HapticFeedback.notify(.success)
-													} catch {
-														HapticFeedback.notify(.error)
-													}
+											}
+										}.tint(.orange)
+										Button("Mark unread", systemImage: "envelope.badge") {
+											Task {
+												guard let id = notif.id else { return }
+												do {
+													try await mark(id, status: .unread)
+													applyStatusChange(id: id, status: .unread)
+													HapticFeedback.notify(.success)
+												} catch {
+													HapticFeedback.notify(.error)
 												}
-											}.tint(.accentColor)
-										}
-									}.labelStyle(.iconOnly)
+											}
+										}.tint(.accentColor)
+									}
+								}.labelStyle(.iconOnly)
+							}
+							.onAppear {
+								if notif.id == data.last?.id, paging.hasMore {
+									Task { await loadNextPage() }
 								}
 							}
 						}
-					case .failure(let failure):
-						FailedView(failure)
+						if case .loadingMore = state {
+							LoadingView("Loading more", systemImage: icon)
+						} else if case .failedMore(_, let error) = state {
+							FailedView(error)
+						}
 					}
-				} else {
-					LoadingView("Loading user notification thread", systemImage: icon)
+				case .failed(let failure):
+					FailedView(failure)
 				}
 			}
 		}.task {
-			await load()
+			await resetAndLoad()
 		}.refreshable {
-			await load()
+			await resetAndLoad()
 		}.navigationTitle("Notifications")
 	}
 

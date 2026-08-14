@@ -32,7 +32,7 @@ struct HomeView: View {
 		do {
 			starredState = .loaded(
 				try await Network.shared.client.userCurrentListStarred(
-					.init(query: .init(page: 1, limit: 10))
+					.init(query: .init(page: 1, limit: 7))
 				).ok.body.json)
 		} catch {
 			starredState = .failed(error)

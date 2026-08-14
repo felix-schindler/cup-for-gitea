@@ -9,7 +9,6 @@ struct RepoSearchFilters: Equatable {
 	var template: Bool?
 	var topic: Bool = false
 	var includeDesc: Bool = false
-	var limitText: String = ""
 
 	enum SortOption: String, CaseIterable {
 		case bestMatch = ""
@@ -76,15 +75,9 @@ struct RepoSearchFilters: Equatable {
 			template?.description ?? "",
 			topic.description,
 			includeDesc.description,
-			limitText,
 		].joined(separator: "|")
 	}
 
 	var sortValue: String? { sort == .bestMatch ? nil : sort.rawValue }
 	var modeValue: String? { mode == .all ? nil : mode.rawValue }
-	var limitValue: Int? {
-		let trimmed = limitText.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard let intValue = Int(trimmed), intValue >= 1 else { return nil }
-		return intValue
-	}
 }

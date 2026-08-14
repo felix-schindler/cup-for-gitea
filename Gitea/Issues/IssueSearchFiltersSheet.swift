@@ -94,11 +94,6 @@ struct IssueSearchFiltersSheet: View {
 					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()
 			}
-
-			Section("Pagination") {
-				TextField("Limit", text: $filters.limitText)
-					.keyboardType(.numberPad)
-			}
 		}
 	}
 }

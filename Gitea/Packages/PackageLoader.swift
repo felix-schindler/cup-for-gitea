@@ -10,16 +10,25 @@ import SwiftUI
 struct PackageLoader: View {
 	let owner: String
 	@State private var state = LoadState<[Components.Schemas.Package]>.loading
+	@State private var paging = Paging()
 
-	func load() async {
-		do {
-			state = .loaded(
-				try await Network.shared.client.listPackages(
-					path: .init(owner: owner),
-					query: .init(page: 1, limit: 7)
-				).ok.body.json)
-		} catch {
-			state = .failed(error)
+	private let defaultLimit = 7
+
+	private func resetAndLoad() async {
+		guard !paging.isLoading else { return }
+		paging.reset()
+		await loadNextPage(reset: true)
+	}
+
+	private func loadNextPage(reset: Bool = false) async {
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
+			try await Network.shared.client.listPackages(
+				path: .init(owner: owner),
+				query: .init(page: page, limit: defaultLimit)
+			).ok.body.json
 		}
 	}
 
@@ -30,7 +39,9 @@ struct PackageLoader: View {
 			loadingText: "Loading packages",
 			emptyText: "There are no packages",
 			icon: Icons.packages.rawValue,
-			load: load
+			load: { await resetAndLoad() },
+			loadMore: { await loadNextPage() },
+			hasMorePages: paging.hasMore
 		) { pkg in
 			SmallPackageView(pkg)
 		}

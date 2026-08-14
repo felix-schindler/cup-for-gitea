@@ -9,15 +9,23 @@ import SwiftUI
 
 struct SubscriptionsLoader: View {
 	private let icon = Icons.starred.rawValue
-	@State private var repos: Result<[Components.Schemas.Repository], Error>?
+	@State private var state = LoadState<[Components.Schemas.Repository]>.loading
+	@State private var paging = Paging()
 
-	private func load() async {
-		do {
-			let repos = try await Network.shared.client.userCurrentListSubscriptions().ok.body.json
-			self.repos = .success(repos)
-		} catch {
-			print(error, error.localizedDescription)
-			self.repos = .failure(error)
+	private let defaultLimit = 7
+
+	private func resetAndLoad() async {
+		guard !paging.isLoading else { return }
+		paging.reset()
+		await loadNextPage(reset: true)
+	}
+
+	private func loadNextPage(reset: Bool = false) async {
+		guard !paging.isLoading else { return }
+		paging.isLoading = true
+		defer { paging.isLoading = false }
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
+			try await Network.shared.client.userCurrentListSubscriptions(.init(query: .init(page: page, limit: defaultLimit))).ok.body.json
 		}
 	}
 
@@ -30,26 +38,38 @@ struct SubscriptionsLoader: View {
 				)
 				.foregroundStyle(.foreground, .yellow)
 			}
-			if let repos {
-				switch repos {
-				case .success(let success):
-					if success.isEmpty {
-						NoContentView("There are no watched repositories", systemImage: icon)
-					} else {
-						ForEach(success, id: \.id) { repo in
-							SmallRepoView(repo)
-						}
-					}
-				case .failure(let failure):
-					FailedView(failure)
-				}
-			} else {
+			switch state {
+			case .loading:
 				LoadingView("Loading watched repositories", systemImage: icon)
+			case .loaded(let repos), .loadingMore(let repos), .failedMore(let repos, _):
+				if repos.isEmpty {
+					if case .failedMore(_, let error) = state {
+						FailedView(error)
+					} else {
+						NoContentView("There are no watched repositories", systemImage: icon)
+					}
+				} else {
+					ForEach(repos, id: \.id) { repo in
+						SmallRepoView(repo)
+							.onAppear {
+								if repo.id == repos.last?.id, paging.hasMore {
+									Task { await loadNextPage() }
+								}
+							}
+					}
+					if case .loadingMore = state {
+						LoadingView("Loading more", systemImage: icon)
+					} else if case .failedMore(_, let error) = state {
+						FailedView(error)
+					}
+				}
+			case .failed(let failure):
+				FailedView(failure)
 			}
 		}.task {
-			await load()
+			await resetAndLoad()
 		}.refreshable {
-			await load()
+			await resetAndLoad()
 		}.navigationTitle("Subscriptions")
 	}
 }

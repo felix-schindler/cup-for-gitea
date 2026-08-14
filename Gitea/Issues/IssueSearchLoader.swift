@@ -89,7 +89,7 @@ struct IssueSearchLoader: View {
 			createdBy: filters.createdByValue,
 			team: filters.teamValue,
 			page: paging.page,
-			limit: filters.limitValue ?? defaultLimit
+			limit: defaultLimit
 		)
 	}
 
@@ -106,7 +106,7 @@ struct IssueSearchLoader: View {
 			assignedBy: filters.assigned ? currentUsername : nil,
 			mentionedBy: filters.mentioned ? currentUsername : nil,
 			page: paging.page,
-			limit: filters.limitValue ?? defaultLimit
+			limit: defaultLimit
 		)
 	}
 
@@ -133,7 +133,7 @@ struct IssueSearchLoader: View {
 		guard !paging.isLoading else { return }
 		paging.isLoading = true
 		defer { paging.isLoading = false }
-		(state, paging) = await paging.nextPage(state: state, limit: filters.limitValue ?? defaultLimit, reset: reset) { page in
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			let results = try await loadIssues(page: page)
 			return results
 		}
@@ -155,7 +155,7 @@ struct IssueSearchLoader: View {
 					assignedBy: filters.assigned ? currentUsername : nil,
 					mentionedBy: filters.mentioned ? currentUsername : nil,
 					page: page,
-					limit: filters.limitValue ?? defaultLimit
+					limit: defaultLimit
 				)
 			).ok.body.json
 		}
@@ -178,7 +178,7 @@ struct IssueSearchLoader: View {
 					createdBy: filters.createdByValue,
 					team: filters.teamValue,
 					page: page,
-					limit: filters.limitValue ?? defaultLimit
+					limit: defaultLimit
 				))
 		).ok.body.json
 	}

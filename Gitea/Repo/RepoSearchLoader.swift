@@ -77,7 +77,7 @@ struct RepoSearchLoader: View {
 		guard !paging.isLoading else { return }
 		paging.isLoading = true
 		defer { paging.isLoading = false }
-		(state, paging) = await paging.nextPage(state: state, limit: filters.limitValue ?? defaultLimit, reset: reset) { page in
+		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			try await loadRepos(page: page)
 		}
 	}
@@ -116,7 +116,7 @@ struct RepoSearchLoader: View {
 			}
 		}
 
-		let limit = filters.limitValue ?? defaultLimit
+		let limit = defaultLimit
 		return try await Network.shared.client.repoSearch(
 			.init(
 				query: .init(

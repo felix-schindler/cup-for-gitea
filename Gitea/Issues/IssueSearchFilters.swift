@@ -22,7 +22,6 @@ struct IssueSearchFilters: Equatable {
 	var myRepos: Bool = false
 	var since: Date?
 	var before: Date?
-	var limitText: String = ""
 
 	var taskKey: String {
 		[
@@ -40,7 +39,6 @@ struct IssueSearchFilters: Equatable {
 			myRepos.description,
 			since?.timeIntervalSince1970.description ?? "",
 			before?.timeIntervalSince1970.description ?? "",
-			limitText,
 		].joined(separator: "|")
 	}
 
@@ -49,16 +47,9 @@ struct IssueSearchFilters: Equatable {
 	var ownerValue: String? { trimmedOrNil(owner) }
 	var createdByValue: String? { trimmedOrNil(createdBy) }
 	var teamValue: String? { trimmedOrNil(team) }
-	var limitValue: Int? { intOrNil(limitText, minimum: 1) }
 
 	private func trimmedOrNil(_ value: String) -> String? {
 		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
 		return trimmed.isEmpty ? nil : trimmed
-	}
-
-	private func intOrNil(_ value: String, minimum: Int) -> Int? {
-		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard let intValue = Int(trimmed), intValue >= minimum else { return nil }
-		return intValue
 	}
 }

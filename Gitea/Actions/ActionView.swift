@@ -14,10 +14,13 @@ struct ActionView: View {
 	private let repo: String
 
 	@State private var jobsState = LoadState<[Components.Schemas.ActionWorkflowJob]>.loading
+	@State private var jobsPaging = Paging()
 	@State private var artifactsState = LoadState<[Components.Schemas.ActionArtifact]>.loading
 	@State private var downloadingArtifactId: Int64?
 	@State private var showDownloadError = false
 	@State private var downloadError: Error?
+
+	private let defaultLimit = 7
 
 	init(run: Components.Schemas.ActionWorkflowRun, owner: String, repo: String) {
 		self.run = run
@@ -40,14 +43,20 @@ struct ActionView: View {
 	}
 
 	private func loadJobs() async {
-		do {
-			jobsState = .loaded(
-				try await Network.shared.client.listWorkflowRunJobs(
-					path: .init(owner: owner, repo: repo, run: Int(run.id ?? 0)),
-					query: .init(page: 1, limit: 7)
-				).ok.body.json.jobs ?? [])
-		} catch {
-			jobsState = .failed(error)
+		guard !jobsPaging.isLoading else { return }
+		jobsPaging.reset()
+		await loadJobsPage(reset: true)
+	}
+
+	private func loadJobsPage(reset: Bool = false) async {
+		guard !jobsPaging.isLoading else { return }
+		jobsPaging.isLoading = true
+		defer { jobsPaging.isLoading = false }
+		(jobsState, jobsPaging) = await jobsPaging.nextPage(state: jobsState, limit: defaultLimit, reset: reset) { page in
+			try await Network.shared.client.listWorkflowRunJobs(
+				path: .init(owner: owner, repo: repo, run: Int(run.id ?? 0)),
+				query: .init(page: page, limit: defaultLimit)
+			).ok.body.json.jobs ?? []
 		}
 	}
 
@@ -122,6 +131,16 @@ struct ActionView: View {
 					} else {
 						ForEach(jobs, id: \.id) { job in
 							ActionsJobView(job: job)
+								.onAppear {
+									if job.id == jobs.last?.id, jobsPaging.hasMore {
+										Task { await loadJobsPage() }
+									}
+								}
+						}
+						if case .loadingMore = jobsState {
+							LoadingView("Loading more", systemImage: Icons.actions.rawValue)
+						} else if case .failedMore(_, let error) = jobsState {
+							FailedView(error)
 						}
 					}
 				case .failed(let failure):
