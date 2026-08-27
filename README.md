@@ -1,3 +1,5 @@
+
+
 # Icon
 
 * License: CC0 - Creative Commons License
@@ -31,5 +33,5 @@ git fetch github pull/<id>/head:pr-<id>
 # Release a new version
 
 1. Change app version in Xcode → Targets → Gitea → Identity → Version
-2. Add changelog in `changelogs/v<verison>.md`
+2. Add changelog in `changelogs/v<version>.md`
 3. Tag branch `git push origin v<version>`
