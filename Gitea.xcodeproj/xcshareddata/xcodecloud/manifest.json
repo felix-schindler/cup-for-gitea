@@ -1,0 +1,9 @@
+{
+  "id" : "e435d550-d02f-4ee1-b94a-bd7a71cf0a8d",
+  "targets" : [
+    {
+      "id" : "31CA5973-96AF-43ED-ADE9-0ACCFC16A16D",
+      "name" : "Gitea"
+    }
+  ]
+}
