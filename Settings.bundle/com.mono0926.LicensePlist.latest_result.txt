@@ -14,11 +14,11 @@ name: swift-http-types, nameSpecified: swift-http-types, owner: apple, version: 
 
 name: swift-numerics, nameSpecified: swift-numerics, owner: apple, version: 1.1.1, source: https://github.com/apple/swift-numerics
 
-name: swift-openapi-generator, nameSpecified: swift-openapi-generator, owner: apple, version: 1.12.2, source: https://github.com/apple/swift-openapi-generator
+name: swift-openapi-generator, nameSpecified: swift-openapi-generator, owner: apple, version: 1.13.1, source: https://github.com/apple/swift-openapi-generator
 
-name: swift-openapi-runtime, nameSpecified: swift-openapi-runtime, owner: apple, version: 1.12.0, source: https://github.com/apple/swift-openapi-runtime
+name: swift-openapi-runtime, nameSpecified: swift-openapi-runtime, owner: apple, version: 1.12.1, source: https://github.com/apple/swift-openapi-runtime
 
-name: swift-openapi-urlsession, nameSpecified: swift-openapi-urlsession, owner: apple, version: 1.3.0, source: https://github.com/apple/swift-openapi-urlsession
+name: swift-openapi-urlsession, nameSpecified: swift-openapi-urlsession, owner: apple, version: 1.3.1, source: https://github.com/apple/swift-openapi-urlsession
 
 name: swiftui-cached-async-image, nameSpecified: swiftui-cached-async-image, owner: lorenzofiamingo, version: 2.1.1, source: https://github.com/lorenzofiamingo/swiftui-cached-async-image
 
