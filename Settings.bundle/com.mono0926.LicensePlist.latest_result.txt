@@ -30,4 +30,4 @@ name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.2, source: https://g
 
 add-version-numbers: false
 
-LicensePlist Version: 3.27.9
+LicensePlist Version: 3.28.2

@@ -398,7 +398,7 @@
 			repositoryURL = "https://github.com/gonzalezreal/textual";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.1;
+				minimumVersion = 0.5.0;
 			};
 		};
 		DC39503A2FAFE94400D5984A /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */ = {
@@ -406,7 +406,7 @@
 			repositoryURL = "https://github.com/apple/swift-openapi-runtime";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.12.0;
+				minimumVersion = 1.12.1;
 			};
 		};
 		DC39503D2FAFE95500D5984A /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
@@ -414,7 +414,7 @@
 			repositoryURL = "https://github.com/apple/swift-openapi-urlsession";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.0;
+				minimumVersion = 1.3.1;
 			};
 		};
 		DC5C68572FAFEDD70012D957 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */ = {
@@ -422,7 +422,7 @@
 			repositoryURL = "https://github.com/apple/swift-openapi-generator";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.12.2;
+				minimumVersion = 1.13.1;
 			};
 		};
 		DC5C68BB2FAFF7250012D957 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
@@ -430,7 +430,7 @@
 			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image";
 			requirement = {
 				kind = exactVersion;
-				version = 2.1.1;
+				version = 2.1.2;
 			};
 		};
 		DC5C68BF2FAFF7410012D957 /* XCRemoteSwiftPackageReference "Highlightr" */ = {
