@@ -18,7 +18,7 @@ This downloads the raw spec and re-applies the local fixes the server spec is mi
 ## Bundle Licenses
 
 ```
-license-plist --config-path license_plist.yml
+make licenses
 ```
 
 ## GitHub contributions
