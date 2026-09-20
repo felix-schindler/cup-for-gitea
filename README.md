@@ -10,10 +10,10 @@
 The server serves an OpenAPI 3.0.3 spec as JSON; the swift-openapi-generator build plugin reads JSON natively, so no conversion is needed.
 
 ```
-./fetch-spec.sh
+make spec
 ```
 
-The script downloads the raw spec and re-applies two local fixes the server spec is missing (the raw-file and plain-string endpoints serve `text/plain`, not `application/octet-stream`/`application/json` as declared), so the generated client works against the real server. Then rebuild. (`jq` is required.)
+This downloads the raw spec and re-applies the local fixes the server spec is missing (the raw-file and plain-string endpoints serve `text/plain`, not `application/octet-stream`/`application/json` as declared, and asset uploads need `required: true`), so the generated client works against the real server. Then rebuild. (`jq` is required.)
 
 ## Bundle Licenses
 
