@@ -14,6 +14,9 @@ struct FullRepoView: View {
 	@State private var readmeError: Error?
 	@State private var readmeReload = 0
 	@State private var copied = false
+	@State private var isStarred: Bool?
+	@State private var starringError: Error?
+	@State private var showStarringErrorAlert = false
 	private let repo: Components.Schemas.Repository
 
 	init(_ repo: Components.Schemas.Repository) {
@@ -58,6 +61,41 @@ struct FullRepoView: View {
 
 		var errorDescription: String? {
 			"Couldn't load the repository's README file."
+		}
+	}
+
+	private func checkStarred() async {
+		do {
+			let response = try await Network.shared.client.userCurrentCheckStarring(
+				.init(path: .init(owner: owner, repo: repoName))
+			)
+			switch response {
+			case .noContent:
+				isStarred = true
+			case .notFound:
+				isStarred = false
+			default:
+				isStarred = nil
+			}
+		} catch {
+			isStarred = nil
+		}
+	}
+
+	private func toggleStar() async {
+		guard let isStarred else { return }
+		do {
+			if isStarred {
+				_ = try await Network.shared.client.userCurrentDeleteStar(.init(path: .init(owner: owner, repo: repoName)))
+			} else {
+				_ = try await Network.shared.client.userCurrentPutStar(.init(path: .init(owner: owner, repo: repoName)))
+			}
+			self.isStarred = !isStarred
+			HapticFeedback.notify(.success)
+		} catch {
+			starringError = error
+			showStarringErrorAlert = true
+			HapticFeedback.notify(.error)
 		}
 	}
 
@@ -230,8 +268,11 @@ struct FullRepoView: View {
 			}
 		}.task(id: readmeReload) {
 			await load()
+		}.task {
+			await checkStarred()
 		}.refreshable {
 			await load()
+			await checkStarred()
 		}.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Menu("More", systemImage: "ellipsis") {
@@ -239,6 +280,16 @@ struct FullRepoView: View {
 						Section {
 							ShareLink(item: url)
 						}
+					}
+
+					Section {
+						AsyncButton(
+							isStarred == true ? "Unstar" : "Star",
+							systemImage: isStarred == true ? "star.slash" : Icons.starred.rawValue
+						) {
+							await toggleStar()
+						}
+						.disabled(isStarred == nil)
 					}
 
 					Section("Clone code") {
@@ -281,5 +332,10 @@ struct FullRepoView: View {
 		}
 		.navigationTitle(repo.fullName ?? "")
 		.navigationBarTitleDisplayMode(.inline)
+		.alert("Error", isPresented: $showStarringErrorAlert, presenting: starringError) { _ in
+			Button("OK") {}
+		} message: { error in
+			Text(error.localizedDescription)
+		}
 	}
 }
