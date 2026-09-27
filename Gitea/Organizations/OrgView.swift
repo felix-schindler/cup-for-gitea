@@ -33,8 +33,8 @@ struct OrgView: View {
 						VisibilityIcon(org.visibility?.value1.rawValue ?? "")
 					}
 
-					if org.description?.isNotEmpty == true {
-						InlineText(markdown: org.description ?? "")
+                    if let desc = org.description?.emojized(), desc.isNotEmpty {
+						InlineText(markdown: desc)
 							.textual.inlineStyle(.gitHub)
 							.textual.textSelection(.enabled)
 					}
