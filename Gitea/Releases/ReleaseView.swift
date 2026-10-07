@@ -37,8 +37,8 @@ struct ReleaseView: View {
 					.font(.footnote)
 				}
 
-				if release.body?.isNotEmpty == true {
-					StructuredText(markdown: (release.body ?? "").emojized())
+                if let body = release.body?.emojized(), body.isNotEmpty {
+					StructuredText(markdown: body)
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
@@ -81,10 +81,12 @@ struct ReleaseView: View {
 			}
 		} header: {
 			HStack {
-				Text((release.name?.isNotEmpty == true ? release.name ?? "" : release.tagName ?? "").emojized())
-				Spacer()
-				Text(release.publishedAt?.toString(timeStyle: .short) ?? "")
-					.font(.footnote)
+                Text((release.name?.emojized() ?? release.tagName ?? "Release"))
+                if let publishedAt = release.publishedAt?.toString(timeStyle: .short) {
+                    Spacer()
+                    Text(publishedAt)
+                        .font(.footnote)
+                }
 			}
 		}
 		.swipeActions {

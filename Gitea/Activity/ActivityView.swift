@@ -80,14 +80,14 @@ struct ActivityView: View {
 						} else {
 							HeadCommitView(commit: pushContent.headCommit)
 						}
-					} else if activity.content?.isNotEmpty == true {
-						Text((activity.content ?? "").emojized())
+                    } else if let content = activity.content?.emojized(), content.isNotEmpty {
+						Text(content)
 							.font(.footnote)
 							.lineLimit(5)
 					}
 				default:
-					if activity.content?.isNotEmpty == true {
-						Text((activity.content ?? "").emojized())
+                    if let content = activity.content?.emojized(), content.isNotEmpty {
+						Text(content)
 							.font(.footnote)
 							.lineLimit(5)
 					}

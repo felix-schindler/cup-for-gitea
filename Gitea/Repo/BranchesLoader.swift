@@ -32,7 +32,7 @@ struct BranchesLoader: View {
 		) { branch in
 			VStack(alignment: .leading) {
 				HStack {
-					Text((branch.name ?? "").emojized())
+                    Text((branch.name?.emojized() ?? ""))
 						.fontWeight(.medium)
 					if branch.protected == true {
 						Image(systemName: "lock")
