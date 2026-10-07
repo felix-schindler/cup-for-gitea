@@ -31,7 +31,7 @@ struct TagsLoader: View {
 			load: load
 		) { tag in
 			VStack(alignment: .leading) {
-				Text((tag.name ?? "").emojized())
+                Text(tag.name?.emojized() ?? "")
 					.font(.headline)
 
 				VStack(alignment: .leading) {
@@ -46,8 +46,8 @@ struct TagsLoader: View {
 				.font(.footnote)
 				.foregroundStyle(.secondary)
 
-				if tag.message?.isNotEmpty == true {
-					Text((tag.message ?? "").emojized())
+                if let message = tag.message?.emojized(), message.isNotEmpty {
+					Text(message)
 				}
 
 				if tag.tarballUrl?.isNotEmpty == true || tag.zipballUrl?.isNotEmpty == true {

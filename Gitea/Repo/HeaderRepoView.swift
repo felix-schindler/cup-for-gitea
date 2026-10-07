@@ -60,8 +60,8 @@ struct HeaderRepoView: View {
 				}
 			}
 
-			if repo.description?.isNotEmpty == true {
-				Text((repo.description ?? "").emojized())
+            if let description = repo.description?.emojized(), desc.isNotEmpty {
+				Text(description)
 			}
 
 			HStack {

@@ -96,11 +96,11 @@ struct WorktimeRow: View {
 			NavigationLink(destination: IssueLoader(owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)) {
 				VStack(alignment: .leading) {
 					HStack {
-						if let inline = try? AttributedString(markdown: (issue.title ?? "").emojized()) {
+                        if let inline = try? AttributedString(markdown: issue.title?.emojized() ?? "") {
 							Text(inline)
 								.lineLimit(1)
 						} else {
-							Text((issue.title ?? "").emojized())
+                            Text(issue.title?.emojized() ?? "")
 								.lineLimit(1)
 						}
 						Spacer()

@@ -39,8 +39,8 @@ struct MilestoneView: View {
 					}
 				}
 
-				if milestone.description?.isNotEmpty == true {
-					StructuredText(markdown: (milestone.description ?? "").emojized())
+                if let description = milestone.description?.emojized(), description.isNotEmpty {
+					StructuredText(markdown: description)
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)
 				}
@@ -53,7 +53,7 @@ struct MilestoneView: View {
 			}
 		} header: {
 			HStack {
-				Text((milestone.title ?? "").emojized())
+				Text((milestone.title?.emojized() ?? ""))
 				Spacer()
 				Text(milestone.createdAt?.toString(.short) ?? "")
 					.font(.footnote)

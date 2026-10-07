@@ -15,7 +15,7 @@ struct SmallLabelView: View {
 			Circle()
 				.fill(Color(hex: label.color ?? ""))
 				.frame(width: 12, height: 12)
-			Text((label.name ?? "").emojized())
+            Text((label.name?.emojized() ?? ""))
 		}
 	}
 }
