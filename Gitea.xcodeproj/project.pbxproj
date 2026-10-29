@@ -116,6 +116,11 @@
 				en,
 				Base,
 				de,
+				es,
+				fr,
+				ja,
+				ko,
+				"pt-BR",
 				"zh-Hans",
 				"zh-Hant",
 			);
