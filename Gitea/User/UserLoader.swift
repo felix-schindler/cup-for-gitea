@@ -108,7 +108,7 @@ struct UserLoader: View {
 								.font(.footnote)
 							}
 
-                            if let description = u.description?.emojized(), description.isNotEmpty {
+							if let description = u.description?.emojized(), description.isNotEmpty {
 								InlineText(markdown: description)
 									.textual.inlineStyle(.gitHub)
 									.textual.textSelection(.enabled)

@@ -39,7 +39,7 @@ struct MilestoneView: View {
 					}
 				}
 
-                if let description = milestone.description?.emojized(), description.isNotEmpty {
+				if let description = milestone.description?.emojized(), description.isNotEmpty {
 					StructuredText(markdown: description)
 						.textual.structuredTextStyle(.gitHub)
 						.textual.textSelection(.enabled)

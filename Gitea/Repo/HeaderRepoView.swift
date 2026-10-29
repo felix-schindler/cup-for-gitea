@@ -60,7 +60,7 @@ struct HeaderRepoView: View {
 				}
 			}
 
-            if let description = repo.description?.emojized(), description.isNotEmpty {
+			if let description = repo.description?.emojized(), description.isNotEmpty {
 				Text(description)
 			}
 
