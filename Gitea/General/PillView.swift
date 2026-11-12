@@ -33,20 +33,21 @@ struct PillView: View {
 	}
 
 	public var body: some View {
+		content
+			.modifier(LabelSpacingIfAvailable())
+			.padding(.horizontal, 8)
+			.padding(.vertical, 3)
+			.background(bgColor)
+			.foregroundStyle(fgColor)
+			.cornerRadius(cornerRadius)
+	}
+
+	@ViewBuilder
+	private var content: some View {
 		if let icon = icon {
 			Label(label, systemImage: icon)
-				.padding(.horizontal, 8)
-				.padding(.vertical, 3)
-				.background(bgColor)
-				.foregroundStyle(fgColor)
-				.cornerRadius(cornerRadius)
 		} else {
 			Text(label)
-				.padding(.horizontal, 8)
-				.padding(.vertical, 3)
-				.background(bgColor)
-				.foregroundStyle(fgColor)
-				.cornerRadius(cornerRadius)
 		}
 	}
 }

@@ -66,6 +66,16 @@ extension View {
 	}
 }
 
+struct LabelSpacingIfAvailable: ViewModifier {
+	func body(content: Content) -> some View {
+		if #available(iOS 26.0, *) {
+			content.labelIconToTitleSpacing(5)
+		} else {
+			content
+		}
+	}
+}
+
 extension Color {
 	// Source - https://stackoverflow.com/a/56874327
 	// Posted by kontiki, modified by community. See post 'Timeline' for change history
