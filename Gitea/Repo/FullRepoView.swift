@@ -9,8 +9,15 @@ import OpenAPIRuntime
 import SwiftUI
 import Textual
 
+private struct SpecialFile {
+	let name: String
+	let content: String
+	let showsImages: Bool
+}
+
 struct FullRepoView: View {
-	@State private var readmeContents: String?
+	@State private var specialFiles: [SpecialFile] = []
+	@State private var selectedFile = 0
 	@State private var readmeError: Error?
 	@State private var readmeReload = 0
 	@State private var copied = false
@@ -26,39 +33,47 @@ struct FullRepoView: View {
 
 	private func load() async {
 		do {
-			let response = try await Network.shared.client.repoGetRawFile(
-				.init(
-					path: .init(
-						owner: owner,
-						repo: repoName,
-						filepath: "README.md"))
-			)
-			switch response {
-			case .ok(let ok):
-				// Collect the entire HTTP body into a single String, limiting to 2 MB
-				readmeContents = try await String(collecting: ok.body.plainText, upTo: 2 * 1024 * 1024)
-				readmeError = nil
-			case .notFound:
-				// No README in this repo — not an error.
-				readmeContents = nil
-				readmeError = nil
-			default:
-				readmeContents = nil
-				readmeError = ReadmeError.undocumented
+			let entries =
+				try await Network.shared.client.repoGetContentsExt(
+					path: .init(owner: owner, repo: repoName, filepath: "."),
+					query: .init(ref: defaultBranch)
+				).ok.body.json.dirContents ?? []
+
+			var files: [SpecialFile] = []
+			for (name, prefix) in [("README", "README"), ("LICENSE", "LICENSE"), ("CONTRIBUTING", "CONTRIBUTING")] {
+				guard
+					let entry = entries.first(where: {
+						$0._type == "file" && ($0.name ?? "").uppercased().hasPrefix(prefix)
+					}),
+					let path = entry.path
+				else { continue }
+
+				let response = try? await Network.shared.client.repoGetRawFile(
+					.init(path: .init(owner: owner, repo: repoName, filepath: "\(defaultBranch)/\(path)"))
+				)
+				if case .ok(let ok) = response,
+					let content = try? await String(collecting: ok.body.plainText, upTo: 2 * 1024 * 1024)
+				{
+					files.append(SpecialFile(name: name, content: content, showsImages: name != "LICENSE"))
+				}
 			}
+
+			specialFiles = files
+			readmeError = nil
 		} catch is CancellationError {
 			// .task(id:) retry restarted this; ignore.
 		} catch {
+			specialFiles = []
 			readmeError = error
 		}
 	}
 
-	enum ReadmeError: LocalizedError {
-		case undocumented
+	private var baseURL: URL? {
+		repo.htmlUrl.flatMap { URL(string: $0) }?.appending(path: "src/branch/\(defaultBranch)/")
+	}
 
-		var errorDescription: String? {
-			"Couldn't load the repository's README file."
-		}
+	private var imageBaseURL: URL? {
+		repo.htmlUrl.flatMap { URL(string: $0) }?.appending(path: "raw/branch/\(defaultBranch)/")
 	}
 
 	var body: some View {
@@ -209,12 +224,35 @@ struct FullRepoView: View {
 				}
 			}
 
-			if let readmeContents, readmeContents.isNotEmpty {
-				Section {
-					let readmeBaseURL = Network.baseURL.appending(path: "\(owner)/\(repoName)/src/branch/\(defaultBranch)")
-					StructuredText(markdown: readmeContents.emojized(), baseURL: readmeBaseURL)
-						.textual.structuredTextStyle(.gitHub)
-						.textual.textSelection(.enabled)
+			if specialFiles.isNotEmpty {
+				let selected = specialFiles[min(selectedFile, specialFiles.count - 1)]
+				Section("Special files") {
+					VStack {
+						if specialFiles.count > 1 {
+							Picker("", selection: $selectedFile) {
+								ForEach(specialFiles.indices, id: \.self) { index in
+									Text(specialFiles[index].name).tag(index)
+								}
+							}
+							.pickerStyle(.segmented)
+						}
+
+						StructuredText(markdown: selected.content.emojized())
+							.textual.structuredTextStyle(.gitHub)
+							.textual.imageAttachmentLoader(
+								.image(relativeTo: selected.showsImages ? imageBaseURL : nil)
+							)
+							.textual.textSelection(.enabled)
+							.environment(
+								\.openURL,
+								OpenURLAction { url in
+									guard url.scheme == nil, let baseURL,
+										let resolved = URL(string: url.absoluteString, relativeTo: baseURL)
+									else { return .systemAction }
+									return .systemAction(resolved)
+								}
+							)
+					}
 				}
 			} else if readmeError != nil {
 				Section {
@@ -249,6 +287,16 @@ struct FullRepoView: View {
 						Button("Copy HTTPS URL") {
 							UIPasteboard.general.string = repo.cloneUrl ?? ""
 							HapticFeedback.notify(.success)
+						}
+					}
+
+					Section {
+						DownloadArchiveButton(
+							url: Network.baseURL.appending(
+								path: "api/v1/repos/\(owner)/\(repoName)/archive/\(defaultBranch).zip"),
+							fileName: "\(repoName).zip"
+						) {
+							Label("Download archive", systemImage: "doc.zipper")
 						}
 					}
 				}
