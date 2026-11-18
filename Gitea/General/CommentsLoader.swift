@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Textual
 
 struct CommentsLoader: View {
 	let owner: String
@@ -49,9 +48,7 @@ struct CommentsLoader: View {
 								Text(c.createdAt?.toString() ?? "")
 									.font(.footnote)
 							}
-							StructuredText(markdown: c.body?.emojized() ?? "")
-								.textual.structuredTextStyle(.gitHub)
-								.textual.textSelection(.enabled)
+							Markdown(c.body ?? "")
 
 							if let assets = c.assets, assets.isNotEmpty {
 								ScrollView(.horizontal, showsIndicators: false) {

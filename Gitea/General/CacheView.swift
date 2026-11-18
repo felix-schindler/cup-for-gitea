@@ -10,6 +10,8 @@ import SwiftUI
 struct CacheView: View {
 	@State private var urlMemoryUsage = URLCache.shared.currentMemoryUsage
 	@State private var urlDiskUsage = URLCache.shared.currentDiskUsage
+	@State private var avatarMemoryUsage = URLCache.avatarCache.currentMemoryUsage
+	@State private var avatarDiskUsage = URLCache.avatarCache.currentDiskUsage
 	@State private var fileSize = FileCache.size()
 
 	var body: some View {
@@ -21,6 +23,17 @@ struct CacheView: View {
 					URLCache.shared.removeAllCachedResponses()
 					urlMemoryUsage = URLCache.shared.currentMemoryUsage
 					urlDiskUsage = URLCache.shared.currentDiskUsage
+					HapticFeedback.notify(.success)
+				}
+			}
+
+			Section("Avatar cache") {
+				Text("In memory: \(ByteFormatter.shared.format(Int64(avatarMemoryUsage)))")
+				Text("On disk: \(ByteFormatter.shared.format(Int64(avatarDiskUsage)))")
+				Button("Clear cache", systemImage: "trash", role: .destructive) {
+					URLCache.avatarCache.removeAllCachedResponses()
+					avatarMemoryUsage = URLCache.avatarCache.currentMemoryUsage
+					avatarDiskUsage = URLCache.avatarCache.currentDiskUsage
 					HapticFeedback.notify(.success)
 				}
 			}

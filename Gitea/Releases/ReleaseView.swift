@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Textual
 
 struct ReleaseView: View {
 	private let release: Components.Schemas.Release
@@ -37,10 +36,8 @@ struct ReleaseView: View {
 					.font(.footnote)
 				}
 
-				if let body = release.body?.emojized(), body.isNotEmpty {
-					StructuredText(markdown: body)
-						.textual.structuredTextStyle(.gitHub)
-						.textual.textSelection(.enabled)
+				if let body = release.body, body.isNotEmpty {
+					Markdown(body)
 				}
 			}
 

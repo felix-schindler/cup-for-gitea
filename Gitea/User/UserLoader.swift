@@ -168,16 +168,18 @@ struct UserLoader: View {
 		}.refreshable {
 			await load()
 		}.toolbar {
-			HStack {
-				if let user, case .success(let u) = user, let htmlUrl = u.htmlUrl, let url = URL(string: htmlUrl) {
-					ShareLink(item: url)
-				}
-				if username == nil {
+			if username == nil {
+				ToolbarItem(placement: .topBarLeading) {
 					NavigationLink(
 						destination: SettingsView(),
 						label: {
 							Label("Settings", systemImage: Icons.settings.rawValue)
 						})
+				}
+			}
+			if let user, case .success(let u) = user, let htmlUrl = u.htmlUrl, let url = URL(string: htmlUrl) {
+				ToolbarItem(placement: .topBarTrailing) {
+					ShareLink(item: url)
 				}
 			}
 		}.navigationTitle(username ?? "Profile")

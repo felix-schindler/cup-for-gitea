@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Textual
 
 struct MilestoneView: View {
 	private let milestone: Components.Schemas.Milestone
@@ -39,10 +38,8 @@ struct MilestoneView: View {
 					}
 				}
 
-				if let description = milestone.description?.emojized(), description.isNotEmpty {
-					StructuredText(markdown: description)
-						.textual.structuredTextStyle(.gitHub)
-						.textual.textSelection(.enabled)
+				if let description = milestone.description, description.isNotEmpty {
+					Markdown(description)
 				}
 			}
 

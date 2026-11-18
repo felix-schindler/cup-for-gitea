@@ -237,8 +237,7 @@ struct FullRepoView: View {
 							.pickerStyle(.segmented)
 						}
 
-						StructuredText(markdown: selected.content.emojized())
-							.textual.structuredTextStyle(.gitHub)
+						Markdown(selected.content)
 							.textual.imageAttachmentLoader(
 								.image(relativeTo: selected.showsImages ? imageBaseURL : nil)
 							)

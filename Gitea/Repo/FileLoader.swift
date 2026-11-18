@@ -7,7 +7,6 @@
 
 import AVKit
 import SwiftUI
-import Textual
 
 struct FileLoader: View {
 	private static let confirmThreshold: Int64 = 3 * 1024 * 1024
@@ -206,9 +205,7 @@ struct FileLoader: View {
 			}
 		} else if let text {
 			if fileExtension == "md" || fileExtension == "markdown" {
-				StructuredText(markdown: text.emojized())
-					.textual.structuredTextStyle(.gitHub)
-					.textual.textSelection(.enabled)
+				Markdown(text)
 			} else {
 				CodeTextView(
 					text,

@@ -110,9 +110,7 @@ struct IssueView: View {
 
 			if item.data.displayBody.isNotEmpty {
 				Section("Description") {
-					StructuredText(markdown: item.data.displayBody.emojized())
-						.textual.structuredTextStyle(.gitHub)
-						.textual.textSelection(.enabled)
+					Markdown(item.data.displayBody)
 				}
 			}
 
