@@ -24,6 +24,7 @@ struct Paging {
 		guard hasMore else { return (currentState, self) }
 		var p = self
 		let current = (reset ? nil : currentState.value) ?? []
+		guard p.page > 1 || current.isEmpty else { return (currentState, self) }
 		do {
 			let results = try await fetch(p.page)
 			guard !Task.isCancelled else { return (currentState, p) }
