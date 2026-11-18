@@ -23,6 +23,10 @@ struct SettingsView: View {
 					Label("Instances", systemImage: "server.rack")
 				}
 
+				NavigationLink(destination: CacheView()) {
+					Label("Caches", systemImage: "internaldrive")
+				}
+
 				NavigationLink(destination: FeedbackView()) {
 					Label("Feedback", systemImage: "exclamationmark.bubble")
 				}
