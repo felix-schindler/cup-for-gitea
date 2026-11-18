@@ -1,5 +1,7 @@
 name: Highlightr, nameSpecified: Highlightr, owner: raspu, version: 2.3.0, source: https://github.com/raspu/Highlightr
 
+name: MarkdownView, nameSpecified: MarkdownView, owner: keitaoouchi, version: 2.1.1, source: https://github.com/keitaoouchi/MarkdownView
+
 name: OpenAPIKit, nameSpecified: OpenAPIKit, owner: mattpolzin, version: 6.2.0, source: https://github.com/mattpolzin/OpenAPIKit
 
 name: swift-algorithms, nameSpecified: swift-algorithms, owner: apple, version: 1.2.1, source: https://github.com/apple/swift-algorithms
@@ -30,4 +32,4 @@ name: Yams, nameSpecified: Yams, owner: jpsim, version: 6.2.2, source: https://g
 
 add-version-numbers: false
 
-LicensePlist Version: 3.28.2
+LicensePlist Version: 3.28.3
