@@ -6,12 +6,41 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct HomeView: View {
 	@State var showNotifications = false
 	@State var showNotificationsBadge = false
 	@State private var versionWarning: String?
 	@State private var starredState = LoadState<[Components.Schemas.Repository]>.loading
+	@State private var jumpTarget: JumpTarget?
+	@State private var jumpDiagnostics: JumpDiagnostics?
+
+	private func jumpToClipboard() {
+		let pasted = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString
+		let host = InstanceManager.selected?.displayURL ?? Network.baseURL.absoluteString
+		var diagnostics = JumpDiagnostics(raw: pasted ?? "", host: host)
+
+		if let pasted, pasted.isNotEmpty {
+			do {
+				diagnostics.target = try JumpURL.parse(pasted, host: host)
+			} catch let error as JumpURLError {
+				diagnostics.error = error
+			} catch {
+				diagnostics.error = .notALink(raw: pasted)
+			}
+		} else {
+			diagnostics.error = .emptyClipboard
+		}
+
+		guard let target = diagnostics.target else {
+			HapticFeedback.notify(.warning)
+			jumpDiagnostics = diagnostics
+			return
+		}
+
+		jumpTarget = target
+	}
 
 	private func load() async {
 		if let version = try? await Network.shared.client.getVersion().ok.body.json.version {
@@ -93,6 +122,11 @@ struct HomeView: View {
 			}
 		}.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
+				Button("Jump", systemImage: "arrow.right.page.on.clipboard") {
+					jumpToClipboard()
+				}
+			}
+			ToolbarItem(placement: .topBarLeading) {
 				Menu("Create", systemImage: "plus") {
 					NavigationLink(destination: NewRepoView()) {
 						Label("New Repository", systemImage: "plus")
@@ -120,11 +154,71 @@ struct HomeView: View {
 			NavigationStack {
 				NotificationLoader()
 			}
+		}.navigationDestination(item: $jumpTarget) { target in
+			jumpDestination(target)
+		}.alert(
+			jumpDiagnostics?.summary ?? "",
+			isPresented: Binding(
+				get: { jumpDiagnostics != nil },
+				set: { if !$0 { jumpDiagnostics = nil } }
+			)
+		) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			if let message = jumpDiagnostics?.message {
+				Text(message)
+			}
 		}.task {
 			await load()
 		}.refreshable {
 			await load()
 		}.navigationTitle("Home")
+	}
+
+	@ViewBuilder
+	private func jumpDestination(_ target: JumpTarget) -> some View {
+		switch target {
+		case .namespace(let username):
+			NamespaceLoader(username)
+		case .repository(let owner, let repo):
+			RepoLoader(owner: owner, repo: repo)
+		case .issue(let owner, let repo, let index):
+			IssueLoader(owner: owner, repo: repo, index: index)
+		case .pullRequest(let owner, let repo, let index):
+			PullRequestLoader(owner: owner, repo: repo, index: index)
+		case .route(let owner, let repo, let route):
+			jumpRoute(owner: owner, repo: repo, route: route)
+		}
+	}
+
+	@ViewBuilder
+	private func jumpRoute(owner: String, repo: String, route: JumpRoute) -> some View {
+		switch route {
+		case .issues:
+			IssueSearchLoader(type: .issues, owner: owner, repo: repo)
+		case .pulls:
+			IssueSearchLoader(type: .pulls, owner: owner, repo: repo)
+		case .releases(let tag):
+			if let tag {
+				ReleaseTagLoader(owner: owner, repo: repo, tag: tag)
+			} else {
+				ReleaseLoader(owner: owner, repo: repo)
+			}
+		case .actions:
+			ActionsLoader(owner: owner, repo: repo)
+		case .run(let id):
+			ActionRunLoader(owner: owner, repo: repo, run: id)
+		case .commits(let ref):
+			CommitsLoader(owner: owner, repo: repo, ref: ref)
+		case .commit(let sha):
+			CommitLoader(owner: owner, repo: repo, sha: sha)
+		case .tree(let ref, let path):
+			if let path {
+				RepoPathLoader(owner: owner, repo: repo, ref: ref, path: path)
+			} else {
+				TreeLoader(owner: owner, repo: repo, ref: ref)
+			}
+		}
 	}
 }
 

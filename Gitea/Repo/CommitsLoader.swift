@@ -133,7 +133,7 @@ private struct CommitRow: View {
 	}
 }
 
-private struct CommitDetailView: View {
+struct CommitDetailView: View {
 	let owner: String
 	let repo: String
 	let commit: Components.Schemas.Commit
