@@ -247,7 +247,7 @@ struct NewPullRequestView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(title.isEmpty || baseBranch.isEmpty || headBranch.isEmpty)
-				.buttonStyle(.borderedProminent)
+				.adaptiveButtonStyleProminent()
 		}
 		.task {
 			await load()

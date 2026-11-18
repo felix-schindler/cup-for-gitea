@@ -99,7 +99,7 @@ struct NewReleaseView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(tagName.isEmpty)
-				.buttonStyle(.borderedProminent)
+				.adaptiveButtonStyleProminent()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Release")

@@ -69,7 +69,7 @@ struct NewLabelView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(name.isEmpty)
-				.buttonStyle(.borderedProminent)
+				.adaptiveButtonStyleProminent()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Label")

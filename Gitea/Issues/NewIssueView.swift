@@ -183,7 +183,7 @@ struct NewIssueView: View {
 			AsyncButton("Save", systemImage: "checkmark") {
 				await create()
 			}.disabled(title.isEmpty)
-				.buttonStyle(.borderedProminent)
+				.adaptiveButtonStyleProminent()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("New Issue")

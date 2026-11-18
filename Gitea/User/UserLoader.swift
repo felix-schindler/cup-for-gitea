@@ -80,14 +80,14 @@ struct UserLoader: View {
 									if let email = u.email, email.isNotEmpty, let url = URL(string: "mailto:\(email)") {
 										Link(email, destination: url)
 											.tint(.accentColor)
-											.buttonStyle(.bordered)
+											.adaptiveButtonStyle()
 											.controlSize(.mini)
 									}
 
 									if let website = u.website, let url = URL(string: website) {
 										Link(website, destination: url)
 											.tint(.accentColor)
-											.buttonStyle(.bordered)
+											.adaptiveButtonStyle()
 											.controlSize(.mini)
 									}
 

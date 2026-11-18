@@ -85,7 +85,7 @@ struct ConfigView: View {
 				} catch {
 					errorMessage = "Failed to log in: \(error.localizedDescription)"
 				}
-			}.buttonStyle(.borderedProminent)
+			}.adaptiveButtonStyleProminent()
 		}
 		.scrollDismissesKeyboard(.immediately)
 		.navigationTitle("Configure instance")

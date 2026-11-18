@@ -143,7 +143,7 @@ struct IssueView: View {
 						await postComment()
 					}
 					.disabled(commentText.isEmpty)
-					.buttonStyle(.borderedProminent)
+					.adaptiveButtonStyleProminent()
 					.buttonBorderShape(.circle)
 				}
 
@@ -621,7 +621,7 @@ struct IssueView: View {
 								})
 						}
 						.controlSize(.mini)
-						.buttonStyle(.bordered)
+						.adaptiveButtonStyle()
 					}
 					if let milestone = issue.milestone {
 						NavigationLink {
@@ -630,7 +630,7 @@ struct IssueView: View {
 							Label(milestone.title?.emojized() ?? "", systemImage: Icons.milestones.rawValue)
 						}
 						.controlSize(.mini)
-						.buttonStyle(.bordered)
+						.adaptiveButtonStyle()
 					}
 				case .pullRequest(let pullRequest):
 					if let user = pullRequest.user {

@@ -43,7 +43,7 @@ struct OrgView: View {
 						ScrollView(.horizontal, showsIndicators: false) {
 							Link(email, destination: url)
 								.tint(.accentColor)
-								.buttonStyle(.bordered)
+								.adaptiveButtonStyle()
 								.controlSize(.mini)
 						}
 					}
@@ -54,7 +54,7 @@ struct OrgView: View {
 								if let website = org.website, let url = URL(string: website) {
 									Link(website, destination: url)
 										.tint(.accentColor)
-										.buttonStyle(.bordered)
+										.adaptiveButtonStyle()
 										.controlSize(.mini)
 								}
 								if org.location?.isNotEmpty == true {

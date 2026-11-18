@@ -44,7 +44,7 @@ struct SetupView: View {
 				)
 				.tint(.accentColor)
 				.buttonBorderShape(.capsule)
-				.buttonStyle(.borderedProminent)
+				.adaptiveButtonStyleProminent()
 				.controlSize(.large)
 
 				Spacer()
