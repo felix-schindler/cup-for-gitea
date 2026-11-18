@@ -46,9 +46,15 @@ struct SmallUserView: View {
 
 #Preview {
 	let user = Components.Schemas.User(
-		active: true, avatarUrl: "https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa", created: Date(), description: "", email: "",
-		followersCount: 0, followingCount: 0, fullName: "Felix", htmlUrl: "https://git.schindlerfelix.de/felix-schindler", id: 1, isAdmin: true, language: "", lastLogin: Date(), location: "",
-		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0, starredReposCount: 0, visibility: .some(.init(value1: ._private)), website: "")
+		active: true,
+		avatarUrl:
+			"https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa",
+		created: Date(), description: "", email: "",
+		followersCount: 0, followingCount: 0, fullName: "Felix",
+		htmlUrl: "https://git.schindlerfelix.de/felix-schindler", id: 1, isAdmin: true, language: "", lastLogin: Date(),
+		location: "",
+		login: "felix-schindler", loginName: "", prohibitLogin: false, restricted: false, sourceId: 0,
+		starredReposCount: 0, visibility: .some(.init(value1: ._private)), website: "")
 
 	NavigationStack {
 		VStack {

@@ -41,7 +41,9 @@ struct ReleaseView: View {
 				}
 			}
 
-			if release.assets?.isNotEmpty == true || release.zipballUrl?.isNotEmpty == true || release.tarballUrl?.isNotEmpty == true {
+			if release.assets?.isNotEmpty == true || release.zipballUrl?.isNotEmpty == true
+				|| release.tarballUrl?.isNotEmpty == true
+			{
 				DisclosureGroup("Assets (\(release.assets?.count ?? 0))") {
 					if release.assets?.isNotEmpty == true {
 						ForEach(release.assets ?? [], id: \.id) { asset in

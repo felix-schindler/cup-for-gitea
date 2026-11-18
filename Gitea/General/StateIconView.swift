@@ -11,7 +11,10 @@ struct StateIconView: View {
 	let icon: String
 	let color: Color
 
-	init(_ type: Components.Schemas.NotificationSubject._TypePayload, _ state: Components.Schemas.NotificationSubject.StatePayload, isDraft: Bool = false) {
+	init(
+		_ type: Components.Schemas.NotificationSubject._TypePayload,
+		_ state: Components.Schemas.NotificationSubject.StatePayload, isDraft: Bool = false
+	) {
 		self.icon =
 			switch type {
 			case .issue:

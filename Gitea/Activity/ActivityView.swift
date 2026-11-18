@@ -44,7 +44,8 @@ struct ActivityView: View {
 					.createPullRequest?, .mergePullRequest?, .closePullRequest?, .reopenPullRequest?,
 					.commentPull?, .approvePullRequest?, .rejectPullRequest?, .pullReviewDismissed?,
 					.pullRequestReadyForReview?, .autoMergePullRequest?:
-					let parts = (activity.content ?? "").split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+					let parts = (activity.content ?? "").split(
+						separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
 					if parts.count == 2 {
 						let content = String(parts[1])
 

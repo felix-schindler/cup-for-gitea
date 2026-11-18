@@ -33,7 +33,9 @@ struct ActionView: View {
 	}
 
 	private var duration: String {
-		guard let completedAt = run.completedAt, let startedAt = run.startedAt, completedAt > startedAt else { return "In progress" }
+		guard let completedAt = run.completedAt, let startedAt = run.startedAt, completedAt > startedAt else {
+			return "In progress"
+		}
 		let interval = completedAt.timeIntervalSince(startedAt)
 		guard interval >= 0 else { return "Invalid duration" }
 		let formatter = DateComponentsFormatter()
@@ -52,7 +54,8 @@ struct ActionView: View {
 		guard !jobsPaging.isLoading else { return }
 		jobsPaging.isLoading = true
 		defer { jobsPaging.isLoading = false }
-		(jobsState, jobsPaging) = await jobsPaging.nextPage(state: jobsState, limit: defaultLimit, reset: reset) { page in
+		(jobsState, jobsPaging) = await jobsPaging.nextPage(state: jobsState, limit: defaultLimit, reset: reset) {
+			page in
 			try await Network.shared.client.listWorkflowRunJobs(
 				path: .init(owner: owner, repo: repo, run: Int(run.id ?? 0)),
 				query: .init(page: page, limit: defaultLimit)
@@ -83,7 +86,9 @@ struct ActionView: View {
 			Section {
 				VStack(alignment: .leading, spacing: 12) {
 					HStack {
-						PillView(status.label, systemImage: status.icon, bgColor: status.color.opacity(0.2), fgColor: status.color)
+						PillView(
+							status.label, systemImage: status.icon, bgColor: status.color.opacity(0.2),
+							fgColor: status.color)
 						Spacer()
 						Text("#\(run.runNumber ?? 0)")
 							.font(.footnote)

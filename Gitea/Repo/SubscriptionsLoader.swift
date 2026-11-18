@@ -25,7 +25,9 @@ struct SubscriptionsLoader: View {
 		paging.isLoading = true
 		defer { paging.isLoading = false }
 		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
-			try await Network.shared.client.userCurrentListSubscriptions(.init(query: .init(page: page, limit: defaultLimit))).ok.body.json
+			try await Network.shared.client.userCurrentListSubscriptions(
+				.init(query: .init(page: page, limit: defaultLimit))
+			).ok.body.json
 		}
 	}
 

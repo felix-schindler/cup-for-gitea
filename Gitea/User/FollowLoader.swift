@@ -25,9 +25,11 @@ struct FollowLoader: View {
 		do {
 			switch filterUserType {
 			case .followers:
-				state = .loaded(try await Network.shared.client.userListFollowers(path: .init(username: username)).ok.body.json)
+				state = .loaded(
+					try await Network.shared.client.userListFollowers(path: .init(username: username)).ok.body.json)
 			case .following:
-				state = .loaded(try await Network.shared.client.userListFollowing(path: .init(username: username)).ok.body.json)
+				state = .loaded(
+					try await Network.shared.client.userListFollowing(path: .init(username: username)).ok.body.json)
 			}
 		} catch {
 			state = .failed(error)

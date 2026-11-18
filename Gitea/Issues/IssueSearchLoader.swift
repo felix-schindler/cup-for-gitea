@@ -63,12 +63,16 @@ struct IssueSearchLoader: View {
 		"\(owner ?? "")|\(repo ?? "")|\(search)|\(filters.taskKey)"
 	}
 
-	init(type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil, milestonesFilter: String? = nil, myRepos: Bool? = nil) {
+	init(
+		type: Operations.IssueSearchIssues.Input.Query._TypePayload, owner: String? = nil, repo: String? = nil,
+		milestonesFilter: String? = nil, myRepos: Bool? = nil
+	) {
 		self.type = type
 		self.owner = owner
 		self.repo = repo
 		let defaultMyRepos = myRepos ?? (owner == nil && repo == nil)
-		self._filters = State(initialValue: IssueSearchFilters(milestones: milestonesFilter ?? "", myRepos: defaultMyRepos))
+		self._filters = State(
+			initialValue: IssueSearchFilters(milestones: milestonesFilter ?? "", myRepos: defaultMyRepos))
 	}
 
 	private var queryPayload: Operations.IssueSearchIssues.Input.Query {
@@ -188,9 +192,13 @@ struct IssueSearchLoader: View {
 		do {
 			switch type {
 			case .issues:
-				pinnedIssues = try await Network.shared.client.repoListPinnedIssues(path: .init(owner: owner, repo: repo)).ok.body.json
+				pinnedIssues = try await Network.shared.client.repoListPinnedIssues(
+					path: .init(owner: owner, repo: repo)
+				).ok.body.json
 			case .pulls:
-				pinnedPullRequests = try await Network.shared.client.repoListPinnedPullRequests(path: .init(owner: owner, repo: repo)).ok.body.json
+				pinnedPullRequests = try await Network.shared.client.repoListPinnedPullRequests(
+					path: .init(owner: owner, repo: repo)
+				).ok.body.json
 			@unknown default:
 				break
 			}

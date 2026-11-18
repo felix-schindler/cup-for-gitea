@@ -34,12 +34,16 @@ struct NotificationLoader: View {
 		paging.isLoading = true
 		defer { paging.isLoading = false }
 		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
-			try await Network.shared.client.notifyGetList(.init(query: .init(all: showAll, page: page, limit: defaultLimit))).ok.body.json
+			try await Network.shared.client.notifyGetList(
+				.init(query: .init(all: showAll, page: page, limit: defaultLimit))
+			).ok.body.json
 		}
 	}
 
 	private func mark(_ id: Int64, status: StatusChange) async throws {
-		_ = try await Network.shared.client.notifyReadThread(.init(path: .init(id: String(id)), query: .init(toStatus: status.rawValue))).resetContent.body.json
+		_ = try await Network.shared.client.notifyReadThread(
+			.init(path: .init(id: String(id)), query: .init(toStatus: status.rawValue))
+		).resetContent.body.json
 	}
 
 	private func applyStatusChange(id: Int64, status: StatusChange) {

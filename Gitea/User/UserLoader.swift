@@ -99,8 +99,12 @@ struct UserLoader: View {
 
 							ScrollView(.horizontal, showsIndicators: false) {
 								HStack {
-									NavigationLink("\(u.followersCount ?? 0) Followers", destination: FollowLoader(u.login ?? "", type: .followers))
-									NavigationLink("\(u.followingCount ?? 0) Following", destination: FollowLoader(u.login ?? "", type: .following))
+									NavigationLink(
+										"\(u.followersCount ?? 0) Followers",
+										destination: FollowLoader(u.login ?? "", type: .followers))
+									NavigationLink(
+										"\(u.followingCount ?? 0) Following",
+										destination: FollowLoader(u.login ?? "", type: .following))
 								}
 								.controlSize(.mini)
 								.buttonBorderShape(.capsule)

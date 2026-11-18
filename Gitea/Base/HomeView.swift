@@ -146,8 +146,11 @@ struct HomeView: View {
 						HapticFeedback.play(.light)
 					},
 					label: {
-						Image(systemName: showNotificationsBadge ? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue)
-							.symbolRenderingMode(.multicolor)
+						Image(
+							systemName: showNotificationsBadge
+								? Icons.notificationsUnread.rawValue : Icons.notifications.rawValue
+						)
+						.symbolRenderingMode(.multicolor)
 					})
 			}
 		}.sheet(isPresented: $showNotifications, onDismiss: { showNotifications = false }) {

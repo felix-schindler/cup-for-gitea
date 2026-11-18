@@ -82,7 +82,9 @@ struct FullRepoView: View {
 				HeaderRepoView(repo)
 			}
 
-			if repo.fork == true || repo.template == true || repo.mirror == true || repo.archived == true || repo.originalUrl?.isNotEmpty == true {
+			if repo.fork == true || repo.template == true || repo.mirror == true || repo.archived == true
+				|| repo.originalUrl?.isNotEmpty == true
+			{
 				Section {
 					VStack(alignment: .leading) {
 						if repo.fork == true {
@@ -93,11 +95,15 @@ struct FullRepoView: View {
 						}
 						if repo.mirror == true {
 							Label("This repository is a mirror.", systemImage: "square.stack.3d.forward.dottedline")
-							Text("Last updated at \(repo.mirrorUpdated?.toString() ?? ""); Inverval: \(repo.mirrorInterval ?? "")")
-								.font(.footnote)
+							Text(
+								"Last updated at \(repo.mirrorUpdated?.toString() ?? ""); Inverval: \(repo.mirrorInterval ?? "")"
+							)
+							.font(.footnote)
 						}
 						if repo.archived == true {
-							Label("This repository has been archived on \(repo.archivedAt?.toString() ?? "").", systemImage: "archivebox")
+							Label(
+								"This repository has been archived on \(repo.archivedAt?.toString() ?? "").",
+								systemImage: "archivebox")
 						}
 						if let originalUrl = repo.originalUrl, let url = URL(string: originalUrl) {
 							Link(originalUrl, destination: url)
@@ -167,7 +173,9 @@ struct FullRepoView: View {
 						// if repo.hasProjects {
 						// 	Text("Projects")
 						// }
-						if repo.hasWiki == true, let externalWiki = repo.externalWiki, let externalWikiUrl = externalWiki.externalWikiUrl, let url = URL(string: externalWikiUrl) {
+						if repo.hasWiki == true, let externalWiki = repo.externalWiki,
+							let externalWikiUrl = externalWiki.externalWikiUrl, let url = URL(string: externalWikiUrl)
+						{
 							Link("Wiki", destination: url)
 						}
 					},

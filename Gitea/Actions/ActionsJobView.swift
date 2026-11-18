@@ -22,7 +22,9 @@ struct ActionsJobView: View {
 						HStack {
 							Text(step.name ?? "")
 								.font(.callout)
-							if let completedAt = step.completedAt, let startedAt = step.startedAt, completedAt > startedAt {
+							if let completedAt = step.completedAt, let startedAt = step.startedAt,
+								completedAt > startedAt
+							{
 								Spacer()
 								Text(duration(from: startedAt, to: completedAt))
 									.font(.footnote)

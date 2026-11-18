@@ -29,7 +29,9 @@ struct PillView: View {
 		verbatim label: String, systemImage: String? = nil, bgColor: Color? = nil,
 		fgColor: Color? = nil, cornerRadius: CGFloat = 25
 	) {
-		self.init(LocalizedStringKey(label), systemImage: systemImage, bgColor: bgColor, fgColor: fgColor, cornerRadius: cornerRadius)
+		self.init(
+			LocalizedStringKey(label), systemImage: systemImage, bgColor: bgColor, fgColor: fgColor,
+			cornerRadius: cornerRadius)
 	}
 
 	public var body: some View {

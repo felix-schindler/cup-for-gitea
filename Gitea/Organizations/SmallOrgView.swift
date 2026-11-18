@@ -41,7 +41,8 @@ struct SmallOrgView: View {
 	List {
 		SmallOrgView(
 			.init(
-				avatarUrl: "https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa",
+				avatarUrl:
+					"https://git.schindlerfelix.de/avatars/2a28dd44a0483741aad7f1611d4269dac57a672427808a1d9f8856247f743ffa",
 				description: "Mobile App for GitLab",
 				email: "",
 				fullName: "",

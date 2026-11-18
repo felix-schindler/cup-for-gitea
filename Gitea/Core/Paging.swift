@@ -20,7 +20,9 @@ struct Paging {
 
 	// Callers set `isLoading = true` before awaiting this, so concurrent
 	// calls (refresh + loadMore) are blocked instead of writing back stale pages.
-	func nextPage<T>(state currentState: LoadState<[T]>, limit: Int, reset: Bool = false, fetch: (Int) async throws -> [T]) async -> (LoadState<[T]>, Paging) {
+	func nextPage<T>(
+		state currentState: LoadState<[T]>, limit: Int, reset: Bool = false, fetch: (Int) async throws -> [T]
+	) async -> (LoadState<[T]>, Paging) {
 		guard hasMore else { return (currentState, self) }
 		var p = self
 		let current = (reset ? nil : currentState.value) ?? []

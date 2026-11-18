@@ -28,7 +28,9 @@ struct MilestonesLoader: View {
 		defer { paging.isLoading = false }
 		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			try await Network.shared.client
-				.issueGetMilestonesList(.init(path: .init(owner: owner, repo: repo), query: .init(page: page, limit: defaultLimit)))
+				.issueGetMilestonesList(
+					.init(path: .init(owner: owner, repo: repo), query: .init(page: page, limit: defaultLimit))
+				)
 				.ok.body.json
 		}
 	}

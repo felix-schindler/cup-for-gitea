@@ -74,7 +74,8 @@ struct SmallIssueView: View {
 		switch item {
 		case .issue(let issue, let isPullRequest):
 			if isPullRequest {
-				PullRequestLoader(owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)
+				PullRequestLoader(
+					owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)
 			} else {
 				IssueView(issue)
 			}

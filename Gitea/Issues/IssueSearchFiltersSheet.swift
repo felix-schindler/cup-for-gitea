@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-private func stateDisplayName(_ state: Operations.IssueSearchIssues.Input.Query.StatePayload) -> LocalizedStringResource {
+private func stateDisplayName(_ state: Operations.IssueSearchIssues.Input.Query.StatePayload) -> LocalizedStringResource
+{
 	switch state {
 	case .open: "Open"
 	case .closed: "Closed"

@@ -135,7 +135,8 @@ struct ActivityLoader: View {
 
 	private func loadHeatmap(username: String) async {
 		do {
-			heatmap = try await Network.shared.client.userGetHeatmapData(.init(path: .init(username: username))).ok.body.json
+			heatmap = try await Network.shared.client.userGetHeatmapData(.init(path: .init(username: username))).ok.body
+				.json
 		} catch {
 			heatmapError = error
 		}

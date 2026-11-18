@@ -25,7 +25,9 @@ struct HeaderRepoView: View {
 	}
 
 	private func load() async {
-		if let langs = try? await Network.shared.client.repoGetLanguages(path: .init(owner: repo.owner?.login ?? "", repo: repo.name ?? "")).ok.body.json {
+		if let langs = try? await Network.shared.client.repoGetLanguages(
+			path: .init(owner: repo.owner?.login ?? "", repo: repo.name ?? "")
+		).ok.body.json {
 			self.langs = langs.additionalProperties
 		}
 	}
@@ -70,7 +72,9 @@ struct HeaderRepoView: View {
 						HStack {
 							Image(systemName: Icons.topics.rawValue)
 							ForEach(repo.topics ?? [], id: \.self) { topic in
-								NavigationLink(destination: RepoSearchLoader(context: .search, search: topic, limitToTopic: true)) {
+								NavigationLink(
+									destination: RepoSearchLoader(context: .search, search: topic, limitToTopic: true)
+								) {
 									Text(topic)
 								}
 								.controlSize(.mini)

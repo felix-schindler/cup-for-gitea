@@ -93,7 +93,10 @@ struct WorktimeRow: View {
 
 	var body: some View {
 		if let issue = entry.issue {
-			NavigationLink(destination: IssueLoader(owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)) {
+			NavigationLink(
+				destination: IssueLoader(
+					owner: issue.repository?.owner ?? "", repo: issue.repository?.name ?? "", index: issue.number ?? 0)
+			) {
 				VStack(alignment: .leading) {
 					HStack {
 						if let inline = try? AttributedString(markdown: issue.title?.emojized() ?? "") {
@@ -108,9 +111,11 @@ struct WorktimeRow: View {
 							.font(.footnote)
 							.foregroundStyle(.secondary)
 					}
-					Text("\(issue.repository?.fullName ?? "")#\(issue.number ?? 0) · \(entry.created?.toString() ?? "")")
-						.font(.caption)
-						.foregroundStyle(.tertiary)
+					Text(
+						"\(issue.repository?.fullName ?? "")#\(issue.number ?? 0) · \(entry.created?.toString() ?? "")"
+					)
+					.font(.caption)
+					.foregroundStyle(.tertiary)
 				}
 			}
 		}

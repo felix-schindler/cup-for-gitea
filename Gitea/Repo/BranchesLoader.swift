@@ -15,7 +15,8 @@ struct BranchesLoader: View {
 
 	private func load() async {
 		do {
-			state = .loaded(try await Network.shared.client.repoListBranches(path: .init(owner: owner, repo: repo)).ok.body.json)
+			state = .loaded(
+				try await Network.shared.client.repoListBranches(path: .init(owner: owner, repo: repo)).ok.body.json)
 		} catch {
 			state = .failed(error)
 		}

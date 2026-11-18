@@ -22,6 +22,7 @@ public final class GiteaClient: Sendable {
 			"Authorization": "token \(token)"
 		]
 		let session = URLSession(configuration: urlSessionConfig)
-		self.client = Client(serverURL: serverURL, transport: URLSessionTransport(configuration: .init(session: session)))
+		self.client = Client(
+			serverURL: serverURL, transport: URLSessionTransport(configuration: .init(session: session)))
 	}
 }

@@ -148,7 +148,9 @@ struct IssueView: View {
 				}
 
 				if item.data.displayComments != 0 || hasPostedComment {
-					CommentsLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, iid: item.data.displayNumber, refreshID: commentRefreshID)
+					CommentsLoader(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, iid: item.data.displayNumber,
+						refreshID: commentRefreshID)
 				}
 			}
 		}.toolbar {
@@ -259,7 +261,9 @@ struct IssueView: View {
 					AsyncButton("Merge Pull Request", role: .destructive) {
 						await mergePullRequest()
 					}
-					.disabled(mergeConfig.method == .manuallyMerged && mergeConfig.headCommitId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+					.disabled(
+						mergeConfig.method == .manuallyMerged
+							&& mergeConfig.headCommitId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 				}
 			}
 			.navigationTitle("Merge")
@@ -283,7 +287,8 @@ struct IssueView: View {
 		do {
 			let response = try await Network.shared.client.issueEditIssue(
 				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					path: .init(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
 					body: .json(
 						.init(
 							assignee: "", assignees: [], body: issue.body,
@@ -307,7 +312,8 @@ struct IssueView: View {
 		do {
 			let response = try await Network.shared.client.issueEditIssue(
 				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					path: .init(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
 					body: .json(
 						.init(
 							assignee: "", assignees: [], body: issue.body,
@@ -365,7 +371,8 @@ struct IssueView: View {
 		do {
 			let response = try await Network.shared.client.repoMergePullRequest(
 				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					path: .init(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
 					body: .json(
 						.init(
 							deleteBranchAfterMerge: mergeConfig.deleteBranch,
@@ -381,29 +388,41 @@ struct IssueView: View {
 			switch response {
 			case .ok:
 				let pr = try await Network.shared.client.repoGetPullRequest(
-					.init(path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber))
+					.init(
+						path: .init(
+							owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber))
 				).ok.body.json
 				item = .pullRequest(pr)
 				showMergeSheet = false
 				HapticFeedback.notify(.success)
 			case .methodNotAllowed:
-				self.mergeError = NSError(domain: "", code: 405, userInfo: [NSLocalizedDescriptionKey: "Pull request is not mergeable. It may be marked as Work in Progress or have merge conflicts."])
+				self.mergeError = NSError(
+					domain: "", code: 405,
+					userInfo: [
+						NSLocalizedDescriptionKey:
+							"Pull request is not mergeable. It may be marked as Work in Progress or have merge conflicts."
+					])
 				showMergeErrorAlert = true
 				HapticFeedback.notify(.error)
 			case .conflict(let error):
-				self.mergeError = NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Merge conflict"])
+				self.mergeError = NSError(
+					domain: "", code: 409,
+					userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Merge conflict"])
 				showMergeErrorAlert = true
 				HapticFeedback.notify(.error)
 			case .code423:
-				self.mergeError = NSError(domain: "", code: 423, userInfo: [NSLocalizedDescriptionKey: "Repository is archived"])
+				self.mergeError = NSError(
+					domain: "", code: 423, userInfo: [NSLocalizedDescriptionKey: "Repository is archived"])
 				showMergeErrorAlert = true
 				HapticFeedback.notify(.error)
 			case .forbidden(let error):
-				self.mergeError = NSError(domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
+				self.mergeError = NSError(
+					domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
 				showMergeErrorAlert = true
 				HapticFeedback.notify(.error)
 			default:
-				self.mergeError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown error occurred"])
+				self.mergeError = NSError(
+					domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown error occurred"])
 				showMergeErrorAlert = true
 				HapticFeedback.notify(.error)
 			}
@@ -418,7 +437,8 @@ struct IssueView: View {
 		do {
 			let response = try await Network.shared.client.repoUpdatePullRequest(
 				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
+					path: .init(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
 				)
 			)
 
@@ -426,11 +446,14 @@ struct IssueView: View {
 			case .ok:
 				HapticFeedback.notify(.success)
 			case .conflict(let error):
-				self.error = NSError(domain: "", code: 409, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Update conflict"])
+				self.error = NSError(
+					domain: "", code: 409,
+					userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Update conflict"])
 				showErrorAlert = true
 				HapticFeedback.notify(.error)
 			case .forbidden(let error):
-				self.error = NSError(domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
+				self.error = NSError(
+					domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: error.headers.message ?? "Forbidden"])
 				showErrorAlert = true
 				HapticFeedback.notify(.error)
 			default:
@@ -451,7 +474,8 @@ struct IssueView: View {
 			.replacingOccurrences(of: #"^WIP:\s*"#, with: "", options: .regularExpression)
 
 		guard cleanedTitle != pr.title else {
-			self.error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No WIP prefix found in title."])
+			self.error = NSError(
+				domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No WIP prefix found in title."])
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
 			return
@@ -470,7 +494,8 @@ struct IssueView: View {
 	private func markAsWIP() async {
 		guard case .pullRequest(let pr) = item else { return }
 		guard !(pr.title ?? "").hasPrefix("WIP:"), !(pr.title ?? "").hasPrefix("[WIP]") else {
-			self.error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Pull request is already marked as WIP."])
+			self.error = NSError(
+				domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Pull request is already marked as WIP."])
 			showErrorAlert = true
 			HapticFeedback.notify(.error)
 			return
@@ -517,7 +542,8 @@ struct IssueView: View {
 		do {
 			_ = try await Network.shared.client.issueCreateComment(
 				.init(
-					path: .init(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
+					path: .init(
+						owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber),
 					body: .json(.init(body: body))
 				)
 			).created.body.json
@@ -582,7 +608,9 @@ struct IssueView: View {
 						let url = URL(string: pr.htmlUrl ?? "")
 					{
 						NavigationLink(
-							destination: PullRequestLoader(owner: item.data.displayOwner, repo: item.data.displayRepo, index: item.data.displayNumber)
+							destination: PullRequestLoader(
+								owner: item.data.displayOwner, repo: item.data.displayRepo,
+								index: item.data.displayNumber)
 						) {
 							Label(
 								title: {
@@ -649,7 +677,8 @@ struct IssueView: View {
 			if let assets = issue.assets, assets.isNotEmpty {
 				ScrollView(.horizontal, showsIndicators: false) {
 					ForEach(assets, id: \.id) { asset in
-						if let browserDownloadUrl = asset.browserDownloadUrl, let url = URL(string: browserDownloadUrl) {
+						if let browserDownloadUrl = asset.browserDownloadUrl, let url = URL(string: browserDownloadUrl)
+						{
 							Link(asset.name ?? "", destination: url)
 						} else {
 							Text(asset.name ?? "")
@@ -665,7 +694,8 @@ struct IssueView: View {
 	private var details: some View {
 		switch item {
 		case .issue(let issue):
-			commonDetails(assignees: issue.assignees, labels: issue.labels ?? [], milestoneTitle: issue.milestone?.title)
+			commonDetails(
+				assignees: issue.assignees, labels: issue.labels ?? [], milestoneTitle: issue.milestone?.title)
 		case .pullRequest(let pullRequest):
 			commonDetails(
 				assignees: pullRequest.assignees,

@@ -54,7 +54,9 @@ struct NewPullRequestView: View {
 		self.users = await users
 
 		// Set defaults
-		if self.baseBranch.isEmpty, let firstMainOrMaster = self.branches?.first(where: { $0.name == "main" || $0.name == "master" }) {
+		if self.baseBranch.isEmpty,
+			let firstMainOrMaster = self.branches?.first(where: { $0.name == "main" || $0.name == "master" })
+		{
 			self.baseBranch = firstMainOrMaster.name ?? ""
 		}
 	}

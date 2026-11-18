@@ -150,7 +150,8 @@ struct NewRepoView: View {
 				VStack(alignment: .leading) {
 					Picker("Object Format", selection: $objectFormat) {
 						ForEach(Components.Schemas.ObjectFormatName.allCases, id: \.self) { format in
-							Text(format.rawValue.uppercased()).tag(Components.Schemas.CreateRepoOption.ObjectFormatNamePayload(value1: format))
+							Text(format.rawValue.uppercased()).tag(
+								Components.Schemas.CreateRepoOption.ObjectFormatNamePayload(value1: format))
 						}
 					}
 					Text("Object format of the repository. Cannot be changed later. SHA1 is most compatible.")

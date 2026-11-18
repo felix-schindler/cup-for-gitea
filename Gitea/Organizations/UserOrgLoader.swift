@@ -30,9 +30,13 @@ struct UserOrgLoader: View {
 		defer { paging.isLoading = false }
 		(state, paging) = await paging.nextPage(state: state, limit: defaultLimit, reset: reset) { page in
 			if let username {
-				return try await Network.shared.client.orgListUserOrgs(.init(path: .init(username: username), query: .init(page: page, limit: defaultLimit))).ok.body.json
+				return try await Network.shared.client.orgListUserOrgs(
+					.init(path: .init(username: username), query: .init(page: page, limit: defaultLimit))
+				).ok.body.json
 			}
-			return try await Network.shared.client.orgListCurrentUserOrgs(.init(query: .init(page: page, limit: defaultLimit))).ok.body.json
+			return try await Network.shared.client.orgListCurrentUserOrgs(
+				.init(query: .init(page: page, limit: defaultLimit))
+			).ok.body.json
 		}
 	}
 

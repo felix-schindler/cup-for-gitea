@@ -54,16 +54,20 @@ struct CommentsLoader: View {
 								ScrollView(.horizontal, showsIndicators: false) {
 									HStack {
 										ForEach(assets, id: \.id) { a in
-											if let browserUrl = a.browserDownloadUrl, let url = URL(string: browserUrl) {
+											if let browserUrl = a.browserDownloadUrl, let url = URL(string: browserUrl)
+											{
 												Link(
 													destination: url,
 													label: {
-														Label("\(a.name ?? "") (\(ByteFormatter.shared.format(a.size ?? 0)))", systemImage: "square.and.arrow.down")
-															.modifier {
-																if #available(iOS 26.0, *) {
-																	$0.labelIconToTitleSpacing(5)
-																}
+														Label(
+															"\(a.name ?? "") (\(ByteFormatter.shared.format(a.size ?? 0)))",
+															systemImage: "square.and.arrow.down"
+														)
+														.modifier {
+															if #available(iOS 26.0, *) {
+																$0.labelIconToTitleSpacing(5)
 															}
+														}
 													}
 												)
 												.controlSize(.mini)
