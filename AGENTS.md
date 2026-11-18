@@ -4,9 +4,8 @@ SwiftUI iOS app (Gitea client). Single Xcode project `Gitea.xcodeproj`, scheme `
 
 ## Commands
 
-- Format (tabs, lineLength 200, `format.json`): `make format` — runs `swift format -irp --configuration ./format.json ./Gitea`. Run before committing.
-- Build: `xcodebuild -project Gitea.xcodeproj -scheme Gitea -destination 'platform=iOS Simulator,name=iPhone 15 Pro' build` — **iPhone 15 Pro is the only available simulator**; `iPhone 16` does not exist in this sim list and fails.
-- No test target or test suite exists. No lint/typecheck step beyond `swift format`.
+- Format `make fmt`. Run before committing.
+- Build: `make build`
 
 ## API client codegen (critical)
 
