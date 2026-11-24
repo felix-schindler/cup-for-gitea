@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private func visibilityDisplayName(_ v: Components.Schemas.UserVisibility) -> LocalizedStringResource {
+private func visibilityDisplayName(_ v: Components.Schemas.VisibilityString) -> LocalizedStringResource {
 	switch v {
 	case ._public: "Public"
 	case .limited: "Limited"
@@ -19,7 +19,7 @@ struct NewOrgView: View {
 	@Environment(\.dismiss) var dismiss
 
 	@State private var name = ""
-	@State private var visibility = Components.Schemas.UserVisibility._public
+	@State private var visibility = Components.Schemas.VisibilityString._public
 	@State private var adminManagesMembers = true
 
 	@State private var error: Error? = nil
@@ -67,7 +67,7 @@ struct NewOrgView: View {
 				}
 				VStack(alignment: .leading) {
 					Picker("Visibility", selection: $visibility) {
-						ForEach(Components.Schemas.UserVisibility.allCases, id: \.self) { v in
+						ForEach(Components.Schemas.VisibilityString.allCases, id: \.self) { v in
 							Text(visibilityDisplayName(v)).tag(v)
 						}
 					}
